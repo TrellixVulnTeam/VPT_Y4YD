@@ -56,19 +56,19 @@
 hs_err_pid*
 
 #dirs
-/c++/VPT2/.vs/ 
-/c++/VPT2/Debug/
-/c++/VPT2/Client/Debug/
-/c++/VPT2/Common/Debug/
-/c++/VPT2/Server/Debug/
-/c++/VPT2/Client/x64/Debug/
-/c++/VPT2/Common/x64/Debug/
-/c++/VPT2/Server/x64/Debug/
-/c++/VPT2/x64/
+/c++/VPT/.vs/ 
+/c++/VPT/Debug/
+/c++/VPT/Client/Debug/
+/c++/VPT/Common/Debug/
+/c++/VPT/Server/Debug/
+/c++/VPT/Client/x64/Debug/
+/c++/VPT/Common/x64/Debug/
+/c++/VPT/Server/x64/Debug/
+/c++/VPT/x64/
 
-#/java/VPT2/nbproject/private/
-#/java/VPT2/build/
-#/java/VPT2/build.xml
-#/java/VPT2/manifest.mf
-#/java/VPT2/nbproject/
-/java/VPT2/build/
+#/java/VPT/nbproject/private/
+#/java/VPT/build/
+#/java/VPT/build.xml
+#/java/VPT/manifest.mf
+#/java/VPT/nbproject/
+/java/VPT/build/
