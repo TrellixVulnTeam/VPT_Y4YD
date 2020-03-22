@@ -14,7 +14,11 @@ namespace ThreadManager {
 		unsigned int GetPortThreadCount();
 		void jointhreads();
 		void detachthreads();
+		void closeport(unsigned int port_number);
+		void openport(unsigned int port_number, void(*port_thread)(int port));
+		vector <thread> GetPortThreads();
 	private:
 		vector <thread> port_threads;
+		unsigned int number_of_threads;
 	};
 }
