@@ -72,3 +72,4 @@ hs_err_pid*
 #/java/VPT/manifest.mf
 #/java/VPT/nbproject/
 /java/VPT/build/
+/java/VPT/dist/
