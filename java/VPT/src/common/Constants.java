@@ -5,10 +5,19 @@ public final class Constants {
     public static enum Branch {
         DEV(-1), ALPHA(0), BETA(1), RELEASE(2);
         
-        public final int branchId;
+        public final int id;
 
-        private Branch(int branchId) {
-            this.branchId = branchId;
+        private Branch(int id) {
+            this.id = id;
+        }
+
+        public static Branch fromId(int id) {
+            for(Branch branch: values()) {
+                if(branch.id == id) {
+                    return branch;
+                }
+            }
+            return null;
         }
     }
     
