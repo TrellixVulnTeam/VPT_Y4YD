@@ -1,5 +1,6 @@
 package common.networking;
 
+import common.Constants;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -25,8 +26,8 @@ public class AESServerConnection extends JNINetworkInterface {
             tCipher.init(Cipher.DECRYPT_MODE, cert);
             try(ObjectInputStream tois = new ObjectInputStream(new CipherInputStream(is, tCipher)); ObjectOutputStream toos = new ObjectOutputStream(os)) {
                 toos.writeObject(cert);
-                eCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                dCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                eCipher = Cipher.getInstance(Constants.ENCRYPTION_MODE);
+                dCipher = Cipher.getInstance(Constants.ENCRYPTION_MODE);
                 SecretKey key = (SecretKey)tois.readObject();
                 dCipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec((byte[])tois.readObject()));
                 eCipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec((byte[])tois.readObject()));

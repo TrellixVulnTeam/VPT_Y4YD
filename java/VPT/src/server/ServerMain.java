@@ -1,9 +1,10 @@
 package server;
 
+import common.Constants;
 import common.networking.AESServer;
 import common.networking.AESServerConnection;
-import common.networking.AESSocket;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 public final class ServerMain {
     
@@ -11,13 +12,14 @@ public final class ServerMain {
         try {
             AESServer server = new AESServer(null);
             while(true) {
-                AESServerConnection connection = server.accept();
-                if(connection.isConnected() && !connection.isClosed()) {
-                    AESSocket socket = new AESSocket(connection);
-                    socket.getOutputStream().writeDouble(ServerConstants.MIN_SUPPORTED_CLIENT_VERSION);
-                    socket.getOutputStream().writeDouble(ServerConstants.MAX_SUPPORTED_CLIENT_VERSION);
-                    socket.getOutputStream().writeInt(ServerConstants.BRANCH.id);
-                    new ConnectionHandler(socket).handleConnection();
+                try {
+                    AESServerConnection connection = server.accept();
+                    if(connection.isConnected() && !connection.isClosed()) {
+                        new ConnectionHandler(connection).handleConnection();
+                    }
+                } catch(IOException | NoSuchAlgorithmException e) {
+                    if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id)
+                        e.printStackTrace(System.err);
                 }
             }
         } catch(IOException e) {

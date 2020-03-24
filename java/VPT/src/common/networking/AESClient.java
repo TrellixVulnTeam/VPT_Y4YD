@@ -1,5 +1,6 @@
 package common.networking;
 
+import common.Constants;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -25,8 +26,8 @@ public class AESClient extends JNINetworkInterface {
         try(ObjectInputStream tois = new ObjectInputStream(is)) {
             serverCert = (X509Certificate)tois.readObject();
             //AUTHENTICATE CERT
-            eCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            dCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            eCipher = Cipher.getInstance(Constants.ENCRYPTION_MODE);
+            dCipher = Cipher.getInstance(Constants.ENCRYPTION_MODE);
             SecretKey key = KeyGenerator.getInstance("AES").generateKey();
             eCipher.init(Cipher.ENCRYPT_MODE, key);
             dCipher.init(Cipher.DECRYPT_MODE, key);
