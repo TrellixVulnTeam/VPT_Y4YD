@@ -3,10 +3,14 @@ package server;
 import common.Constants;
 import common.networking.AESServerConnection;
 import common.networking.packet.Packet;
+import common.networking.packet.PacketId;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
+import common.networking.packet.packets.LoginPacket;
+import common.networking.packet.packets.LoginResultPacket;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import server.user.LoginService;
 
 public class ConnectionHandler {
     
@@ -37,7 +41,11 @@ public class ConnectionHandler {
         while(!connection.isClosed()) {
             try {
                 Packet p = pis.readPacket();
-                //Proccess Packet
+                if(p.id == PacketId.LOGIN.id) {
+                    LoginPacket loginPacket = (LoginPacket)p;
+                    pos.writePacket(new LoginResultPacket(LoginService.login(loginPacket.userId, loginPacket.password)));
+                }
+            } catch(ClassCastException e) {
             } catch(ClassNotFoundException | IOException e) {
                 if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
                     e.printStackTrace();
