@@ -1,4 +1,4 @@
-package server;
+package server.serialization;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
+import server.ServerConstants;
 
 public final class BackupSerialization {
     
