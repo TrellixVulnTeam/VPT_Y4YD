@@ -33,6 +33,7 @@ public class PacketOutputStream extends FilterOutputStream {
             oos.writeObject(packet);
             digester.on(false);
             oos.writeObject(digester.getMessageDigest().digest());
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -42,6 +43,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeObject(obj);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -51,6 +53,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeDouble(d);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -60,6 +63,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeByte(b);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -69,6 +73,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeBoolean(b);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -78,6 +83,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeInt(i);
+            oos.flush();
         } finally {
             digester.on(true);
         }
