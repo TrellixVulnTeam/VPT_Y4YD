@@ -27,8 +27,8 @@ public final class BackupSerialization {
             activeFiles.add(fileName);
         }
         
-        File file = new File(ServerConstants.SERVER_DIR + fileName);
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
+        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
+        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName.replaceAll("/", File.separator) + ".bkup");
         bkupFile.createNewFile();
         Files.copy(file.toPath(), bkupFile.toPath());
         try(ObjectOutputStream os = osFunction.apply(file)) {
@@ -44,8 +44,8 @@ public final class BackupSerialization {
     }
     
     public static synchronized void restore(String fileName) throws FileNotFoundException, IOException {
-        File file = new File(ServerConstants.SERVER_DIR + fileName);
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
+        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
+        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName.replaceAll("/", File.separator) + ".bkup");
         if(!bkupFile.exists()) {
             throw new FileNotFoundException("File: " + bkupFile.getAbsolutePath() + " does not exist");
         }
