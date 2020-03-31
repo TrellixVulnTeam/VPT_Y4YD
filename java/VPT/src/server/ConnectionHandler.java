@@ -8,6 +8,7 @@ import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.LoginPacket;
 import common.networking.packet.packets.LoginResultPacket;
+import common.networking.packet.packets.ServerErrorResult;
 import java.io.IOException;
 import server.user.LoginService;
 
@@ -48,6 +49,13 @@ public class ConnectionHandler {
             } catch(ClassNotFoundException | IOException e) {
                 if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
                     e.printStackTrace(System.err);
+                }
+                try {
+                    pos.writePacket(new ServerErrorResult());
+                } catch(IOException exc) {
+                    if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
+                        exc.printStackTrace(System.err);
+                    }
                 }
             }
         }
