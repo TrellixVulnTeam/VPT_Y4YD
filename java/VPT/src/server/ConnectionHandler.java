@@ -9,7 +9,6 @@ import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.LoginPacket;
 import common.networking.packet.packets.LoginResultPacket;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import server.user.LoginService;
 
 public class ConnectionHandler {
@@ -19,7 +18,7 @@ public class ConnectionHandler {
     private final PacketOutputStream pos;
     private volatile boolean isRunning;
 
-    public ConnectionHandler(AESServerConnection connection) throws IOException, NoSuchAlgorithmException {
+    public ConnectionHandler(AESServerConnection connection) throws IOException {
         this.connection = connection;
         pis = new PacketInputStream(connection.getInputStream());
         pos = new PacketOutputStream(connection.getOutputStream());
@@ -48,7 +47,7 @@ public class ConnectionHandler {
             } catch(ClassCastException e) {
             } catch(ClassNotFoundException | IOException e) {
                 if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
-                    e.printStackTrace();
+                    e.printStackTrace(System.err);
                 }
             }
         }

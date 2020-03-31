@@ -1,6 +1,6 @@
 package server.serialization;
 
-import common.Constants;
+import common.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,11 +8,9 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
@@ -23,7 +21,7 @@ public final class MacSerialization {
     private static final ArrayList<String> activeFiles = new ArrayList<>();
     private static final HashMap<String, Object> locks = new HashMap<>();
     
-    public static void serialize(Object o, String fileName, Function<File, OutputStream> osFunction) throws IOException, NoSuchAlgorithmException {
+    public static void serialize(Object o, String fileName, Function<File, OutputStream> osFunction) throws IOException {
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -37,7 +35,7 @@ public final class MacSerialization {
         }
         
         File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
-        DigestOutputStream digester = new DigestOutputStream(osFunction.apply(file), MessageDigest.getInstance(Constants.HASH_MODE));
+        DigestOutputStream digester = new DigestOutputStream(osFunction.apply(file), Utils.createMD());
         try(ObjectOutputStream os = new ObjectOutputStream(digester)) {
             os.writeObject(o);
             digester.on(false);
@@ -50,7 +48,7 @@ public final class MacSerialization {
         }
     }
     
-    public static Object deserialize(String fileName, Function<File, InputStream> isFunction) throws ClassNotFoundException, InvalidObjectException, IOException, NoSuchAlgorithmException {
+    public static Object deserialize(String fileName, Function<File, InputStream> isFunction) throws ClassNotFoundException, InvalidObjectException, IOException {
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -64,7 +62,7 @@ public final class MacSerialization {
         }
         Object output;
         File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
-        DigestInputStream digester = new DigestInputStream(isFunction.apply(file), MessageDigest.getInstance(Constants.HASH_MODE));
+        DigestInputStream digester = new DigestInputStream(isFunction.apply(file), Utils.createMD());
         try(ObjectInputStream is = new ObjectInputStream(digester)) {
             output = is.readObject();
             digester.on(false);

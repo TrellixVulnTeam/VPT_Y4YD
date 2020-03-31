@@ -5,7 +5,6 @@ import common.networking.AESServer;
 import common.networking.AESServerConnection;
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 public final class ServerMain {
     
@@ -19,7 +18,7 @@ public final class ServerMain {
                     if(connection.isConnected() && !connection.isClosed()) {
                         new ConnectionHandler(connection).handleConnection();
                     }
-                } catch(IOException | NoSuchAlgorithmException e) {
+                } catch(IOException e) {
                     if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id)
                         e.printStackTrace(System.err);
                 }

@@ -1,21 +1,20 @@
 package common.networking.packet;
 
-import common.Constants;
+import common.Utils;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class PacketInputStream extends FilterInputStream {
     
     protected final ObjectInputStream ois;
     protected final DigestInputStream digester;
     
-    public PacketInputStream(InputStream is) throws IOException, NoSuchAlgorithmException {
-        this(new DigestInputStream(is, MessageDigest.getInstance(Constants.HASH_MODE)));
+    public PacketInputStream(InputStream is) throws IOException {
+        this(new DigestInputStream(is, Utils.createMD()));
     }
     
     private PacketInputStream(DigestInputStream digester) throws IOException {

@@ -1,9 +1,9 @@
 package server.serialization;
 
 import common.Constants;
+import common.Utils;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import server.ServerConstants;
@@ -23,7 +22,7 @@ public final class DefaultSerialization {
     private static final ArrayList<String> activeFiles = new ArrayList<>();
     private static final HashMap<String, Object> locks = new HashMap<>();
     
-    public static void serialize(Object o, String fileName) throws IOException, NoSuchAlgorithmException {
+    public static void serialize(Object o, String fileName) throws IOException {
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -40,7 +39,7 @@ public final class DefaultSerialization {
         File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName.replaceAll("/", File.separator) + ".bkup");
         bkupFile.createNewFile();
         Files.copy(file.toPath(), bkupFile.toPath());
-        DigestOutputStream digester = new DigestOutputStream(new FileOutputStream(file), MessageDigest.getInstance(Constants.HASH_MODE));
+        DigestOutputStream digester = new DigestOutputStream(new FileOutputStream(file), Utils.createMD());
         try(ObjectOutputStream os = new ObjectOutputStream(digester)) {
             os.writeObject(o);
             digester.on(false);
@@ -55,7 +54,7 @@ public final class DefaultSerialization {
         
     }
     
-    public static Object deserialize(String fileName) throws ClassNotFoundException, InvalidObjectException, IOException, NoSuchAlgorithmException {
+    public static Object deserialize(String fileName) throws ClassNotFoundException, InvalidObjectException, IOException {
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -69,7 +68,7 @@ public final class DefaultSerialization {
         }
         Object output;
         File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
-        DigestInputStream digester = new DigestInputStream(new FileInputStream(file), MessageDigest.getInstance(Constants.HASH_MODE));
+        DigestInputStream digester = new DigestInputStream(new FileInputStream(file), Utils.createMD());
         try(ObjectInputStream is = new ObjectInputStream(digester)) {
             output = is.readObject();
             digester.on(false);
