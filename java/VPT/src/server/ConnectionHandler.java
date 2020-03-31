@@ -6,17 +6,21 @@ import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
+import common.networking.packet.packets.ForceLogoutPacket;
 import common.networking.packet.packets.LoginPacket;
 import common.networking.packet.packets.LoginResultPacket;
 import common.networking.packet.packets.ServerErrorResult;
 import java.io.IOException;
 import server.user.LoginService;
+import server.user.User;
+import server.user.UserStore;
 
 public class ConnectionHandler {
     
     private final AESServerConnection connection;
     private final PacketInputStream pis;
     private final PacketOutputStream pos;
+    private Runnable onUserDeletion;
     private volatile boolean isRunning;
 
     public ConnectionHandler(AESServerConnection connection) throws IOException {
@@ -38,12 +42,20 @@ public class ConnectionHandler {
     }
     
     private void doHandleConnection() {
+        onUserDeletion = this::onUserDeletion;
         while(!connection.isClosed()) {
             try {
                 Packet p = pis.readPacket();
                 if(p.id == PacketId.LOGIN.id) {
+                    User currentUser = LoginService.getCurrentUser();
+                    if(currentUser != null) {
+                        LoginService.logout();
+                        UserStore.unsubscribeFromDeletionEvents(currentUser.userID, onUserDeletion);
+                    }
                     LoginPacket loginPacket = (LoginPacket)p;
-                    pos.writePacket(new LoginResultPacket(LoginService.login(loginPacket.userId, loginPacket.password)));
+                    boolean result = LoginService.login(loginPacket.userId, loginPacket.password);
+                    UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
+                    pos.writePacket(new LoginResultPacket(result));
                 }
             } catch(ClassCastException e) {
             } catch(ClassNotFoundException | IOException e) {
@@ -56,6 +68,18 @@ public class ConnectionHandler {
                     if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
                         exc.printStackTrace(System.err);
                     }
+                }
+            }
+        }
+    }
+    
+    private void onUserDeletion() {
+        if(!connection.isClosed()) {
+            try {
+                pos.writePacket(new ForceLogoutPacket());
+            } catch(IOException e) {
+                if (ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
+                    e.printStackTrace(System.err);
                 }
             }
         }

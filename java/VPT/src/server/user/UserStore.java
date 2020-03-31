@@ -17,6 +17,8 @@ public final class UserStore {
     private static final ReentrantReadWriteLock userLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
     private static final ConcurrentHashMap<String, ArrayList<UserAttribute>> publicAttributes = new ConcurrentHashMap<>();
     private static final ReentrantReadWriteLock attributeLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    private static final ConcurrentHashMap<String, ArrayList<Runnable>> deletionSubscribers = new ConcurrentHashMap();
+    private static final ReentrantReadWriteLock deletionSubscribersLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
     
     public static NetPublicUser getPublicUser(String userId) {
         return getUserInternal(userId).toNetPublicUser();
@@ -65,6 +67,41 @@ public final class UserStore {
             }
         } finally {
             userLock.readLock().unlock();
+        }
+    }
+    
+    public static void subscribeToDeletionEvents(String userId, Runnable onUserDeletion) throws IllegalArgumentException {
+        deletionSubscribersLock.readLock().lock();
+        try {
+            if(getUserInternal(userId) == null) {
+                throw new IllegalArgumentException("User: " + userId + " does not exist");
+            }
+            synchronized(deletionSubscribers) {
+                if(deletionSubscribers.containsKey(userId)) {
+                    deletionSubscribers.put(userId, new ArrayList<>());
+                }
+            }
+            synchronized(deletionSubscribers.get(userId)) {
+                deletionSubscribers.get(userId).add(onUserDeletion);
+            }
+        } finally {
+            deletionSubscribersLock.readLock().unlock();
+        }
+    }
+    
+    public static void unsubscribeFromDeletionEvents(String userId, Runnable callback) {
+        deletionSubscribersLock.readLock().lock();
+        try {
+            synchronized(deletionSubscribers) {
+                if(deletionSubscribers.containsKey(userId)) {
+                    deletionSubscribers.put(userId, new ArrayList<>());
+                }
+            }
+            synchronized(deletionSubscribers.get(userId)) {
+                deletionSubscribers.get(userId).remove(callback);
+            }
+        } finally {
+            deletionSubscribersLock.readLock().unlock();
         }
     }
     

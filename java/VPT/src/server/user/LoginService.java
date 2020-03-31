@@ -39,17 +39,35 @@ public final class LoginService {
     private static final class Session {
         
         private User user;
+        private Runnable onUserDeletion = null;
 
         private Session() {
             user = null;
         }
         
-        private void setUser(User user) {
+        private synchronized void setUser(User user) {
+            if(onUserDeletion == null) {
+                onUserDeletion = this::onUserDeletion;
+            }
+            if(this.user != null) {
+                UserStore.unsubscribeFromDeletionEvents(this.user.userID, onUserDeletion);
+            }
             this.user = user;
+            if(user != null) {
+                try {
+                    UserStore.subscribeToDeletionEvents(user.userID, onUserDeletion);
+                } catch(IllegalArgumentException e) {
+                    this.user = null;
+                }
+            }
         }
         
-        private User getUser() {
+        private synchronized User getUser() {
             return user;
+        }
+        
+        private void onUserDeletion() {
+            this.user = null;
         }
         
     }
