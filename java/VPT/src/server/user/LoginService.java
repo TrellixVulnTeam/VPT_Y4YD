@@ -1,13 +1,15 @@
 package server.user;
 
-import java.io.File;
-import server.ServerConstants;
-
 public final class LoginService {
     
     private static final ThreadLocal<Session> session = ThreadLocal.withInitial(() -> new Session());
     
     public static boolean login(String userId, byte[] password) {
+        User user = UserStore.login(userId, password);
+        if(user != null) {
+            session.get().setUser(user);
+            return true;
+        }
         return false;
     }
     
@@ -18,6 +20,21 @@ public final class LoginService {
     public static User getCurrentUser() {
         return session.get().getUser();
     }
+    
+    public static void checkAccess() throws SecurityException {
+        if(getCurrentUser() != null && getCurrentUser().isAdmin()) {
+            return;
+        }
+        throw new SecurityException("Invalid Permissions");
+    }
+    
+    public static void checkAccess(User user) throws SecurityException {
+        if(getCurrentUser() == user) {
+            return;
+        }
+        checkAccess();
+    }
+    
     
     private static final class Session {
         
