@@ -60,7 +60,7 @@ public class ConnectionHandler {
                         pos.writePacket(new LoginResultPacket(result));
                     }
                 } catch(SecurityException e) {
-                    pos.writePacket(new IllegalAccessPacket());
+                    pos.writePacket(new IllegalAccessPacket(e.getMessage()));
                 }
             } catch(ClassCastException e) {
             } catch(ClassNotFoundException | IOException e) {

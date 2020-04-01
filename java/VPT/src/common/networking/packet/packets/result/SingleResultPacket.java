@@ -4,12 +4,12 @@ public class SingleResultPacket<T> extends ResultPacket {
     
     public final T result;
 
-    public SingleResultPacket(T result, ResultType resultType) {
-        this(result, resultType.id);
+    public SingleResultPacket(ResultType resultType, boolean wasActionSuccessful, String msg, T result) {
+        this(resultType.id, wasActionSuccessful, msg, result);
     }
 
-    public SingleResultPacket(T result, int resultType) {
-        super(resultType);
+    public SingleResultPacket(int resultType, boolean wasActionSuccessful, String msg, T result) {
+        super(resultType, wasActionSuccessful, msg);
         this.result = result;
     }
     

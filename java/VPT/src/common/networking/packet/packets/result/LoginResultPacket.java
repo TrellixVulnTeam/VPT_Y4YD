@@ -1,9 +1,9 @@
 package common.networking.packet.packets.result;
 
-public class LoginResultPacket extends SingleResultPacket<Boolean> {
+public class LoginResultPacket extends ResultPacket {
 
     public LoginResultPacket(boolean result) {
-        super(result, ResultType.LOGIN);
+        super(ResultType.LOGIN, result, result ? null : "Invalid Login");
     }
     
 }
