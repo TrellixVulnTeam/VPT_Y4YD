@@ -30,6 +30,7 @@ public final class BackupSerialization {
         }
         
         File file = new File(ServerConstants.SERVER_DIR + fileName);
+        file.createNewFile();
         File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
         bkupFile.createNewFile();
         Files.copy(file.toPath(), bkupFile.toPath());

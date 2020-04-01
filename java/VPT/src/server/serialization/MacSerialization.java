@@ -36,6 +36,7 @@ public final class MacSerialization {
         }
         
         File file = new File(ServerConstants.SERVER_DIR + fileName);
+        file.createNewFile();
         DigestOutputStream digester = new DigestOutputStream(osFunction.apply(file), Utils.createMD());
         try(ObjectOutputStream os = new ObjectOutputStream(digester)) {
             os.writeObject(o);
