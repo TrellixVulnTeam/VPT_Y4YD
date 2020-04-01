@@ -1,4 +1,4 @@
-package common.networking.packet.packets;
+package common.networking.packet.packets.result;
 
 public enum ResultType {
     

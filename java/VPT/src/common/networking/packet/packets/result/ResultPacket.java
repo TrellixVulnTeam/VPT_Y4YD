@@ -1,4 +1,4 @@
-package common.networking.packet.packets;
+package common.networking.packet.packets.result;
 
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
