@@ -77,7 +77,7 @@ public final class UserStore {
                 throw new IllegalArgumentException("User: " + userId + " does not exist");
             }
             synchronized(deletionSubscribers) {
-                if(deletionSubscribers.containsKey(userId)) {
+                if(!deletionSubscribers.containsKey(userId)) {
                     deletionSubscribers.put(userId, new ArrayList<>());
                 }
             }
@@ -93,8 +93,8 @@ public final class UserStore {
         deletionSubscribersLock.readLock().lock();
         try {
             synchronized(deletionSubscribers) {
-                if(deletionSubscribers.containsKey(userId)) {
-                    deletionSubscribers.put(userId, new ArrayList<>());
+                if(!deletionSubscribers.containsKey(userId)) {
+                    return;
                 }
             }
             synchronized(deletionSubscribers.get(userId)) {
