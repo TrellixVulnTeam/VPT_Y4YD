@@ -7,6 +7,7 @@ import common.networking.packet.PacketId;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.ForceLogoutPacket;
+import common.networking.packet.packets.IllegalAccessPacket;
 import common.networking.packet.packets.LoginPacket;
 import common.networking.packet.packets.LoginResultPacket;
 import common.networking.packet.packets.ServerErrorResult;
@@ -45,17 +46,21 @@ public class ConnectionHandler {
         onUserDeletion = this::onUserDeletion;
         while(!connection.isClosed()) {
             try {
-                Packet p = pis.readPacket();
-                if(p.id == PacketId.LOGIN.id) {
-                    User currentUser = LoginService.getCurrentUser();
-                    if(currentUser != null) {
-                        LoginService.logout();
-                        UserStore.unsubscribeFromDeletionEvents(currentUser.userID, onUserDeletion);
+                try {
+                    Packet p = pis.readPacket();
+                    if(p.id == PacketId.LOGIN.id) {
+                        User currentUser = LoginService.getCurrentUser();
+                        if(currentUser != null) {
+                            LoginService.logout();
+                            UserStore.unsubscribeFromDeletionEvents(currentUser.userID, onUserDeletion);
+                        }
+                        LoginPacket loginPacket = (LoginPacket)p;
+                        boolean result = LoginService.login(loginPacket.userId, loginPacket.password);
+                        UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
+                        pos.writePacket(new LoginResultPacket(result));
                     }
-                    LoginPacket loginPacket = (LoginPacket)p;
-                    boolean result = LoginService.login(loginPacket.userId, loginPacket.password);
-                    UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
-                    pos.writePacket(new LoginResultPacket(result));
+                } catch(SecurityException e) {
+                    pos.writePacket(new IllegalAccessPacket());
                 }
             } catch(ClassCastException e) {
             } catch(ClassNotFoundException | IOException e) {
