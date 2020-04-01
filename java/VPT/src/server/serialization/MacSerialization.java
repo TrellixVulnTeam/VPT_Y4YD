@@ -22,6 +22,7 @@ public final class MacSerialization {
     private static final HashMap<String, Object> locks = new HashMap<>();
     
     public static void serialize(Object o, String fileName, Function<File, OutputStream> osFunction) throws IOException {
+        fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -34,7 +35,7 @@ public final class MacSerialization {
             activeFiles.add(fileName);
         }
         
-        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
+        File file = new File(ServerConstants.SERVER_DIR + fileName);
         DigestOutputStream digester = new DigestOutputStream(osFunction.apply(file), Utils.createMD());
         try(ObjectOutputStream os = new ObjectOutputStream(digester)) {
             os.writeObject(o);
@@ -49,6 +50,7 @@ public final class MacSerialization {
     }
     
     public static Object deserialize(String fileName, Function<File, InputStream> isFunction) throws ClassNotFoundException, InvalidObjectException, IOException {
+        fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -61,7 +63,7 @@ public final class MacSerialization {
             activeFiles.add(fileName);
         }
         Object output;
-        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
+        File file = new File(ServerConstants.SERVER_DIR + fileName);
         DigestInputStream digester = new DigestInputStream(isFunction.apply(file), Utils.createMD());
         try(ObjectInputStream is = new ObjectInputStream(digester)) {
             output = is.readObject();

@@ -16,6 +16,7 @@ public final class BackupSerialization {
     private static final HashMap<String, Object> locks = new HashMap<>();
     
     public static void backupAndSerialize(Object o, String fileName, Function<File, ObjectOutputStream> osFunction) throws IOException {
+        fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -28,8 +29,8 @@ public final class BackupSerialization {
             activeFiles.add(fileName);
         }
         
-        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName.replaceAll("/", File.separator) + ".bkup");
+        File file = new File(ServerConstants.SERVER_DIR + fileName);
+        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
         bkupFile.createNewFile();
         Files.copy(file.toPath(), bkupFile.toPath());
         try(ObjectOutputStream os = osFunction.apply(file)) {
@@ -45,8 +46,9 @@ public final class BackupSerialization {
     }
     
     public static synchronized void restore(String fileName) throws FileNotFoundException, IOException {
-        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName.replaceAll("/", File.separator) + ".bkup");
+        fileName = fileName.replaceAll("/", File.separator);
+        File file = new File(ServerConstants.SERVER_DIR + fileName);
+        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
         if(!bkupFile.exists()) {
             throw new FileNotFoundException("File: " + bkupFile.getAbsolutePath() + " does not exist");
         }

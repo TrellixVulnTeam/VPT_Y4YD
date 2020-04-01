@@ -23,6 +23,7 @@ public final class DefaultSerialization {
     private static final HashMap<String, Object> locks = new HashMap<>();
     
     public static void serialize(Object o, String fileName) throws IOException {
+        fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -35,8 +36,8 @@ public final class DefaultSerialization {
             activeFiles.add(fileName);
         }
         
-        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName.replaceAll("/", File.separator) + ".bkup");
+        File file = new File(ServerConstants.SERVER_DIR + fileName);
+        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
         bkupFile.createNewFile();
         Files.copy(file.toPath(), bkupFile.toPath());
         DigestOutputStream digester = new DigestOutputStream(new FileOutputStream(file), Utils.createMD());
@@ -55,6 +56,7 @@ public final class DefaultSerialization {
     }
     
     public static Object deserialize(String fileName) throws ClassNotFoundException, InvalidObjectException, IOException {
+        fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -67,7 +69,7 @@ public final class DefaultSerialization {
             activeFiles.add(fileName);
         }
         Object output;
-        File file = new File(ServerConstants.SERVER_DIR + fileName.replaceAll("/", File.separator));
+        File file = new File(ServerConstants.SERVER_DIR);
         DigestInputStream digester = new DigestInputStream(new FileInputStream(file), Utils.createMD());
         try(ObjectInputStream is = new ObjectInputStream(digester)) {
             output = is.readObject();
