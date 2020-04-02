@@ -2,7 +2,7 @@ package common.networking.packet.packets.result;
 
 public enum ResultType {
     
-    NULL(-1), SERVER_ERROR(0), ILLEGAL_ACCESS(1), INVALID_REQUEST(2), LOGIN(3);
+    NULL(-1), SERVER_ERROR(0), ILLEGAL_ACCESS(1), INVALID_REQUEST(2), LOGIN(3), CREATE_USER(4);
     
     public final int id;
 
