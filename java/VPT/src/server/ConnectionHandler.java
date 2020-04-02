@@ -2,19 +2,11 @@ package server;
 
 import common.Constants;
 import common.networking.AESServerConnection;
-import common.networking.packet.Packet;
-import common.networking.packet.PacketId;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.ForceLogoutPacket;
-import common.networking.packet.packets.result.IllegalAccessPacket;
-import common.networking.packet.packets.LoginPacket;
-import common.networking.packet.packets.result.LoginResultPacket;
-import common.networking.packet.packets.result.ServerErrorResult;
+import common.networking.packet.packets.result.ErrorResultPacket;
 import java.io.IOException;
-import server.user.LoginService;
-import server.user.User;
-import server.user.UserStore;
 
 public class ConnectionHandler {
     
@@ -46,29 +38,14 @@ public class ConnectionHandler {
         onUserDeletion = this::onUserDeletion;
         while(!connection.isClosed()) {
             try {
-                try {
-                    Packet p = pis.readPacket();
-                    if(p.id == PacketId.LOGIN.id) {
-                        User currentUser = LoginService.getCurrentUser();
-                        if(currentUser != null) {
-                            LoginService.logout();
-                            UserStore.unsubscribeFromDeletionEvents(currentUser.userID, onUserDeletion);
-                        }
-                        LoginPacket loginPacket = (LoginPacket)p;
-                        boolean result = LoginService.login(loginPacket.userId, loginPacket.password);
-                        UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
-                        pos.writePacket(new LoginResultPacket(result));
-                    }
-                } catch(SecurityException e) {
-                    pos.writePacket(new IllegalAccessPacket(e.getMessage()));
-                }
+                pos.writePacket(PacketHandler.process(pis.readPacket(), onUserDeletion));
             } catch(ClassCastException e) {
             } catch(ClassNotFoundException | IOException e) {
                 if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
                     e.printStackTrace(System.err);
                 }
                 try {
-                    pos.writePacket(new ServerErrorResult());
+                    pos.writePacket(ErrorResultPacket.SERVER_ERROR);
                 } catch(IOException exc) {
                     if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
                         exc.printStackTrace(System.err);
