@@ -119,11 +119,11 @@ public final class UserStore {
         LoginService.checkAccess();
         userLock.writeLock().lock();
         try {
-            if(checkUserIdExistance(user.userID)) {
+            if(checkUserIdExistance(user.userId)) {
                 throw new IllegalArgumentException("User Already Exists");
             }
-            DefaultSerialization.serialize(user, "Users/" + Utils.hash(user.userID) + ".usr");
-            users.put(user.userID, new WeakReference<>(user));
+            DefaultSerialization.serialize(user, "Users/" + Utils.hash(user.userId) + ".usr");
+            users.put(user.userId, new WeakReference<>(user));
         } finally {
             userLock.writeLock().unlock();
         }

@@ -20,7 +20,7 @@ public final class PacketHandler {
                 User currentUser = LoginService.getCurrentUser();
                 if(currentUser != null) {
                     LoginService.logout();
-                    UserStore.unsubscribeFromDeletionEvents(currentUser.userID, onUserDeletion);
+                    UserStore.unsubscribeFromDeletionEvents(currentUser.userId, onUserDeletion);
                 }
                 LoginPacket loginPacket = (LoginPacket)p;
                 boolean result = LoginService.login(loginPacket.userId, loginPacket.password);

@@ -50,12 +50,12 @@ public final class LoginService {
                 onUserDeletion = this::onUserDeletion;
             }
             if(this.user != null) {
-                UserStore.unsubscribeFromDeletionEvents(this.user.userID, onUserDeletion);
+                UserStore.unsubscribeFromDeletionEvents(this.user.userId, onUserDeletion);
             }
             this.user = user;
             if(user != null) {
                 try {
-                    UserStore.subscribeToDeletionEvents(user.userID, onUserDeletion);
+                    UserStore.subscribeToDeletionEvents(user.userId, onUserDeletion);
                 } catch(IllegalArgumentException e) {
                     this.user = null;
                 }

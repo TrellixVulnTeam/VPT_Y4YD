@@ -8,15 +8,15 @@ public class NetPublicUser implements Serializable {
     
     private static final long serialVersionUID = 3943087653729020969L;
 
-    public final String userID;
+    public final String userId;
     private final Collection<NetUserAttribute> attributes;
 
-    public NetPublicUser(String userID) {
-        this(userID, new ArrayList<>());
+    public NetPublicUser(String userId) {
+        this(userId, new ArrayList<>());
     }
 
-    public NetPublicUser(String userID, Collection<NetUserAttribute> attributes) {
-        this.userID = userID;
+    public NetPublicUser(String userId, Collection<NetUserAttribute> attributes) {
+        this.userId = userId;
         this.attributes = attributes;
     }
     
