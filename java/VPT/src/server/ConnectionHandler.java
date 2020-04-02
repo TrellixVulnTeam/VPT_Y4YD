@@ -39,7 +39,6 @@ public class ConnectionHandler {
         while(!connection.isClosed()) {
             try {
                 pos.writePacket(PacketHandler.process(pis.readPacket(), onUserDeletion));
-            } catch(ClassCastException e) {
             } catch(ClassNotFoundException | IOException e) {
                 if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
                     e.printStackTrace(System.err);

@@ -39,18 +39,19 @@ public final class UserStore {
         userLock.readLock().lock();
         try {
             if(!users.containsKey(userId) || users.get(userId).get() == null) {
+                if(!checkUserIdExistance(userId)) {
+                    return null;
+                }
                 userLock.readLock().unlock();
                 userLock.writeLock().lock();
                 userLock.readLock().lock();
                 try {
-                    String fileName = "Users" + File.separator + Utils.hash(userId) + ".usr";
-                    File userFile = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
-                    if(!userFile.exists()) {
+                    if(!checkUserIdExistance(userId)) {
                         return null;
                     }
                     User user;
                     try {
-                        user = (User)DefaultSerialization.deserialize(fileName);
+                        user = (User)DefaultSerialization.deserialize("Users/" + Utils.hash(userId) + ".usr");
                     } catch(ClassCastException | ClassNotFoundException | IOException e) {
                         return null;
                     }
@@ -102,6 +103,29 @@ public final class UserStore {
             }
         } finally {
             deletionSubscribersLock.readLock().unlock();
+        }
+    }
+    
+    public static boolean checkUserIdExistance(String userId) {
+        userLock.readLock().lock();
+        try {
+            return new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + Utils.hash(userId) + ".usr").exists();
+        } finally {
+            userLock.readLock().unlock();
+        }
+    }
+    
+    public static void createUser(User user) throws IllegalArgumentException, IOException, SecurityException {
+        LoginService.checkAccess();
+        userLock.writeLock().lock();
+        try {
+            if(checkUserIdExistance(user.userID)) {
+                throw new IllegalArgumentException("User Already Exists");
+            }
+            DefaultSerialization.serialize(user, "Users/" + Utils.hash(user.userID) + ".usr");
+            users.put(user.userID, new WeakReference<>(user));
+        } finally {
+            userLock.writeLock().unlock();
         }
     }
     
