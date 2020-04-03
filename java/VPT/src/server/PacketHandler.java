@@ -3,6 +3,7 @@ package server;
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
 import common.networking.packet.packets.CreateUserPacket;
+import common.networking.packet.packets.DeleteUserPacket;
 import common.networking.packet.packets.LoginPacket;
 import common.networking.packet.packets.result.DefaultResults;
 import common.networking.packet.packets.result.ErrorResultPacket;
@@ -33,6 +34,14 @@ public final class PacketHandler {
                     return DefaultResults.createUser(true);
                 } catch(IllegalArgumentException e) {
                     return DefaultResults.createUser(false, e.getMessage());
+                }
+            } else if(p.id == PacketId.DELETE_USER.id) {
+                try {
+                    DeleteUserPacket packet = (DeleteUserPacket)p;
+                    UserStore.deleteUser(packet.data);
+                    return DefaultResults.deleteUser(true);
+                } catch(IllegalArgumentException e) {
+                    return DefaultResults.deleteUser(false, e.getMessage());
                 }
             }
             return ErrorResultPacket.INVALID_REQUEST;

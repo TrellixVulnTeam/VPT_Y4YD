@@ -14,6 +14,14 @@ public final class DefaultResults {
         return createResult(ResultType.CREATE_USER, result, msg);
     }
     
+    public static ResultPacket deleteUser(boolean result) {
+        return deleteUser(result, null);
+    }
+    
+    public static ResultPacket deleteUser(boolean result, String msg) {
+        return createResult(ResultType.DELETE_USER, result, msg);
+    }
+    
     public static ResultPacket createResult(ResultType resultType, boolean result, String msg) {
         return createResult(resultType.id, result, msg);
     }

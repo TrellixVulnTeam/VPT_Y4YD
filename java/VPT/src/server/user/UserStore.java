@@ -129,6 +129,24 @@ public final class UserStore {
         }
     }
     
+    public static void deleteUser(String userId) throws IllegalArgumentException, IOException, SecurityException {
+        if(!checkUserIdExistance(userId)) {
+            throw new IllegalArgumentException("User Does Not Exist");
+        }
+        User user = getUserInternal(userId);
+        LoginService.checkAccess(user);
+        userLock.writeLock().lock();
+        try {
+            if(!checkUserIdExistance(userId)) {
+                throw new IllegalArgumentException("User Does Not Exist");
+            }
+            new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + Utils.hash(userId) + ".usr").delete();
+            users.remove(userId);
+        } finally {
+            userLock.writeLock().unlock();
+        }
+    }
+    
     private UserStore() {}
 
 }
