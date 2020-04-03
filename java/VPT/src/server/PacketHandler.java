@@ -15,7 +15,7 @@ import server.user.UserStore;
 
 public final class PacketHandler {
     
-    public static ResultPacket process(Packet p, Runnable onUserDeletion) throws IOException {
+    public static ResultPacket process(Packet p, Runnable onUserDeletion) {
         try {
             if(p.id == PacketId.LOGIN.id) {
                 User currentUser = LoginService.getCurrentUser();
@@ -49,6 +49,8 @@ public final class PacketHandler {
             return ErrorResultPacket.ILLEGAL_ACCESS(e.getMessage());
         } catch(ClassCastException e) {
             return ErrorResultPacket.INVALID_REQUEST;
+        } catch(IOException e) {
+            return ErrorResultPacket.SERVER_ERROR;
         }
     }
     

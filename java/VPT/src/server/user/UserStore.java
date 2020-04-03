@@ -1,11 +1,14 @@
 package server.user;
 
 import common.Utils;
+import common.user.AttributeSearch;
+import common.user.AttributeSearchCriteria;
 import common.user.NetPublicUser;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import server.ServerConstants;
@@ -124,6 +127,14 @@ public final class UserStore {
             }
             DefaultSerialization.serialize(user, "Users/" + Utils.hash(user.userId) + ".usr");
             users.put(user.userId, new WeakReference<>(user));
+            if(user.isVisible()) {
+                attributeLock.writeLock().lock();
+                try {
+                    publicAttributes.put(user.userId, user.getAttributes());
+                } finally {
+                    attributeLock.writeLock().unlock();
+                }
+            }
         } finally {
             userLock.writeLock().unlock();
         }
@@ -142,9 +153,130 @@ public final class UserStore {
             }
             new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + Utils.hash(userId) + ".usr").delete();
             users.remove(userId);
+            attributeLock.writeLock().lock();
+            try {
+                publicAttributes.remove(user.userId);
+            } finally {
+                attributeLock.writeLock().unlock();
+            }
         } finally {
             userLock.writeLock().unlock();
         }
+    }
+    
+    @SuppressWarnings("LockAcquiredButNotSafelyReleased")
+    public static void notifyVisibilityChange(User user) {
+        attributeLock.readLock().lock();
+        try {
+            boolean isVisible = user.isVisible();
+            if(publicAttributes.containsKey(user.userId) == isVisible) {
+                return;
+            }
+            attributeLock.readLock().unlock();
+            attributeLock.writeLock().lock();
+            attributeLock.readLock().lock();
+            try {
+                if(publicAttributes.containsKey(user.userId) == isVisible) {
+                    return;
+                }
+                if(isVisible) {
+                    publicAttributes.put(user.userId, user.getAttributes());
+                } else {
+                    publicAttributes.remove(user.userId);
+                }
+            } finally {
+                attributeLock.writeLock().unlock();
+            }
+        } finally {
+            attributeLock.readLock().unlock();
+        }
+    }
+    
+    public static void loadAttributes() throws ClassNotFoundException, IOException {
+        File attributesFile = new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + "attributes.attrs");
+        if(!attributesFile.exists()) {
+            attributesFile.createNewFile();
+            return;
+        }
+        if(attributesFile.length() == 0) {
+            return;
+        }
+        HashMap<String, ArrayList<UserAttribute>> attributes = (HashMap<String, ArrayList<UserAttribute>>)DefaultSerialization.deserialize("Users/attributes.attrs");
+        attributeLock.writeLock().lock();
+        try {
+            publicAttributes.putAll(attributes);
+        } finally {
+            attributeLock.writeLock().unlock();
+        }
+    }
+    
+    public static void saveAttributes() throws IOException {
+        File attributesFile = new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + "attributes.attrs");
+        attributesFile.createNewFile();
+        DefaultSerialization.serialize(getPublicAttributes(), "Users/attributes.attrs");
+    }
+    
+    public static HashMap<String, ArrayList<UserAttribute>> getPublicAttributes() {
+        attributeLock.readLock().lock();
+        try {
+            return new HashMap<>(publicAttributes);
+        } finally {
+            attributeLock.readLock().unlock();
+        }
+    }
+    
+    public static ArrayList<String> search(AttributeSearch search) {
+        HashMap<String, ArrayList<UserAttribute>> attributes = getPublicAttributes();
+        ArrayList<AttributeSearchCriteria> criteria = search.getCriteria();
+        HashMap<String, Integer> rankings = new HashMap<>();
+        attributes.forEach((userId, userAttributes) -> {
+            int rank = 0;
+            boolean elegable = true;
+            for(AttributeSearchCriteria crit: criteria) {
+                if(!elegable) {
+                    return;
+                }
+                switch(crit.location) {
+                    case ANYWHERE:
+                        for(UserAttribute attribute: userAttributes) {
+                            int count = attribute.search(crit.search);
+                            if(crit.isBlacklist) {
+                                elegable = !(!elegable || count > 0);
+                            } else {
+                                rank += count;
+                            }
+                        }
+                    case USERID:
+                        int countUID = Utils.countStringMatches(userId, crit.search);
+                        if(crit.isBlacklist) {
+                            elegable = !(!elegable || countUID > 0);
+                        } else {
+                            rank += countUID;
+                        }
+                        break;
+                    default:
+                        if(!crit.location.isIrregular) {
+                            for(UserAttribute attribute: userAttributes) {
+                                if(attribute.type == crit.location.equivilentType) {
+                                    int count = attribute.search(crit.search);
+                                    if(crit.isBlacklist) {
+                                        elegable = !(!elegable || count > 0);
+                                    } else {
+                                        rank += count;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            if(elegable && rank > 0) {
+                rankings.put(userId, rank);
+            }
+        });
+        ArrayList<String> out = new ArrayList<>(rankings.keySet());
+        out.sort((a, b) -> rankings.get(a) - rankings.get(b));
+        return out;
     }
     
     private UserStore() {}

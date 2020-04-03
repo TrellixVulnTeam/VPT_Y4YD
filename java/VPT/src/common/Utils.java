@@ -27,6 +27,23 @@ public final class Utils {
         }
     }
     
+    //Code from: https://stackoverflow.com/questions/767759/occurrences-of-substring-in-a-string
+    public static int countStringMatches(String str, String findStr) {
+        int lastIndex = 0;
+        int count = 0;
+
+        while(lastIndex != -1){
+
+            lastIndex = str.indexOf(findStr,lastIndex);
+
+            if(lastIndex != -1){
+                count ++;
+                lastIndex += findStr.length();
+            }
+        }
+        
+        return count;
+    }
     
     public static interface NSAEFunction<T> {
         
