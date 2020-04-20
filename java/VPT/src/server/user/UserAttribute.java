@@ -1,5 +1,6 @@
 package server.user;
 
+import common.user.AttributeSearchCriteria;
 import common.user.NetUserAttribute;
 import common.user.UserAttributeType;
 
@@ -15,6 +16,6 @@ public abstract class UserAttribute {
     
     public abstract NetUserAttribute toNetUserAttribute();
     
-    public abstract int search(String search);
+    public abstract int search(AttributeSearchCriteria search);
     
 }

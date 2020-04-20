@@ -239,7 +239,7 @@ public final class UserStore {
                 switch(crit.location) {
                     case ANYWHERE:
                         for(UserAttribute attribute: userAttributes) {
-                            int count = attribute.search(crit.search);
+                            int count = attribute.search(crit);
                             if(crit.isBlacklist) {
                                 elegable = !(!elegable || count > 0);
                             } else {
@@ -247,7 +247,7 @@ public final class UserStore {
                             }
                         }
                     case USERID:
-                        int countUID = Utils.countStringMatches(userId, crit.search);
+                        int countUID = Utils.countStringMatches(userId, crit.search, crit.quote, crit.matchCase);
                         if(crit.isBlacklist) {
                             elegable = !(!elegable || countUID > 0);
                         } else {
@@ -258,7 +258,7 @@ public final class UserStore {
                         if(!crit.location.isIrregular) {
                             for(UserAttribute attribute: userAttributes) {
                                 if(attribute.type == crit.location.equivilentType) {
-                                    int count = attribute.search(crit.search);
+                                    int count = attribute.search(crit);
                                     if(crit.isBlacklist) {
                                         elegable = !(!elegable || count > 0);
                                     } else {
