@@ -2,7 +2,9 @@ package common;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +51,40 @@ public final class Utils {
     
     public static <T> T conditionalTransform(T o, boolean condition, ConditionalTransformFunction<T> function) {
         return condition ? function.transform(o) : o;
+    }
+    
+    public static long fromNanos(long nanos, TimeUnit unit) {
+        return unit.convert(nanos, TimeUnit.NANOSECONDS);
+    }
+    
+    public static long toNanos(long duration, TimeUnit unit) {
+        return TimeUnit.NANOSECONDS.convert(duration, unit);
+    }
+
+    public static String formatTimeout(long timeout) {
+        Duration duration = Duration.ofNanos(timeout);
+        long days = duration.toDaysPart();
+        int hours = duration.toHoursPart();
+        int minutes = duration.toMinutesPart();
+        int seconds = duration.toSecondsPart();
+        String out = "";
+        if(days != 0) {
+            out += days;
+            out += " Days ";
+        }
+        if(hours != 0) {
+            out += hours;
+            out += " Hours ";
+        }
+        if(minutes != 0) {
+            out += minutes;
+            out += " Minutes ";
+        }
+        if(seconds != 0) {
+            out += seconds;
+            out += " Seconds ";
+        }
+        return out.trim();
     }
     
     public static interface NSAEFunction<T> {

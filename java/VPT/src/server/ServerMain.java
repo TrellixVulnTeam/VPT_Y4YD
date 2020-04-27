@@ -3,6 +3,8 @@ package server;
 import common.Constants;
 import common.networking.AESServer;
 import common.networking.AESServerConnection;
+import common.networking.packet.packets.ServerStatus;
+import common.networking.packet.packets.ServerStatusPacket;
 import java.io.File;
 import java.io.IOException;
 
@@ -16,7 +18,13 @@ public final class ServerMain {
                 try {
                     AESServerConnection connection = server.accept();
                     if(connection.isConnected() && !connection.isClosed()) {
-                        new ConnectionHandler(connection).handleConnection();
+                        ServerStatusPacket status = new ServerStatusPacket(ServerStatus.OK);
+                        ConnectionHandler handler = new ConnectionHandler(connection, status);
+                        if(status.data == ServerStatus.OK) {
+                            handler.handleConnection();
+                        } else {
+                            connection.close();
+                        }
                     }
                 } catch(IOException e) {
                     if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id)

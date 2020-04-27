@@ -1,5 +1,7 @@
 package server;
 
+import common.Utils;
+import common.networking.AESServerConnection;
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
 import common.networking.packet.packets.CreateUserPacket;
@@ -13,11 +15,15 @@ import server.user.LoginService;
 import server.user.User;
 import server.user.UserStore;
 
+import static server.ServerConstants.USER_REQUESTS_TE;
+import static server.ServerConstants.USER_SPEC_REQUESTS_TE;
+
 public final class PacketHandler {
     
-    public static ResultPacket process(Packet p, Runnable onUserDeletion) {
+    public static ResultPacket process(Packet p, Runnable onUserDeletion, AESServerConnection connection) {
         try {
             if(p.id == PacketId.LOGIN.id) {
+                RequestService.request(connection, "Login", USER_REQUESTS_TE);
                 User currentUser = LoginService.getCurrentUser();
                 if(currentUser != null) {
                     LoginService.logout();
@@ -28,6 +34,7 @@ public final class PacketHandler {
                 UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
                 return DefaultResults.login(result);
             } else if(p.id == PacketId.CREATE_USER.id) {
+                RequestService.request(connection, "Create User", USER_REQUESTS_TE);
                 try {
                     CreateUserPacket packet = (CreateUserPacket)p;
                     UserStore.createUser(new User(packet.userId, packet.password, packet.isAdmin));
@@ -36,6 +43,7 @@ public final class PacketHandler {
                     return DefaultResults.createUser(false, e.getMessage());
                 }
             } else if(p.id == PacketId.DELETE_USER.id) {
+                RequestService.request(connection, "Delete User", USER_SPEC_REQUESTS_TE);
                 try {
                     DeleteUserPacket packet = (DeleteUserPacket)p;
                     UserStore.deleteUser(packet.data);
@@ -45,6 +53,8 @@ public final class PacketHandler {
                 }
             }
             return ErrorResultPacket.INVALID_REQUEST;
+        } catch(RequestService.TooManyRequestsException e) {
+            return ErrorResultPacket.TOO_MANY_REQUESTS(Utils.formatTimeout(e.timeout));
         } catch(SecurityException e) {
             return ErrorResultPacket.ILLEGAL_ACCESS(e.getMessage());
         } catch(ClassCastException e) {

@@ -5,6 +5,7 @@ import common.networking.AESServerConnection;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.ForceLogoutPacket;
+import common.networking.packet.packets.ServerStatusPacket;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import java.io.IOException;
 
@@ -16,13 +17,14 @@ public class ConnectionHandler {
     private Runnable onUserDeletion;
     private volatile boolean isRunning;
 
-    public ConnectionHandler(AESServerConnection connection) throws IOException {
+    public ConnectionHandler(AESServerConnection connection, ServerStatusPacket status) throws IOException {
         this.connection = connection;
         pis = new PacketInputStream(connection.getInputStream());
         pos = new PacketOutputStream(connection.getOutputStream());
         pos.writeUnhashedDouble(ServerConstants.MIN_SUPPORTED_CLIENT_VERSION);
         pos.writeUnhashedDouble(ServerConstants.MAX_SUPPORTED_CLIENT_VERSION);
         pos.writeUnhashedInt(ServerConstants.BRANCH.id);
+        pos.writePacket(status);
         isRunning = false;
     }
     
@@ -38,7 +40,7 @@ public class ConnectionHandler {
         onUserDeletion = this::onUserDeletion;
         while(!connection.isClosed()) {
             try {
-                pos.writePacket(PacketHandler.process(pis.readPacket(), onUserDeletion));
+                pos.writePacket(PacketHandler.process(pis.readPacket(), onUserDeletion, connection));
             } catch(ClassNotFoundException | IOException e) {
                 if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.isClosed()) {
                     e.printStackTrace(System.err);

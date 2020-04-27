@@ -9,6 +9,10 @@ public class ErrorResultPacket extends ResultPacket {
         return new ErrorResultPacket(ResultType.ILLEGAL_ACCESS, reason == null ? "" : reason);
     }
     
+    public static final ErrorResultPacket TOO_MANY_REQUESTS(String timeout) {
+        return new ErrorResultPacket(ResultType.TOO_MANY_REQUESTS, "Too Many Requests. Try again" + (timeout == null ? "" : " in " + timeout));
+    }
+    
     public ErrorResultPacket(ResultType resultType, String msg) {
         super(resultType, false, msg);
     }
