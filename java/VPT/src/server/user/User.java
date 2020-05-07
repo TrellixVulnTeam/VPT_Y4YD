@@ -48,6 +48,7 @@ public class User extends PublicUser {
             if(this.isVisible != this.isVisible) {
                 this.isVisible = isVisible;
                 UserStore.notifyVisibilityChange(this);
+                UserStore.notifyUserChange(this);
             }
         } finally {
             readWriteLock.writeLock().unlock();
@@ -68,6 +69,7 @@ public class User extends PublicUser {
         readWriteLock.writeLock().lock();
         try {
             this.isAdmin = isAdmin;
+            UserStore.notifyUserChange(this);
         } finally {
             readWriteLock.writeLock().unlock();
         }

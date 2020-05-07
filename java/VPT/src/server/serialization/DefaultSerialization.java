@@ -1,6 +1,5 @@
 package server.serialization;
 
-import common.Constants;
 import common.Utils;
 import java.io.File;
 import java.io.FileInputStream;

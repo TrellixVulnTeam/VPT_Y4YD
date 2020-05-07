@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import server.ServerConstants;
 import server.serialization.DefaultSerialization;
 
@@ -18,10 +19,21 @@ public final class UserStore {
 
     private static final ConcurrentHashMap<String, WeakReference<User>> users = new ConcurrentHashMap<>();
     private static final ReentrantReadWriteLock userLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    private static final ConcurrentHashMap<String, User> editedUsers = new ConcurrentHashMap<>();
+    //Note: Due to the usage of the editedUsers array, this lock will be used differently (read lock to add, write lock to remove)
+    private static final ReentrantReadWriteLock editedUserLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
     private static final ConcurrentHashMap<String, ArrayList<UserAttribute>> publicAttributes = new ConcurrentHashMap<>();
     private static final ReentrantReadWriteLock attributeLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
     private static final ConcurrentHashMap<String, ArrayList<Runnable>> deletionSubscribers = new ConcurrentHashMap();
     private static final ReentrantReadWriteLock deletionSubscribersLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    private static final Consumer<User> saveUser = (user) -> {
+        try {
+            saveUser(user, false);
+        } catch(IOException e) {
+            System.err.println("Error saving user: " + user.userId);
+            e.printStackTrace(System.err);
+        }
+    };
     
     public static NetPublicUser getPublicUser(String userId) {
         return getUserInternal(userId).toNetPublicUser();
@@ -118,14 +130,32 @@ public final class UserStore {
         }
     }
     
+    public static boolean checkUserExistance(User user) {
+        if(user == null) {
+            return false;
+        }
+        userLock.readLock().lock();
+        try {
+            if(!users.contains(user.userId)) {
+                return false;
+            }
+            return users.get(user.userId).get().equals(user);
+        } finally {
+            userLock.readLock().unlock();
+        }
+    }
+    
     public static void createUser(User user) throws IllegalArgumentException, IOException, SecurityException {
         LoginService.checkAccess();
+        if(checkUserIdExistance(user.userId)) {
+            throw new IllegalArgumentException("User Already Exists");
+        }
         userLock.writeLock().lock();
         try {
             if(checkUserIdExistance(user.userId)) {
                 throw new IllegalArgumentException("User Already Exists");
             }
-            DefaultSerialization.serialize(user, "Users/" + Utils.hash(user.userId) + ".usr");
+            saveUser(user, true);
             users.put(user.userId, new WeakReference<>(user));
             if(user.isVisible()) {
                 attributeLock.writeLock().lock();
@@ -146,26 +176,66 @@ public final class UserStore {
         }
         User user = getUserInternal(userId);
         LoginService.checkAccess(user);
-        userLock.writeLock().lock();
+        editedUserLock.writeLock().lock();
         try {
-            if(!checkUserIdExistance(userId)) {
-                throw new IllegalArgumentException("User Does Not Exist");
-            }
-            new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + Utils.hash(userId) + ".usr").delete();
-            users.remove(userId);
-            attributeLock.writeLock().lock();
+            editedUsers.remove(userId);
+            userLock.writeLock().lock();
             try {
-                publicAttributes.remove(user.userId);
+                if(!checkUserIdExistance(userId)) {
+                    throw new IllegalArgumentException("User Does Not Exist");
+                }
+                new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + Utils.hash(userId) + ".usr").delete();
+                users.remove(userId);
+                attributeLock.writeLock().lock();
+                try {
+                    publicAttributes.remove(user.userId);
+                } finally {
+                    attributeLock.writeLock().unlock();
+                }
             } finally {
-                attributeLock.writeLock().unlock();
+                userLock.writeLock().unlock();
             }
         } finally {
-            userLock.writeLock().unlock();
+            editedUserLock.writeLock().unlock();
         }
+    }
+    
+    public static void notifyUserChange(User user) {
+        if(!checkUserExistance(user)) {
+            return;
+        }
+        editedUserLock.readLock().lock();
+        try {
+            if(!editedUsers.contains(user)) {
+                editedUsers.put(user.userId, user);
+            }
+        } finally {
+            editedUserLock.readLock().unlock();
+        }
+    }
+    
+    public static void saveUsers() {
+        editedUserLock.writeLock().lock();
+        try {
+            editedUsers.values().forEach(saveUser);
+            editedUsers.clear();
+        } finally {
+            editedUserLock.writeLock().unlock();
+        }
+    }
+    
+    private static void saveUser(User user, boolean ignoreExistance) throws IOException {
+        if(!checkUserExistance(user) && !ignoreExistance) {
+            return;
+        }
+        DefaultSerialization.serialize(user, "Users/" + Utils.hash(user.userId) + ".usr");
     }
     
     @SuppressWarnings("LockAcquiredButNotSafelyReleased")
     public static void notifyVisibilityChange(User user) {
+        if(!checkUserExistance(user)) {
+            return;
+        }
         attributeLock.readLock().lock();
         try {
             boolean isVisible = user.isVisible();

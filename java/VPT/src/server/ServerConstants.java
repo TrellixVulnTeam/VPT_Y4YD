@@ -18,6 +18,7 @@ public final class ServerConstants {
     public static final boolean USE_FAIR_LOCKS = true;
     public static final String SERVER_DIR = new File("/").getAbsolutePath() + "VPT" + separator + "Server";
     public static final String BACKUP_DIR = SERVER_DIR + separator + "Backups";
+    public static final long PERIODIC_INTERVAL = Utils.toNanos(10, TimeUnit.MINUTES);
     
     //REQUEST
     public static final long MIN_REQUEST_FORGET_TIME = Utils.toNanos(10, TimeUnit.MINUTES);

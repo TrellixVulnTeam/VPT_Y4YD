@@ -7,11 +7,18 @@ import common.networking.packet.packets.ServerStatus;
 import common.networking.packet.packets.ServerStatusPacket;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import server.user.UserStore;
 
 public final class ServerMain {
     
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    
     public static void main(String[] args) {
         createDirs();
+        startPeriodicMethods();
         try {
             AESServer server = new AESServer(null);
             while(true) {
@@ -44,6 +51,26 @@ public final class ServerMain {
     private static void createDir(String dir) {
         new File(ServerConstants.SERVER_DIR + File.separator + dir.replaceAll("/", File.separator)).mkdirs();
         new File(ServerConstants.BACKUP_DIR + File.separator + dir.replaceAll("/", File.separator)).mkdirs();
+    }
+    
+    private static void startPeriodicMethods() {
+        executor.scheduleWithFixedDelay(ServerMain::doPeriodic, ServerConstants.PERIODIC_INTERVAL, ServerConstants.PERIODIC_INTERVAL, TimeUnit.NANOSECONDS);
+        Runtime.getRuntime().addShutdownHook(new Thread(ServerMain::saveData));
+    }
+    
+    private static void doPeriodic() {
+        RequestService.cleanup();
+        saveData();
+    }
+    
+    private static void saveData() {
+        try {
+            UserStore.saveUsers();
+            UserStore.saveAttributes();
+        } catch(IOException e) {
+            System.err.println("Error saving data");
+            e.printStackTrace(System.err);
+        }
     }
 
     private ServerMain() {}
