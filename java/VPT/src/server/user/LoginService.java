@@ -86,4 +86,6 @@ public final class LoginService {
         
     }
     
+    private LoginService() {}
+    
 }

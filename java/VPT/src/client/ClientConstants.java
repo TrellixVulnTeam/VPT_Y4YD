@@ -1,6 +1,6 @@
 package client;
 
-import common.Constants.Branch;
+import static common.Constants.Branch;
 
 public final class ClientConstants {
     

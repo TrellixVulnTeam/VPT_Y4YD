@@ -58,7 +58,7 @@ public final class UserStore {
             }
             publicKeyLock.readLock().lock();
             try {
-                return (NetPublicUser)MacSerialization.deserialize("Users/" + Utils.hash(user.userId) + ".usr.pub", userPublicKeys.get(userId));
+                return (NetPublicUser)MacSerialization.deserialize("Users/" + Utils.hash(userId) + ".usr.pub", userPublicKeys.get(userId));
             } catch(InvalidKeyException | InvalidObjectException e) {
                 e.printStackTrace(System.err);
                 throw new IOException(e);

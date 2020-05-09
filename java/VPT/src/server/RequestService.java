@@ -33,7 +33,7 @@ public final class RequestService {
                 throw new TooManyRequestsException(remainingTimeout);
             }
             if(lastRequest.numRequests % requestsToEscalate == 0) {
-                long timeout = (int)Math.pow(5, lastRequest.numRequests / requestsToEscalate);
+                long timeout = (long)Math.pow(5, lastRequest.numRequests / requestsToEscalate);
                 lastRequest.setLastTimeout(timeout);
                 lastRequest.setRequestTime();
                 throw new TooManyRequestsException(timeout);
@@ -67,9 +67,9 @@ public final class RequestService {
     
     private static final class LastRequest {
         
-        private int numRequests;
-        private long lastRequestTime;
-        private long lastTimeout;
+        public int numRequests;
+        public long lastRequestTime;
+        public long lastTimeout;
 
         public LastRequest() {
             this(1, System.nanoTime(), 0);
