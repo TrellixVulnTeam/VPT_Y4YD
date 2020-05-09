@@ -2,18 +2,20 @@ package server.serialization;
 
 import common.Utils;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
+import java.io.Serializable;
+import java.security.InvalidKeyException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.SignedObject;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Function;
 import server.ServerConstants;
 
 public final class MacSerialization {
@@ -21,7 +23,7 @@ public final class MacSerialization {
     private static final ArrayList<String> activeFiles = new ArrayList<>();
     private static final HashMap<String, Object> locks = new HashMap<>();
     
-    public static void serialize(Object o, String fileName, Function<File, OutputStream> osFunction) throws IOException {
+    public static void serialize(Serializable o, String fileName, PrivateKey signingKey) throws InvalidKeyException, IOException {
         fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
@@ -35,13 +37,16 @@ public final class MacSerialization {
             activeFiles.add(fileName);
         }
         
+        SignedObject signedObject;
+        try {
+            signedObject = new SignedObject(o, signingKey, Utils.createSignature());
+        } catch(SignatureException e) {
+            throw new IOException(e);
+        }
         File file = new File(ServerConstants.SERVER_DIR + fileName);
         file.createNewFile();
-        DigestOutputStream digester = new DigestOutputStream(osFunction.apply(file), Utils.createMD());
-        try(ObjectOutputStream os = new ObjectOutputStream(digester)) {
-            os.writeObject(o);
-            digester.on(false);
-            os.writeObject(digester.getMessageDigest().digest());
+        try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
+            os.writeObject(signedObject);
         }
         
         synchronized(locks.get(fileName)) {
@@ -50,7 +55,7 @@ public final class MacSerialization {
         }
     }
     
-    public static Object deserialize(String fileName, Function<File, InputStream> isFunction) throws ClassNotFoundException, InvalidObjectException, IOException {
+    public static Object deserialize(String fileName, PublicKey verificationKey) throws ClassNotFoundException, InvalidKeyException, InvalidObjectException, IOException {
         fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
@@ -63,18 +68,20 @@ public final class MacSerialization {
             }
             activeFiles.add(fileName);
         }
+        
         Object output;
         File file = new File(ServerConstants.SERVER_DIR + fileName);
-        DigestInputStream digester = new DigestInputStream(isFunction.apply(file), Utils.createMD());
-        try(ObjectInputStream is = new ObjectInputStream(digester)) {
-            output = is.readObject();
-            digester.on(false);
+        try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
             try {
-                if(MessageDigest.isEqual(digester.getMessageDigest().digest(), (byte[])is.readObject())) {
+                SignedObject signedObject = (SignedObject)is.readObject();
+                if(signedObject.verify(verificationKey, Utils.createSignature())) {
                     throw new ClassCastException();
                 }
+                output = signedObject.getObject();
+            } catch(SignatureException e) {
+                throw new IOException(e);
             } catch(ClassCastException e) {
-                throw new InvalidObjectException("Invalid Hash");
+                throw new InvalidObjectException("Invalid Signature");
             }
         }
         

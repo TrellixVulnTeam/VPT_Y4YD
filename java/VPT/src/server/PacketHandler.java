@@ -11,12 +11,11 @@ import common.networking.packet.packets.result.DefaultResults;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.packet.packets.result.ResultPacket;
 import java.io.IOException;
+import static server.ServerConstants.USER_REQUESTS_TE;
+import static server.ServerConstants.USER_SPEC_REQUESTS_TE;
 import server.user.LoginService;
 import server.user.User;
 import server.user.UserStore;
-
-import static server.ServerConstants.USER_REQUESTS_TE;
-import static server.ServerConstants.USER_SPEC_REQUESTS_TE;
 
 public final class PacketHandler {
     

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import server.user.LoginService;
 import server.user.UserStore;
 
 public final class ServerMain {
@@ -18,6 +19,7 @@ public final class ServerMain {
     
     public static void main(String[] args) {
         createDirs();
+        loadData();
         startPeriodicMethods();
         try {
             AESServer server = new AESServer(null);
@@ -63,10 +65,22 @@ public final class ServerMain {
         saveData();
     }
     
+    private static void loadData() {
+        try {
+            UserStore.loadAttributes();
+            UserStore.loadPublicKeys();
+        } catch(ClassNotFoundException | IOException e) {
+            System.err.println("Error loading data");
+            e.printStackTrace(System.err);
+        }
+    }
+    
     private static void saveData() {
+        LoginService.markAsSystemThread();
         try {
             UserStore.saveUsers();
             UserStore.saveAttributes();
+            UserStore.savePublicKeys();
         } catch(IOException e) {
             System.err.println("Error saving data");
             e.printStackTrace(System.err);

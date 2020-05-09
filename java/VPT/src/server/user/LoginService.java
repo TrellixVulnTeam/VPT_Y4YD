@@ -3,6 +3,7 @@ package server.user;
 public final class LoginService {
     
     private static final ThreadLocal<Session> session = ThreadLocal.withInitial(() -> new Session());
+    private static final ThreadLocal<Boolean> isSystemThread = ThreadLocal.withInitial(() -> false);
     
     public static boolean login(String userId, byte[] password) {
         User user = UserStore.login(userId, password);
@@ -22,6 +23,9 @@ public final class LoginService {
     }
     
     public static void checkAccess() throws SecurityException {
+        if(isSystemThread.get()) {
+            return;
+        }
         if(getCurrentUser() != null && getCurrentUser().isAdmin()) {
             return;
         }
@@ -29,12 +33,22 @@ public final class LoginService {
     }
     
     public static void checkAccess(User user) throws SecurityException {
+        if(user == null) {
+            throw new SecurityException("Invalid Permissions");
+        }
         if(getCurrentUser() == user) {
             return;
         }
         checkAccess();
     }
     
+    public static void markAsSystemThread() throws RuntimeException {
+        if(!Thread.currentThread().getStackTrace()[1].getClassName().equals("server.ServerMain")) {
+            //This shouldn't occur. Throw RuntimeException and crash the thread
+            throw new RuntimeException();
+        }
+        isSystemThread.set(true);
+    }
     
     private static final class Session {
         

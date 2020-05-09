@@ -1,13 +1,16 @@
 package server.serialization;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Function;
 import server.ServerConstants;
 
 public final class BackupSerialization {
@@ -15,7 +18,7 @@ public final class BackupSerialization {
     private static final ArrayList<String> activeFiles = new ArrayList<>();
     private static final HashMap<String, Object> locks = new HashMap<>();
     
-    public static void backupAndSerialize(Object o, String fileName, Function<File, ObjectOutputStream> osFunction) throws IOException {
+    public static void serialize(Serializable o, String fileName) throws IOException {
         fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
@@ -34,7 +37,7 @@ public final class BackupSerialization {
         File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
         bkupFile.createNewFile();
         Files.copy(file.toPath(), bkupFile.toPath());
-        try(ObjectOutputStream os = osFunction.apply(file)) {
+        try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
             os.writeObject(o);
         }
         bkupFile.delete();
@@ -44,6 +47,33 @@ public final class BackupSerialization {
             locks.get(fileName).notify();
         }
         
+    }
+    
+    public static Object deserialize(String fileName) throws ClassNotFoundException, IOException {
+        fileName = fileName.replaceAll("/", File.separator);
+        synchronized(locks) {
+            if(!locks.containsKey(fileName)) {
+                locks.put(fileName, new Object());
+            }
+        }
+        synchronized(locks.get(fileName)) {
+            while(activeFiles.contains(fileName)) {
+                try {locks.get(fileName).wait();} catch(InterruptedException e) {}
+            }
+            activeFiles.add(fileName);
+        }
+        
+        Object output;
+        File file = new File(ServerConstants.SERVER_DIR);
+        try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
+            output = is.readObject();
+        }
+        
+        synchronized(locks.get(fileName)) {
+            activeFiles.remove(fileName);
+            locks.get(fileName).notify();
+        }
+        return output;
     }
     
     public static synchronized void restore(String fileName) throws FileNotFoundException, IOException {

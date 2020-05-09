@@ -1,6 +1,6 @@
 package server;
 
-import static common.Constants.Branch;
+import common.Constants.Branch;
 import common.Utils;
 import java.io.File;
 import static java.io.File.separator;
