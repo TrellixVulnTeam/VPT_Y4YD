@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import server.ServerConstants;
 import server.serialization.BackupSerialization;
 import server.serialization.EncryptionSerialization;
@@ -196,6 +197,9 @@ public final class UserStore {
     }
     
     public static void createUser(User user) throws IllegalArgumentException, IOException, SecurityException {
+        if(isInvalidUserId(user.userId)) {
+            throw new IllegalArgumentException("User Id Cannot Contain Any of the Following Characters: " + ServerConstants.USERID_FORBIDDEN_CHARACTERS);
+        }
         LoginService.checkAccess();
         if(checkUserIdExistance(user.userId)) {
             throw new IllegalArgumentException("User Already Exists");
@@ -473,6 +477,13 @@ public final class UserStore {
         out.sort((a, b) -> rankings.get(a) - rankings.get(b));
         return out;
     }
+    
+    
+    public static final Pattern INVALID_USERID_PATTERN = Pattern.compile(ServerConstants.USERID_FORBIDDEN_CHARACTERS_REGEX);
+    public static boolean isInvalidUserId(String userId) {
+        return INVALID_USERID_PATTERN.matcher(userId).find();
+    }
+    
     
     private UserStore() {}
 

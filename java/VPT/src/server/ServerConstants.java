@@ -25,6 +25,10 @@ public final class ServerConstants {
     public static final int USER_REQUESTS_TE = 5;
     public static final int USER_SPEC_REQUESTS_TE = 1;
     
+    //USER
+    public static final String USERID_FORBIDDEN_CHARACTERS = "<>:'/\\|?*[]^$.+-(){}";
+    public static final String USERID_FORBIDDEN_CHARACTERS_REGEX = "[\\Q<>:'/\\|?*[]^$.+-(){}\\E]+";
+    
     private ServerConstants() {}
     
 }
