@@ -21,9 +21,9 @@ public class ConnectionHandler {
         this.connection = connection;
         pis = connection.pis;
         pos = connection.pos;
-        pos.writeUnhashedDouble(ServerConstants.MIN_SUPPORTED_CLIENT_VERSION);
-        pos.writeUnhashedDouble(ServerConstants.MAX_SUPPORTED_CLIENT_VERSION);
-        pos.writeUnhashedInt(ServerConstants.BRANCH.id);
+        pos.writeDouble(ServerConstants.MIN_SUPPORTED_CLIENT_VERSION);
+        pos.writeDouble(ServerConstants.MAX_SUPPORTED_CLIENT_VERSION);
+        pos.writeInt(ServerConstants.BRANCH.id);
         pos.writePacket(status);
         isRunning = false;
     }

@@ -1,90 +1,99 @@
 package common.networking.packet;
 
-import common.Utils;
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.security.DigestOutputStream;
 
-public class PacketOutputStream extends FilterOutputStream {
+public class PacketOutputStream extends FilterOutputStream implements ObjectOutput {
     
     protected final ObjectOutputStream oos;
-    protected final DigestOutputStream digester;
     
     public PacketOutputStream(OutputStream os) throws IOException {
-        this(new DigestOutputStream(os, Utils.createMD()));
+        this(new ObjectOutputStream(os));
     }
     
-    private PacketOutputStream(DigestOutputStream digester) throws IOException {
-        this(new ObjectOutputStream(digester), digester);
-    }
-    
-    private PacketOutputStream(ObjectOutputStream oos, DigestOutputStream digester) {
+    public PacketOutputStream(ObjectOutputStream oos) {
         super(oos);
         this.oos = oos;
-        this.digester = digester;
     }
     
     public void writePacket(Packet packet) throws IOException {
-        try {
-            oos.writeObject(packet);
-            digester.on(false);
-            oos.writeObject(digester.getMessageDigest().digest());
-            oos.flush();
-        } finally {
-            digester.on(true);
-        }
+        oos.writeObject(packet);
+        oos.flush();
     }
-    
-    public void writeUnhashedObject(Object obj) throws IOException {
-        try {
-            digester.on(false);
-            oos.writeObject(obj);
-            oos.flush();
-        } finally {
-            digester.on(true);
-        }
+
+    @Override
+    public void writeObject(Object obj) throws IOException {
+        oos.writeObject(obj);
+        oos.flush();
     }
-    
-    public void writeUnhashedDouble(double d) throws IOException {
-        try {
-            digester.on(false);
-            oos.writeDouble(d);
-            oos.flush();
-        } finally {
-            digester.on(true);
-        }
+
+    @Override
+    public void writeBoolean(boolean v) throws IOException {
+        oos.writeBoolean(v);
+        oos.flush();
     }
-    
-    public void writeUnhashedByte(byte b) throws IOException {
-        try {
-            digester.on(false);
-            oos.writeByte(b);
-            oos.flush();
-        } finally {
-            digester.on(true);
-        }
+
+    @Override
+    public void writeByte(int v) throws IOException {
+        oos.writeByte(v);
+        oos.flush();
     }
-    
-    public void writeUnhashedBoolean(boolean b) throws IOException {
-        try {
-            digester.on(false);
-            oos.writeBoolean(b);
-            oos.flush();
-        } finally {
-            digester.on(true);
-        }
+
+    @Override
+    public void writeShort(int v) throws IOException {
+        oos.writeShort(v);
+        oos.flush();
     }
-    
-    public void writeUnhashedInt(int i) throws IOException {
-        try {
-            digester.on(false);
-            oos.writeInt(i);
-            oos.flush();
-        } finally {
-            digester.on(true);
-        }
+
+    @Override
+    public void writeChar(int v) throws IOException {
+        oos.writeChar(v);
+        oos.flush();
+    }
+
+    @Override
+    public void writeInt(int v) throws IOException {
+        oos.writeInt(v);
+        oos.flush();
+    }
+
+    @Override
+    public void writeLong(long v) throws IOException {
+        oos.writeLong(v);
+        oos.flush();
+    }
+
+    @Override
+    public void writeFloat(float v) throws IOException {
+        oos.writeFloat(v);
+        oos.flush();
+    }
+
+    @Override
+    public void writeDouble(double v) throws IOException {
+        oos.writeDouble(v);
+        oos.flush();
+    }
+
+    @Override
+    public void writeBytes(String s) throws IOException {
+        oos.writeBytes(s);
+        oos.flush();
+    }
+
+    @Override
+    public void writeChars(String s) throws IOException {
+        oos.writeChars(s);
+        oos.flush();
+    }
+
+    @Override
+    public void writeUTF(String s) throws IOException {
+        oos.writeUTF(s);
+        oos.flush();
     }
     
 }
