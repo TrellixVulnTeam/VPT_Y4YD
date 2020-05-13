@@ -2,6 +2,7 @@ package common;
 
 public final class Constants {
 
+    public static String TLS_MODE = "TLSv1.3";
     public static String ENCRYPTION_MODE = "AES/CBC/PKCS5Padding";
     public static String HASH_MODE = "SHA-256";
     public static String SIGN_MODE = "SHA256withRSA";

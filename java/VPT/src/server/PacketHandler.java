@@ -1,7 +1,6 @@
 package server;
 
 import common.Utils;
-import common.networking.AESServerConnection;
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
 import common.networking.packet.packets.CreateUserPacket;
@@ -10,6 +9,7 @@ import common.networking.packet.packets.LoginPacket;
 import common.networking.packet.packets.result.DefaultResults;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.packet.packets.result.ResultPacket;
+import common.networking.ssl.SSLConnection;
 import java.io.IOException;
 import static server.ServerConstants.USER_REQUESTS_TE;
 import static server.ServerConstants.USER_SPEC_REQUESTS_TE;
@@ -19,7 +19,7 @@ import server.user.UserStore;
 
 public final class PacketHandler {
     
-    public static ResultPacket process(Packet p, Runnable onUserDeletion, AESServerConnection connection) {
+    public static ResultPacket process(Packet p, Runnable onUserDeletion, SSLConnection connection) {
         try {
             if(p.id == PacketId.LOGIN.id) {
                 RequestService.request(connection, "Login", USER_REQUESTS_TE);

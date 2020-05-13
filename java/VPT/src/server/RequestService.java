@@ -1,6 +1,6 @@
 package server;
 
-import common.networking.AESServerConnection;
+import common.networking.ssl.SSLConnection;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -9,14 +9,14 @@ import java.util.function.Predicate;
 
 public final class RequestService {
     
-    private static final HashMap<AESServerConnection, HashMap<String, LastRequest>> requests = new HashMap<>();
+    private static final HashMap<SSLConnection, HashMap<String, LastRequest>> requests = new HashMap<>();
     private static final ReadWriteLock requestLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
-    private static final Predicate<AESServerConnection> isConnectionClosed = connection -> connection.isClosed();
+    private static final Predicate<SSLConnection> isConnectionClosed = connection -> connection.socket.isClosed();
     private static final Predicate<LastRequest> shouldForgetRequest = request ->
             (System.nanoTime() - request.lastRequestTime) >= (Math.max(3 * request.lastTimeout, ServerConstants.MIN_REQUEST_FORGET_TIME));
     private static final Consumer<HashMap<String, LastRequest>> requestSetProcesser = requestSet -> requestSet.values().removeIf(shouldForgetRequest);
     
-    public static void request(AESServerConnection connection, String type, int requestsToEscalate) throws TooManyRequestsException {
+    public static void request(SSLConnection connection, String type, int requestsToEscalate) throws TooManyRequestsException {
         requestLock.readLock().lock();
         try {
             if(!requests.containsKey(connection)) {

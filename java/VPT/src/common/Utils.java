@@ -179,6 +179,15 @@ public final class Utils {
         return out.trim();
     }
     
+    public static <T> boolean contains(T[] arr, T obj) {
+        for(T o: arr) {
+            if(o.equals(obj)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public static interface NSAEFunction<T> {
         
         public T execute() throws NoSuchAlgorithmException, NoSuchPaddingException;

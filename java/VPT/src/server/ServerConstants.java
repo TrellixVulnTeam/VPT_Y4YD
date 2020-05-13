@@ -15,6 +15,7 @@ public final class ServerConstants {
     public static final Branch BRANCH = Branch.DEV;
     
     //GENERAL
+    public static final int SERVER_PORT = 0;
     public static final boolean USE_FAIR_LOCKS = true;
     public static final String SERVER_DIR = new File("/").getAbsolutePath() + "VPT" + separator + "Server";
     public static final String BACKUP_DIR = SERVER_DIR + separator + "Backups";
