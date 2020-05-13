@@ -1,21 +1,19 @@
 package common.networking.packet;
 
-import common.Constants;
+import common.Utils;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.security.DigestOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class PacketOutputStream extends FilterOutputStream {
     
     protected final ObjectOutputStream oos;
     protected final DigestOutputStream digester;
     
-    public PacketOutputStream(OutputStream os) throws IOException, NoSuchAlgorithmException {
-        this(new DigestOutputStream(os, MessageDigest.getInstance(Constants.HASH_MODE)));
+    public PacketOutputStream(OutputStream os) throws IOException {
+        this(new DigestOutputStream(os, Utils.createMD()));
     }
     
     private PacketOutputStream(DigestOutputStream digester) throws IOException {
@@ -33,6 +31,7 @@ public class PacketOutputStream extends FilterOutputStream {
             oos.writeObject(packet);
             digester.on(false);
             oos.writeObject(digester.getMessageDigest().digest());
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -42,6 +41,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeObject(obj);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -51,6 +51,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeDouble(d);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -60,6 +61,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeByte(b);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -69,6 +71,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeBoolean(b);
+            oos.flush();
         } finally {
             digester.on(true);
         }
@@ -78,6 +81,7 @@ public class PacketOutputStream extends FilterOutputStream {
         try {
             digester.on(false);
             oos.writeInt(i);
+            oos.flush();
         } finally {
             digester.on(true);
         }
