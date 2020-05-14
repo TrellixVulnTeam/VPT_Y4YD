@@ -5,6 +5,8 @@ import common.networking.packet.PacketId;
 
 public class CreateUserPacket extends Packet {
 
+    private static final long serialVersionUID = 6527009738809022401L;
+    
     public final String userId;
     public final boolean isAdmin;
     public final byte[] password;

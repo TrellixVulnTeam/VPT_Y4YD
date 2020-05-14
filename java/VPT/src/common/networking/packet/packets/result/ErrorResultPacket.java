@@ -1,6 +1,8 @@
 package common.networking.packet.packets.result;
 
 public class ErrorResultPacket extends ResultPacket {
+    
+    private static final long serialVersionUID = 1958928940460357927L;
 
     public static final ErrorResultPacket SERVER_ERROR = new ErrorResultPacket(ResultType.SERVER_ERROR, "Server Error");
     public static final ErrorResultPacket INVALID_REQUEST = new ErrorResultPacket(ResultType.INVALID_REQUEST, "Invalid Request");

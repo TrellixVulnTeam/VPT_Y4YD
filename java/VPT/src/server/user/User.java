@@ -8,6 +8,8 @@ import java.util.HashMap;
 
 public class User extends PublicUser {
 
+    private static final long serialVersionUID = -732320744263029685L;
+    
     private byte[] password;
     private boolean isVisible, isAdmin;
     private final HashMap<String, Key> keyStore;

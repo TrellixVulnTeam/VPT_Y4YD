@@ -5,6 +5,8 @@ import common.networking.packet.PacketId;
 
 public class ResultPacket extends Packet {
 
+    private static final long serialVersonUID = 2298268915644736483L;
+    
     public final int resultType;
     public final boolean wasActionSuccessful;
     public final String msg;

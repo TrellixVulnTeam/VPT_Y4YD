@@ -3,8 +3,11 @@ package server.user;
 import common.user.AttributeSearchCriteria;
 import common.user.NetUserAttribute;
 import common.user.UserAttributeType;
+import java.io.Serializable;
 
-public abstract class UserAttribute {
+public abstract class UserAttribute implements Serializable {
+    
+    private static final long serialVersionUID = -8240452626850634012L;
     
     public final UserAttributeType type;
 
