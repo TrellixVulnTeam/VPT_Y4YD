@@ -5,8 +5,15 @@ import common.networking.packet.packets.ServerStatus;
 import common.networking.packet.packets.ServerStatusPacket;
 import common.networking.ssl.SSLConfig;
 import common.networking.ssl.SSLConnection;
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -21,9 +28,30 @@ public final class ServerMain {
     
     @SuppressWarnings("UseSpecificCatch")
     public static void main(String[] args) {
+        Console console = System.console();
+        if(console == null) {
+            System.err.println("Error: No Console Detected");
+            System.exit(1);
+        }
+        createDirs();
         try {
-            createDirs();
-            loadData();
+            try {
+                char[] sslKeystorePassword = console.readPassword("Enter SSL Keystore Password: ");
+                KeyStore sslKeystore = KeyStore.getInstance(new File(ServerConstants.SERVER_DIR + File.separator + "SSLKeystore.keystore"), sslKeystorePassword);
+                Arrays.fill(sslKeystorePassword, ' ');
+                SSLConfig.initServer(sslKeystore, new char[0], "SSLKey");
+            } catch(CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException e) {
+                throw new Exception("Error Loading SSL Keystore", e);
+            } catch(KeyManagementException e) {
+                throw new Exception("Error Initializing SSLConfig", e);
+            }
+        } catch(Exception e) {
+            System.err.println(e.getMessage());
+            e.getCause().printStackTrace(System.err);
+            System.exit(1);
+        }
+        loadData();
+        try {
             startPeriodicMethods();
             try {
                 SSLServerSocket server = SSLConfig.createServerSocket(ServerConstants.SERVER_PORT);
@@ -47,7 +75,7 @@ public final class ServerMain {
             } catch(IOException e) {
                 e.printStackTrace(System.err);
             }
-        } catch(Exception e) {
+        } catch(RuntimeException e) {
             executor.shutdown();
             throw e;
         }
