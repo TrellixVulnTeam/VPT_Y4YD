@@ -12,20 +12,14 @@ import java.security.MessageDigest;
 public class PacketInputStream extends FilterInputStream implements ObjectInput {
     
     protected final ObjectInputStream ois;
-    protected final DigestInputStream digester;
     
     public PacketInputStream(InputStream is) throws IOException {
-        this(new DigestInputStream(is, Utils.createMD()));
+        this(new ObjectInputStream(is));
     }
     
-    private PacketInputStream(DigestInputStream digester) throws IOException {
-        this(new ObjectInputStream(digester), digester);
-    }
-    
-    private PacketInputStream(ObjectInputStream ois, DigestInputStream digester) {
+    public PacketInputStream(ObjectInputStream ois) {
         super(ois);
         this.ois = ois;
-        this.digester = digester;
     }
     
     public Packet readPacket() throws ClassNotFoundException, IOException {
