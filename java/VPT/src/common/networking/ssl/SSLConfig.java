@@ -16,7 +16,7 @@ import javax.net.ssl.TrustManager;
 
 public final class SSLConfig {
     
-    private static SSLContext context = Utils.catchNoSuchAlgorithmException(() -> SSLContext.getInstance(Constants.TLS_MODE));
+    private static final SSLContext context = Utils.catchNoSuchAlgorithmException(() -> SSLContext.getInstance(Constants.TLS_MODE));
     private static SSLSocketFactory socketFactory;
     private static SSLServerSocketFactory serverSocketFactory;
     private static boolean init = false;
