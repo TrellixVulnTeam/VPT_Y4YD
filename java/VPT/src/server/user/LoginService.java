@@ -43,7 +43,7 @@ public final class LoginService {
     }
     
     public static void markAsSystemThread() throws RuntimeException {
-        if(!Thread.currentThread().getStackTrace()[1].getClassName().equals("server.ServerMain")) {
+        if(!Thread.currentThread().getStackTrace()[2].getClassName().equals("server.ServerMain")) {
             //This shouldn't occur. Throw RuntimeException and crash the thread
             throw new RuntimeException();
         }

@@ -1,13 +1,10 @@
 package common.networking.packet;
 
-import common.Utils;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 
 public class PacketInputStream extends FilterInputStream implements ObjectInput {
     

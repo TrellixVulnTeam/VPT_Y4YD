@@ -30,7 +30,9 @@ public final class PacketHandler {
                 }
                 LoginPacket loginPacket = (LoginPacket)p;
                 boolean result = LoginService.login(loginPacket.userId, loginPacket.password);
-                UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
+                if(result) {
+                    UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
+                }
                 return DefaultResults.login(result);
             } else if(p.id == PacketId.CREATE_USER.id) {
                 RequestService.request(connection, "Create User", USER_REQUESTS_TE);
@@ -50,6 +52,8 @@ public final class PacketHandler {
                 } catch(IllegalArgumentException e) {
                     return DefaultResults.deleteUser(false, e.getMessage());
                 }
+            } else if(p.id == PacketId.SHUTDOWN.id) {
+                System.exit(0);
             }
             return ErrorResultPacket.INVALID_REQUEST;
         } catch(RequestService.TooManyRequestsException e) {

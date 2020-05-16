@@ -1,11 +1,11 @@
 package server;
 
+import common.Console;
 import common.Constants;
 import common.networking.packet.packets.ServerStatus;
 import common.networking.packet.packets.ServerStatusPacket;
 import common.networking.ssl.SSLConfig;
 import common.networking.ssl.SSLConnection;
-import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -28,18 +28,24 @@ public final class ServerMain {
     
     @SuppressWarnings("UseSpecificCatch")
     public static void main(String[] args) {
-        Console console = System.console();
-        if(console == null) {
-            System.err.println("Error: No Console Detected");
-            System.exit(1);
+        @SuppressWarnings("UnusedAssignment")
+        Console console = null;
+        if(ServerConstants.BRANCH == Constants.Branch.DEV) {
+            console = new Console(true, true, true);
+        } else {
+            try {
+                console = new Console(true, false, true);
+            } catch(IllegalArgumentException e) {
+                System.err.println("Error: No Console Detected");
+                System.exit(1);
+            }
         }
         createDirs();
         try {
             try {
                 char[] sslKeystorePassword = console.readPassword("Enter SSL Keystore Password: ");
                 KeyStore sslKeystore = KeyStore.getInstance(new File(ServerConstants.SERVER_DIR + File.separator + "SSLKeystore.keystore"), sslKeystorePassword);
-                Arrays.fill(sslKeystorePassword, ' ');
-                SSLConfig.initServer(sslKeystore, new char[0], "SSLKey");
+                SSLConfig.initServer(sslKeystore, sslKeystorePassword, "sslkey");
             } catch(CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException e) {
                 throw new Exception("Error Loading SSL Keystore", e);
             } catch(KeyManagementException e) {

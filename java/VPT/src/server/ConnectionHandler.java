@@ -7,6 +7,7 @@ import common.networking.packet.packets.ForceLogoutPacket;
 import common.networking.packet.packets.ServerStatusPacket;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.ssl.SSLConnection;
+import java.io.EOFException;
 import java.io.IOException;
 
 public class ConnectionHandler {
@@ -42,6 +43,11 @@ public class ConnectionHandler {
             try {
                 pos.writePacket(PacketHandler.process(pis.readPacket(), onUserDeletion, connection));
             } catch(ClassNotFoundException | IOException e) {
+                if(e instanceof EOFException) {
+                    try {
+                        connection.socket.close();
+                    } catch(IOException exc) {}
+                }
                 if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.socket.isClosed()) {
                     e.printStackTrace(System.err);
                 }
