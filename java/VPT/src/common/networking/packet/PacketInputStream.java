@@ -6,24 +6,46 @@ import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 
+/**
+ * An {@link InputStream} with special methods for reading {@link Packet}s
+ */
 public class PacketInputStream extends FilterInputStream implements ObjectInput {
     
+    /**
+     * An internal {@link ObjectInputStream} to use for data reading
+     */
     protected final ObjectInputStream ois;
     
+    /**
+     * Creates a PacketInputStream which reads from the specified {@link InputStream}
+     * @param is the InputStream to read from
+     * @throws IOException if an error occurs creating the stream
+     */
     public PacketInputStream(InputStream is) throws IOException {
         this(new ObjectInputStream(is));
     }
     
+    /**
+     * Creates a PacketInputStream which reads from the specified {@link ObjectInputStream}
+     * @param ois the ObjectInputStream to read from
+     */
     public PacketInputStream(ObjectInputStream ois) {
         super(ois);
         this.ois = ois;
     }
     
-    public Packet readPacket() throws ClassNotFoundException, IOException {
-        Object packetObj = ois.readObject();
-        if(packetObj != null && packetObj instanceof Packet) {
-            return (Packet)packetObj;
-        }
+    /**
+     * Reads a {@link Packet} from the stream
+     * @return The {@link Packet} read from the stream
+     * @throws IOException if an I/O error occurs while reading the stream
+     */
+    public Packet readPacket() throws IOException {
+        try {
+            Object packetObj = ois.readObject();
+            if(packetObj != null && packetObj instanceof Packet) {
+                return (Packet)packetObj;
+            }
+        } catch(ClassNotFoundException e) {}
         return Packet.NULL_PACKET;
     }
 

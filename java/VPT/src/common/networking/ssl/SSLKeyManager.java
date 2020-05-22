@@ -11,14 +11,38 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import javax.net.ssl.X509KeyManager;
 
+/**
+ * A {@link X509KeyManager} which only returns a specific key alias
+ */
 class SSLKeyManager implements X509KeyManager {
 
+    /**
+     * The {@link KeyStore} to read from
+     */
     protected KeyStore keyStore;
+    /**
+     * The password of the requested key
+     */
     protected char[] password;
+    /**
+     * The alias of the requested key
+     */
     protected String alias;
-    private String type;
-    private String issuer;
+    /**
+     * The type of the requested key
+     */
+    protected String type;
+    /**
+     * The issuer of the requested key
+     */
+    protected String issuer;
 
+    /**
+     * Creates a new SSLKeyManager
+     * @param keyStore the {@link KeyStore} to read from
+     * @param password the password of the requested key
+     * @param alias the alias of the requested key
+     */
     public SSLKeyManager(KeyStore keyStore, char[] password, String alias) {
         this.keyStore = keyStore;
         this.password = password;

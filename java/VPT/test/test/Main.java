@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.KeyStore;
-import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import javax.swing.JOptionPane;
 
+/**
+ * Test code for interacting with the server
+ */
 public class Main {
     
     public static void main(String[] args) throws Exception {

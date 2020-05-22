@@ -7,23 +7,48 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.stream.Collectors;
 
+/**
+ * Contains the publicly accessible attributes of a {@link User}
+ */
 public class PublicUser implements Serializable {
     
+    /**
+     * A lock protecting access to the properties of this User
+     */
     protected ReadWriteLock readWriteLock;
     private static final long serialVersionUID = 647217896180882120L;
 
+    /**
+     * The userId of this User
+     */
     public final String userId;
+    /**
+     * The attributes associated with this User
+     */
     private final ArrayList<UserAttribute> attributes;
 
+    /**
+     * Creates a new PublicUser with the given userId
+     * @param userId the userId to associate with this PublicUser
+     */
     public PublicUser(String userId) {
         this(userId, new ArrayList<>());
     }
 
+    /**
+     * Creates a new PublicUser with the given userId and attributes
+     * @param userId the userId to associate with this PublicUser
+     * @param attributes the attributes to associate with this PublicUser
+     */
     public PublicUser(String userId, Collection<UserAttribute> attributes) {
         this.userId = userId;
         this.attributes = new ArrayList<>(attributes);
     }
     
+    /**
+     * Retrieves the attributes associated with this User
+     * @return the attributes associated with this User
+     */
     public final ArrayList<UserAttribute> getAttributes() {
         readWriteLock.readLock().lock();
         try {
@@ -33,6 +58,10 @@ public class PublicUser implements Serializable {
         }
     }
     
+    /**
+     * Converts this PublicUser to a NetPublicUser
+     * @return a NetPublicUser containing the same information as this PublicUser
+     */
     public final NetPublicUser toNetPublicUser() {
         readWriteLock.readLock().lock();
         try {

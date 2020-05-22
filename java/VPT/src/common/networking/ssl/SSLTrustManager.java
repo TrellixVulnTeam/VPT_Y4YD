@@ -10,10 +10,21 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import javax.net.ssl.X509TrustManager;
 
+/**
+ * A {@link X509TrustManager} which loads from a {@link KeyStore}
+ */
 class SSLTrustManager implements X509TrustManager {
 
+    /**
+     * The {@link X509Certificate}s from the {@link KeyStore}
+     */
     protected X509Certificate[] certs;
     
+    /**
+     * Creates a new SSLTrustManager
+     * @param keyStore the {@link KeyStore} to read from
+     * @throws KeyStoreException if there is an error reading from the KeyStore
+     */
     public SSLTrustManager(KeyStore keyStore) throws KeyStoreException {
         Enumeration<String> aliases = keyStore.aliases();
         int foundCerts = 0;

@@ -18,11 +18,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import server.ServerConstants;
 
+/**
+ * Wraps objects in {@link SignedObject}s and serializes them while backing up the original files in {@link ServerConstants#BACKUP_DIR}
+ */
 public final class MacSerialization {
     
+    /**
+     * Stores the filenames of files which are currently being modified
+     */
     private static final ArrayList<String> activeFiles = new ArrayList<>();
+    /**
+     * Stores the locks for individual files
+     */
     private static final HashMap<String, Object> locks = new HashMap<>();
     
+    /**
+     * Serializes an object while backing up the original file in {@link ServerConstants#BACKUP_DIR}
+     * @param o the object to serialize
+     * @param fileName the filename to backup to. This will be assumed relative to {@link ServerConstants#SERVER_DIR}
+     * @param signingKey the key to use to sign the object
+     * @throws InvalidKeyException if the key is invalid
+     * @throws IOException if there was an error serializing the object
+     */
     public static void serialize(Serializable o, String fileName, PrivateKey signingKey) throws InvalidKeyException, IOException {
         fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
@@ -55,6 +72,16 @@ public final class MacSerialization {
         }
     }
     
+    /**
+     * Deserializes an object
+     * @param fileName the filename of the file to restore from. This will be assumed relative to {@link ServerConstants#SERVER_DIR}
+     * @param verificationKey the key to use to verify the object's integrity
+     * @return The deserialized object
+     * @throws ClassNotFoundException if the class of the returned object cannot be found
+     * @throws InvalidKeyException if the provided key is invalid
+     * @throws InvalidObjectException if there is an error verifying the integrity of the object
+     * @throws IOException if there was an error deserializing the object
+     */
     public static Object deserialize(String fileName, PublicKey verificationKey) throws ClassNotFoundException, InvalidKeyException, InvalidObjectException, IOException {
         fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {

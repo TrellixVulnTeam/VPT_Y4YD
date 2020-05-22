@@ -24,19 +24,55 @@ import server.serialization.BackupSerialization;
 import server.serialization.EncryptionSerialization;
 import server.serialization.MacSerialization;
 
+/**
+ * Stores users and their related attributes
+ */
 public final class UserStore {
+    //Note: Due to the usage of the some maps, some locks will be used differently (read lock to add, write lock to remove)
 
+    /**
+     * Contains references to all current users
+     */
     private static final ConcurrentHashMap<String, WeakReference<User>> users = new ConcurrentHashMap<>();
+    /**
+     * Protects access to {@link #users}
+     */
     private static final ReentrantReadWriteLock userLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    /**
+     * Contains references to all users with edited data
+     */
     private static final ConcurrentHashMap<String, User> editedUsers = new ConcurrentHashMap<>();
-    //Note: Due to the usage of the editedUsers array, this lock will be used differently (read lock to add, write lock to remove)
+    /**
+     * Protects access to {@link #editedUsers}
+     */
     private static final ReentrantReadWriteLock editedUserLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    /**
+     * Contains all publicly available attributes of users
+     */
     private static final ConcurrentHashMap<String, ArrayList<UserAttribute>> publicAttributes = new ConcurrentHashMap<>();
+    /**
+     * Protects access to {@link #publicAttributes}
+     */
     private static final ReentrantReadWriteLock attributeLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    /**
+     * Contains methods to be run on the deletion of users
+     */
     private static final ConcurrentHashMap<String, ArrayList<Runnable>> deletionSubscribers = new ConcurrentHashMap();
+    /**
+     * Protects access to {@link #deletionSubscribers}
+     */
     private static final ReentrantReadWriteLock deletionSubscribersLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    /**
+     * Contains the public keys of users
+     */
     private static final ConcurrentHashMap<String, PublicKey> userPublicKeys = new ConcurrentHashMap<>();
+    /**
+     * Protects access to {@link #userPublicKeys}
+     */
     private static final ReentrantReadWriteLock publicKeyLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    /**
+     * A {@link Consumer} of users which saves them
+     */
     private static final Consumer<User> saveUser = (user) -> {
         try {
             saveUser(user, false);
@@ -45,8 +81,22 @@ public final class UserStore {
             e.printStackTrace(System.err);
         }
     };
-    private static boolean attributesChanged = false, publicKeysChanged = false;
+    /**
+     * Whether {@link #publicAttributes} has been edited
+     */
+    private static boolean attributesChanged = false;
+    /**
+     * Whether {@link #userPublicKeys} has been edited
+     */
+    private static boolean publicKeysChanged = false;
     
+    /**
+     * Retrieves a NetPublicUser containing the data for the specified userId
+     * @param userId the userId of the user to retrieve
+     * @return a NetPublicUser containing the data for the specified userId
+     * @throws IllegalArgumentException if the specified userId does not exist
+     * @throws IOException if there was an error reading the user's data
+     */
     public static NetPublicUser getPublicUser(String userId) throws IllegalArgumentException, IOException {
         userLock.readLock().lock();
         try {
@@ -73,17 +123,40 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Retrieves the user with the specified userId or <code>null</code> if none could be found or there was an error in retrieving them
+     * @param userId the userId of the user to retrieve
+     * @param decryptionKey the key to use to read the user file if necessary
+     * @return the user with the specified userId
+     * @throws SecurityException if the current user does not have the required permissions to access the requested user
+     * @see #getUserInternal(java.lang.String, java.security.Key) 
+     */
     public static User getUser(String userId, Key decryptionKey) throws SecurityException {
         User user = getUserInternal(userId, decryptionKey);
         LoginService.checkAccess(user);
         return user;
     }
     
+    /**
+     * Retrieves the user with the specified userId and checks the given password against it
+     * @param userId the userId of the user to retrieve
+     * @param password the password of the requested user
+     * @return the user with the specified userId or <code>null</code> if the password is incorrect
+     */
     public static User login(String userId, byte[] password) {
         User user = getUserInternal(userId, Utils.createPasswordKey(password));
         return user != null && user.checkPassword(password) ? user : null;
     }
     
+    /**
+     * Retrieves the user with the specified userId or <code>null</code> if the user could not be found or if an error occurred in retrieving them
+     * @param userId the userId of the user to retrieve
+     * @param decryptionKey the key to use to read the user file if necessary
+     * @return the user with the specified userId
+     * @see #getDRUserInternal(java.lang.String) 
+     * @see #getUser(java.lang.String, java.security.Key) 
+     * @see #login(java.lang.String, byte[]) 
+     */
     private static User getUserInternal(String userId, Key decryptionKey) {
         userLock.readLock().lock();
         try {
@@ -120,6 +193,12 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Retrieves a user's secret key or <code>null</code> if the current user does not have the permissions to access it
+     * @param userId the userId to retrieve the key for
+     * @return the user's secret key
+     * @throws IllegalArgumentException if the specified user does not exist
+     */
     public static Key getUserKey(String userId) throws IllegalArgumentException {
         if(!checkUserIdExistance(userId)) {
             throw new IllegalArgumentException("User doesn't exist");
@@ -132,6 +211,11 @@ public final class UserStore {
         return null;
     }
     
+    /**
+     * Retrieves a currently loaded user or <code>null</code> if no currently loaded user could be found with that id
+     * @param userId the userId of the user to retrieve
+     * @return the currently loaded user with the specified id
+     */
     private static User getDRUserInternal(String userId) {
         userLock.readLock().lock();
         try {
@@ -145,25 +229,41 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Registers the given method to be run if the specified user is deleted
+     * @param userId the userId of the user to check
+     * @param onUserDeletion the method to be run
+     * @throws IllegalArgumentException if the specified user does not exist
+     */
     public static void subscribeToDeletionEvents(String userId, Runnable onUserDeletion) throws IllegalArgumentException {
         deletionSubscribersLock.readLock().lock();
         try {
-            if(!checkUserIdExistance(userId)) {
-                throw new IllegalArgumentException("User: " + userId + " does not exist");
-            }
-            synchronized(deletionSubscribers) {
-                if(!deletionSubscribers.containsKey(userId)) {
-                    deletionSubscribers.put(userId, new ArrayList<>());
+            userLock.readLock().lock();
+            try {
+                if(!checkUserIdExistance(userId)) {
+                    throw new IllegalArgumentException("User: " + userId + " does not exist");
                 }
-            }
-            synchronized(deletionSubscribers.get(userId)) {
-                deletionSubscribers.get(userId).add(onUserDeletion);
+                synchronized(deletionSubscribers) {
+                    if(!deletionSubscribers.containsKey(userId)) {
+                        deletionSubscribers.put(userId, new ArrayList<>());
+                    }
+                }
+                synchronized(deletionSubscribers.get(userId)) {
+                    deletionSubscribers.get(userId).add(onUserDeletion);
+                }
+            } finally {
+                userLock.readLock().unlock();
             }
         } finally {
             deletionSubscribersLock.readLock().unlock();
         }
     }
     
+    /**
+     * Unregisters the given method from being run when the specified user is deleted
+     * @param userId the userId of the user being checked
+     * @param callback the method which would be run
+     */
     public static void unsubscribeFromDeletionEvents(String userId, Runnable callback) {
         deletionSubscribersLock.readLock().lock();
         try {
@@ -180,6 +280,11 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Checks if the given userId corresponds to an existing user
+     * @param userId the userId to check
+     * @return whether the given userId corresponds to an existing user
+     */
     public static boolean checkUserIdExistance(String userId) {
         userLock.readLock().lock();
         try {
@@ -189,6 +294,11 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Checks if the given user is registered
+     * @param user the user to check
+     * @return whether the given user is registered
+     */
     public static boolean checkUserExistance(User user) {
         if(user == null) {
             return false;
@@ -196,6 +306,13 @@ public final class UserStore {
         return getDRUserInternal(user.userId) == user;
     }
     
+    /**
+     * Registers the given user and creates all required files
+     * @param user the user to create
+     * @throws IllegalArgumentException if the userId of the given user is invalid
+     * @throws IOException if there is an error creating any of the required files
+     * @throws SecurityException if the current user does not have the permissions to create the specified user
+     */
     public static void createUser(User user) throws IllegalArgumentException, IOException, SecurityException {
         if(isInvalidUserId(user.userId)) {
             throw new IllegalArgumentException("User Id Cannot Contain Any of the Following Characters: " + ServerConstants.USERID_FORBIDDEN_CHARACTERS);
@@ -235,6 +352,13 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Deletes the specified user
+     * @param userId the userId of the user to delete
+     * @throws IllegalArgumentException if the specified user does not exist
+     * @throws IOException if there is an error deleting the user's files
+     * @throws SecurityException if the current user does not have the required permissions to delete the specified user
+     */
     public static void deleteUser(String userId) throws IllegalArgumentException, IOException, SecurityException {
         if(!checkUserIdExistance(userId)) {
             throw new IllegalArgumentException("User Does Not Exist");
@@ -281,6 +405,10 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Marks the given user as modified
+     * @param user the user to mark
+     */
     public static void notifyUserChange(User user) {
         if(!checkUserExistance(user)) {
             return;
@@ -295,6 +423,9 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Saves all modified users
+     */
     public static void saveUsers() {
         editedUserLock.writeLock().lock();
         try {
@@ -305,8 +436,15 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Saves a user
+     * @param user the user to save
+     * @param ignoreExistance whether the user's registration status will be ignored.
+     * If this flag is set, the method will not check if the user exists in {@link #users}
+     * @throws IOException if there is an error saving the user
+     */
     private static void saveUser(User user, boolean ignoreExistance) throws IOException {
-        if(!checkUserExistance(user) && !ignoreExistance) {
+        if(!ignoreExistance && !checkUserExistance(user)) {
             return;
         }
         try {
@@ -317,6 +455,10 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Notifies that the visibility status of the specified user has changed
+     * @param user the user whose visibility status has changed
+     */
     @SuppressWarnings("LockAcquiredButNotSafelyReleased")
     public static void notifyVisibilityChange(User user) {
         if(!checkUserExistance(user)) {
@@ -349,6 +491,11 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Populates {@link #publicAttributes}
+     * @throws ClassNotFoundException if the read data's class cannot be found
+     * @throws IOException if an error occurs reading the data
+     */
     public static void loadAttributes() throws ClassNotFoundException, IOException {
         File attributesFile = new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + "attributes.attrs");
         if(!attributesFile.exists()) {
@@ -367,6 +514,10 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Saves {@link #publicAttributes}
+     * @throws IOException if an error occurs saving the data
+     */
     public static void saveAttributes() throws IOException {
         if(!attributesChanged) {
             return;
@@ -382,6 +533,11 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Populates {@link #userPublicKeys}
+     * @throws ClassNotFoundException if the read data's class cannot be found
+     * @throws IOException if an error occurs reading the data
+     */
     public static void loadPublicKeys() throws ClassNotFoundException, IOException {
         File keyFile = new File(ServerConstants.SERVER_DIR + File.separator + "Users" + File.separator + "publickeys.pks");
         if(!keyFile.exists()) {
@@ -400,6 +556,10 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Saves {@link #userPublicKeys}
+     * @throws IOException if an error occurs saving the data
+     */
     public static void savePublicKeys() throws IOException {
         if(!publicKeysChanged) {
             return;
@@ -415,6 +575,11 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Retrieves all publicly available user attributes
+     * @return all publicly available user attributes
+     * @see #search(common.user.AttributeSearch) 
+     */
     public static HashMap<String, ArrayList<UserAttribute>> getPublicAttributes() {
         attributeLock.readLock().lock();
         try {
@@ -424,6 +589,12 @@ public final class UserStore {
         }
     }
     
+    /**
+     * Searches all publicly available attributes for the specified criteria
+     * @param search the search criteria
+     * @return a ranked list of users fitting the criteria
+     * @see #getPublicAttributes() 
+     */
     public static ArrayList<String> search(AttributeSearch search) {
         HashMap<String, ArrayList<UserAttribute>> attributes = getPublicAttributes();
         ArrayList<AttributeSearchCriteria> criteria = search.getCriteria();
@@ -479,7 +650,15 @@ public final class UserStore {
     }
     
     
+    /**
+     * A pattern which matches to any invalid userId
+     */
     public static final Pattern INVALID_USERID_PATTERN = Pattern.compile(ServerConstants.USERID_FORBIDDEN_CHARACTERS_REGEX);
+    /**
+     * Checks if the given userId is invalid
+     * @param userId the userId to check
+     * @return whether the given userId is invalid
+     */
     public static boolean isInvalidUserId(String userId) {
         return INVALID_USERID_PATTERN.matcher(userId).find();
     }

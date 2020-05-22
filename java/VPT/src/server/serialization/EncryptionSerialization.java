@@ -22,11 +22,28 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import server.ServerConstants;
 
+/**
+ * Serializes objects while encrypting them and backing up the original files in {@link ServerConstants#BACKUP_DIR}
+ */
 public final class EncryptionSerialization {
     
+    /**
+     * Stores the filenames of files which are currently being modified
+     */
     private static final ArrayList<String> activeFiles = new ArrayList<>();
+    /**
+     * Stores the locks for individual files
+     */
     private static final HashMap<String, Object> locks = new HashMap<>();
     
+    /**
+     * Serializes an object while backing up the original file in {@link ServerConstants#BACKUP_DIR}
+     * @param o the object to serialize
+     * @param fileName the filename to backup to. This will be assumed relative to {@link ServerConstants#SERVER_DIR}
+     * @param encryptionKey the key to use to encrypt the object
+     * @throws InvalidKeyException if the key is invalid
+     * @throws IOException if there was an error serializing the object
+     */
     public static void serialize(Serializable o, String fileName, Key encryptionKey) throws InvalidKeyException, IOException {
         fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {
@@ -65,6 +82,16 @@ public final class EncryptionSerialization {
         
     }
     
+    /**
+     * Deserializes an object
+     * @param fileName the filename of the file to restore from. This will be assumed relative to {@link ServerConstants#SERVER_DIR}
+     * @param decryptionKey the key to use to decrypt the object
+     * @return The deserialized object
+     * @throws ClassNotFoundException if the class of the returned object cannot be found
+     * @throws InvalidKeyException if the provided key is invalid
+     * @throws InvalidObjectException if there is an error verifying the integrity of the object
+     * @throws IOException if there was an error deserializing the object
+     */
     public static Object deserialize(String fileName, Key decryptionKey) throws ClassNotFoundException, InvalidKeyException, InvalidObjectException, IOException {
         fileName = fileName.replaceAll("/", File.separator);
         synchronized(locks) {

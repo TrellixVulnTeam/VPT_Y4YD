@@ -6,19 +6,39 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+/**
+ * An {@link OutputStream} with special methods for writing {@link Packet}s
+ */
 public class PacketOutputStream extends FilterOutputStream implements ObjectOutput {
     
+    /**
+     * An internal {@link ObjectOutputStream} to use for data writing
+     */
     protected final ObjectOutputStream oos;
     
+    /**
+     * Creates a PacketOutputStream which writes to the specified {@link OutputStream}
+     * @param os The OutputStream to write to
+     * @throws IOException if an error occurs creating the stream
+     */
     public PacketOutputStream(OutputStream os) throws IOException {
         this(new ObjectOutputStream(os));
     }
     
+    /**
+     * Creates a PacketOutputStream which writes to the specified {@link OutputStream}
+     * @param oos the OutputStream to write to
+     */
     public PacketOutputStream(ObjectOutputStream oos) {
         super(oos);
         this.oos = oos;
     }
     
+    /**
+     * Writes a {@link Packet} to the stream
+     * @param packet the Packet to write
+     * @throws IOException if an I/O error occurs while writing to the stream
+     */
     public void writePacket(Packet packet) throws IOException {
         oos.writeObject(packet);
         oos.flush();

@@ -13,7 +13,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,10 +21,20 @@ import javax.net.ssl.SSLSocket;
 import server.user.LoginService;
 import server.user.UserStore;
 
+/**
+ * Provides an entry point for the server side of the VPT
+ */
 public final class ServerMain {
     
+    /**
+     * A ScheduledThreadPoolExecutor used for executing periodic methods
+     */
     private static final ScheduledThreadPoolExecutor executor = (ScheduledThreadPoolExecutor)Executors.newScheduledThreadPool(1);
     
+    /**
+     * The entry point for the server side of the VPT
+     * @param args the command line arguments
+     */
     @SuppressWarnings("UseSpecificCatch")
     public static void main(String[] args) {
         @SuppressWarnings("UnusedAssignment")
@@ -63,7 +72,7 @@ public final class ServerMain {
                 SSLServerSocket server = SSLConfig.createServerSocket(ServerConstants.SERVER_PORT);
                 while(true) {
                     try {
-                        SSLConnection connection = new SSLConnection((SSLSocket)server.accept());
+                        SSLConnection connection = new SSLConnection((SSLSocket)server.accept(), false);
                         if(connection.socket.isConnected() && !connection.socket.isClosed()) {
                             ServerStatusPacket status = new ServerStatusPacket(ServerStatus.OK);
                             ConnectionHandler handler = new ConnectionHandler(connection, status);
@@ -87,26 +96,44 @@ public final class ServerMain {
         }
     }
     
+    /**
+     * Creates the server directories
+     */
     private static void createDirs() {
         createDir("");
         createDir("Users");
     }
     
+    /**
+     * Creates the requested directory and a corresponding backup directory
+     * @param dir the directory file path. This will be assumed relative to {@link ServerConstants#SERVER_DIR}
+     * and {@link ServerConstants#BACKUP_DIR} for the working and backup directories respectively
+     */
     private static void createDir(String dir) {
         new File(ServerConstants.SERVER_DIR + File.separator + dir.replaceAll("/", File.separator)).mkdirs();
         new File(ServerConstants.BACKUP_DIR + File.separator + dir.replaceAll("/", File.separator)).mkdirs();
     }
     
+    /**
+     * Initializes {@link #executor} to run {@link #doPeriodic()} every {@link ServerConstants#PERIODIC_INTERVAL} nanoseconds
+     * and registers {@link #saveData()} as a shutdown hook
+     */
     private static void startPeriodicMethods() {
         executor.scheduleWithFixedDelay(ServerMain::doPeriodic, ServerConstants.PERIODIC_INTERVAL, ServerConstants.PERIODIC_INTERVAL, TimeUnit.NANOSECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread(ServerMain::saveData));
     }
     
+    /**
+     * Runs periodic methods. These will save modified data and cleanup any old data
+     */
     private static void doPeriodic() {
         RequestService.cleanup();
         saveData();
     }
     
+    /**
+     * Loads required data from disk into memory. This should only run at the start of the program
+     */
     private static void loadData() {
         try {
             UserStore.loadAttributes();
@@ -117,6 +144,9 @@ public final class ServerMain {
         }
     }
     
+    /**
+     * Saves any modified data to disk
+     */
     private static void saveData() {
         LoginService.markAsSystemThread();
         try {
