@@ -47,21 +47,26 @@ public final class BackupSerialization {
             activeFiles.add(fileName);
         }
         
-        File file = new File(ServerConstants.SERVER_DIR + fileName);
-        file.createNewFile();
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
-        bkupFile.createNewFile();
-        Files.copy(file.toPath(), bkupFile.toPath());
-        try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
-            os.writeObject(o);
-        }
-        bkupFile.delete();
+        try {
+            
+            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            file.createNewFile();
+            File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
+            bkupFile.createNewFile();
+            Files.copy(file.toPath(), bkupFile.toPath());
+            try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
+                os.writeObject(o);
+            }
+            bkupFile.delete();
+            
+        } finally {
         
-        synchronized(locks.get(fileName)) {
-            activeFiles.remove(fileName);
-            locks.get(fileName).notify();
+            synchronized(locks.get(fileName)) {
+                activeFiles.remove(fileName);
+                locks.get(fileName).notify();
+            }
+            
         }
-        
     }
     
     /**
@@ -85,17 +90,23 @@ public final class BackupSerialization {
             activeFiles.add(fileName);
         }
         
-        Object output;
-        File file = new File(ServerConstants.SERVER_DIR);
-        try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
-            output = is.readObject();
-        }
+        try {
         
-        synchronized(locks.get(fileName)) {
-            activeFiles.remove(fileName);
-            locks.get(fileName).notify();
+            Object output;
+            File file = new File(ServerConstants.SERVER_DIR);
+            try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
+                output = is.readObject();
+            }
+            return output;
+            
+        } finally {
+        
+            synchronized(locks.get(fileName)) {
+                activeFiles.remove(fileName);
+                locks.get(fileName).notify();
+            }
+            
         }
-        return output;
     }
     
     /**

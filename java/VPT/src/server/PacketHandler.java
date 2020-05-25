@@ -87,24 +87,24 @@ public final class PacketHandler {
         int hours = duration.toHoursPart();
         int minutes = duration.toMinutesPart();
         int seconds = duration.toSecondsPart();
-        String out = "";
+        StringBuilder out = new StringBuilder();
         if(days != 0) {
-            out += days;
-            out += " Days ";
+            out.append(days);
+            out.append(" Days ");
         }
         if(hours != 0) {
-            out += hours;
-            out += " Hours ";
+            out.append(hours);
+            out.append(" Hours ");
         }
         if(minutes != 0) {
-            out += minutes;
-            out += " Minutes ";
+            out.append(minutes);
+            out.append(" Minutes ");
         }
         if(seconds != 0) {
-            out += seconds;
-            out += " Seconds ";
+            out.append(seconds);
+            out.append(" Seconds ");
         }
-        return out.trim();
+        return out.toString().trim();
     }
     
     private PacketHandler() {}

@@ -54,21 +54,27 @@ public final class MacSerialization {
             activeFiles.add(fileName);
         }
         
-        SignedObject signedObject;
         try {
-            signedObject = new SignedObject(o, signingKey, Utils.createSignature());
-        } catch(SignatureException e) {
-            throw new IOException(e);
-        }
-        File file = new File(ServerConstants.SERVER_DIR + fileName);
-        file.createNewFile();
-        try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
-            os.writeObject(signedObject);
-        }
         
-        synchronized(locks.get(fileName)) {
-            activeFiles.remove(fileName);
-            locks.get(fileName).notify();
+            SignedObject signedObject;
+            try {
+                signedObject = new SignedObject(o, signingKey, Utils.createSignature());
+            } catch(SignatureException e) {
+                throw new IOException(e);
+            }
+            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            file.createNewFile();
+            try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
+                os.writeObject(signedObject);
+            }
+            
+        } finally {
+
+            synchronized(locks.get(fileName)) {
+                activeFiles.remove(fileName);
+                locks.get(fileName).notify();
+            }
+            
         }
     }
     
@@ -96,27 +102,33 @@ public final class MacSerialization {
             activeFiles.add(fileName);
         }
         
-        Object output;
-        File file = new File(ServerConstants.SERVER_DIR + fileName);
-        try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
-            try {
-                SignedObject signedObject = (SignedObject)is.readObject();
-                if(signedObject.verify(verificationKey, Utils.createSignature())) {
-                    throw new ClassCastException();
-                }
-                output = signedObject.getObject();
-            } catch(SignatureException e) {
-                throw new IOException(e);
-            } catch(ClassCastException e) {
-                throw new InvalidObjectException("Invalid Signature");
-            }
-        }
+        try {
         
-        synchronized(locks.get(fileName)) {
-            activeFiles.remove(fileName);
-            locks.get(fileName).notify();
+            Object output;
+            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
+                try {
+                    SignedObject signedObject = (SignedObject)is.readObject();
+                    if(signedObject.verify(verificationKey, Utils.createSignature())) {
+                        throw new ClassCastException();
+                    }
+                    output = signedObject.getObject();
+                } catch(SignatureException e) {
+                    throw new IOException(e);
+                } catch(ClassCastException e) {
+                    throw new InvalidObjectException("Invalid Signature");
+                }
+            }
+            return output;
+            
+        } finally {
+        
+            synchronized(locks.get(fileName)) {
+                activeFiles.remove(fileName);
+                locks.get(fileName).notify();
+            }
+            
         }
-        return output;
     }
     
     private MacSerialization() {}

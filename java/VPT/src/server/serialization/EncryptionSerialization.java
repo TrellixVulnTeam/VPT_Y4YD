@@ -58,28 +58,33 @@ public final class EncryptionSerialization {
             activeFiles.add(fileName);
         }
         
-        File file = new File(ServerConstants.SERVER_DIR + fileName);
-        file.createNewFile();
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
-        bkupFile.createNewFile();
-        Files.copy(file.toPath(), bkupFile.toPath());
-        Utils.IVCipher cipher = Utils.createCipher(Cipher.ENCRYPT_MODE, encryptionKey);
-        DigestOutputStream digester = new DigestOutputStream(new FileOutputStream(file), Utils.createMD());
-        byte[] iv = cipher.iv;
-        digester.write(Utils.intToBytes(iv.length));
-        digester.write(iv);
-        try(ObjectOutputStream os = new ObjectOutputStream(new CipherOutputStream(digester, cipher.cipher))) {
-            os.writeObject(o);
-            digester.on(false);
-            os.writeObject(digester.getMessageDigest().digest());
-        }
-        bkupFile.delete();
+        try {
         
-        synchronized(locks.get(fileName)) {
-            activeFiles.remove(fileName);
-            locks.get(fileName).notify();
-        }
+            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            file.createNewFile();
+            File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
+            bkupFile.createNewFile();
+            Files.copy(file.toPath(), bkupFile.toPath());
+            Utils.IVCipher cipher = Utils.createCipher(Cipher.ENCRYPT_MODE, encryptionKey);
+            DigestOutputStream digester = new DigestOutputStream(new FileOutputStream(file), Utils.createMD());
+            byte[] iv = cipher.iv;
+            digester.write(Utils.intToBytes(iv.length));
+            digester.write(iv);
+            try(ObjectOutputStream os = new ObjectOutputStream(new CipherOutputStream(digester, cipher.cipher))) {
+                os.writeObject(o);
+                digester.on(false);
+                os.writeObject(digester.getMessageDigest().digest());
+            }
+            bkupFile.delete();
+            
+        } finally {
+
+            synchronized(locks.get(fileName)) {
+                activeFiles.remove(fileName);
+                locks.get(fileName).notify();
+            }
         
+        }
     }
     
     /**
@@ -106,28 +111,34 @@ public final class EncryptionSerialization {
             activeFiles.add(fileName);
         }
         
-        Object output;
-        File file = new File(ServerConstants.SERVER_DIR);
-        DigestInputStream digester = new DigestInputStream(new FileInputStream(file), Utils.createMD());
-        try(ObjectInputStream is = new ObjectInputStream(new CipherInputStream(digester,
-                Utils.createCipher(Cipher.DECRYPT_MODE, decryptionKey,
-                        digester.readNBytes(Utils.bytesToInt(digester.readNBytes(Integer.BYTES)))).cipher))) {
-            output = is.readObject();
-            digester.on(false);
-            try {
-                if(MessageDigest.isEqual(digester.getMessageDigest().digest(), (byte[])is.readObject())) {
-                    throw new ClassCastException();
-                }
-            } catch(ClassCastException e) {
-                throw new InvalidObjectException("Invalid Hash");
-            }
-        }
+        try {
         
-        synchronized(locks.get(fileName)) {
-            activeFiles.remove(fileName);
-            locks.get(fileName).notify();
+            Object output;
+            File file = new File(ServerConstants.SERVER_DIR);
+            DigestInputStream digester = new DigestInputStream(new FileInputStream(file), Utils.createMD());
+            try(ObjectInputStream is = new ObjectInputStream(new CipherInputStream(digester,
+                    Utils.createCipher(Cipher.DECRYPT_MODE, decryptionKey,
+                            digester.readNBytes(Utils.bytesToInt(digester.readNBytes(Integer.BYTES)))).cipher))) {
+                output = is.readObject();
+                digester.on(false);
+                try {
+                    if(MessageDigest.isEqual(digester.getMessageDigest().digest(), (byte[])is.readObject())) {
+                        throw new ClassCastException();
+                    }
+                } catch(ClassCastException e) {
+                    throw new InvalidObjectException("Invalid Hash");
+                }
+            }
+            return output;
+            
+        } finally {
+
+            synchronized(locks.get(fileName)) {
+                activeFiles.remove(fileName);
+                locks.get(fileName).notify();
+            }
+            
         }
-        return output;
     }
     
     private EncryptionSerialization() {}
