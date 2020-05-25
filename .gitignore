@@ -73,4 +73,4 @@ hs_err_pid*
 #/java/VPT/nbproject/
 /java/VPT/nbproject/private
 /java/VPT/build/
-/java/VPT/dist/
+#/java/VPT/dist/
