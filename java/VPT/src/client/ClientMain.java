@@ -8,6 +8,7 @@ import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.ServerStatusPacket;
 import common.networking.ssl.SSLConfig;
 import common.networking.ssl.SSLConnection;
+import java.awt.GraphicsEnvironment;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,10 @@ public final class ClientMain {
     private static PacketOutputStream pos = null;
     
     public static void main(String[] args) {
+        if(GraphicsEnvironment.isHeadless()) {
+            System.err.println("Cannot run in headless enviornment");
+            System.exit(1);
+        }
         try {
             KeyStore truststore = KeyStore.getInstance(new File("C:\\VPT\\truststore.keystore"), "VPTtrst".toCharArray());
             SSLConfig.initClient(truststore);
