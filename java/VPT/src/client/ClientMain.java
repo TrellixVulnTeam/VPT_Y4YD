@@ -82,6 +82,8 @@ public final class ClientMain {
                 }
             }
         });
+        recieveThread.setDaemon(true);
+        recieveThread.start();
         ClientJNI.main(args);
     }
     
