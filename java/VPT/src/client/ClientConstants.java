@@ -18,6 +18,8 @@ public final class ClientConstants {
      * The {@link Branch} this client is in. This may activate or deactivate certain features
      */
     public static final Branch BRANCH = Branch.DEV;
+    public static final String SERVER_IP = "localhost";
+    public static final int SERVER_PORT = 0;
     
     private ClientConstants() {}
     
