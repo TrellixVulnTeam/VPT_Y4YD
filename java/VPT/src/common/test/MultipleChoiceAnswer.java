@@ -1,6 +1,10 @@
 package common.test;
 
-public class MultipleChoiceAnswer {
+import java.io.Serializable;
+
+public class MultipleChoiceAnswer implements Serializable {
+    
+    private static final long serialVersionUID = -7083064546445004713L;
     
     public final String answer;
     public final boolean isCorrect;

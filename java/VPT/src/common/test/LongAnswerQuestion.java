@@ -1,6 +1,8 @@
 package common.test;
 
-public class LongAnswerQuestion extends Question {
+public class LongAnswerQuestion extends NetQuestion {
+    
+    private static final long serialVersionUID = 2216411656854561767L;
     
     public final String question;
 
