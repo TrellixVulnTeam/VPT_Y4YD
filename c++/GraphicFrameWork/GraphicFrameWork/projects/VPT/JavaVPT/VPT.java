@@ -1,6 +1,6 @@
 class VPT  {  
 static{
-    System.load("C:\\Users\\richa\\source\\repos\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\JavaVPT\\Client.dll");
+    System.load("C:\\Users\\ryand\\Desktop\\Folders\\Visual Studio Projects\\Projects\\VPT\\c++\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\JavaVPT\\Client.dll");
 }
 static native void main1(String args[]);
 static native void forceLogout();

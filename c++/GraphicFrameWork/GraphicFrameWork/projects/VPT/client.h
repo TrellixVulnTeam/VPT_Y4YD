@@ -1,7 +1,7 @@
 #include <iostream>
-#include "C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\Instance.h"
+#include "../../Instance.h"
 #include <vector>
-#include "C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\Component.h"
+#include "../../Component.h"
 #include <cstdlib> 
 #include <ctime> 
 using namespace std;

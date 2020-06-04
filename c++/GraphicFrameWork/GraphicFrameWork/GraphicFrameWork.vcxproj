@@ -107,17 +107,17 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-14.0.1\include\win32;C:\Program Files\Java\jdk-14.0.1\include;C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\SDL2_ttf-2.0.15\include;C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\SDL2_image-2.0.5\include;C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-14.0.1\include\win32;C:\Program Files\Java\jdk-14.0.1\include;$(ProjectDir)SDL2_ttf-2.0.15\include;$(ProjectDir)SDL2_image-2.0.5\include;$(ProjectDir)SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\Java\jdk-14.0.1\lib;C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\SDL2_ttf-2.0.15\lib\x64;C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\SDL2_image-2.0.5\lib\x64;C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork\SDL2-2.0.10\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Java\jdk-14.0.1\lib;$(ProjectDir)SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)SDL2_image-2.0.5\lib\x64;$(ProjectDir)SDL2-2.0.10\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>cd C:\Users\richa\source\repos\GraphicFrameWork\GraphicFrameWork
-UpdateDll.bat</Command>
+      <Command>cd $(ProjectDir)
+call UpdateDll.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
