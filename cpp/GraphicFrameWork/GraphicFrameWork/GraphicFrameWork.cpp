@@ -61,6 +61,31 @@ JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray j
 
 JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet)
 {
+    jclass packetClass = env->FindClass("common.networking.packet.Packet");
+    if (!env->IsInstanceOf(packet, packetClass)) {
+        //Not a packet
+        return;
+    }
+    int packetId = env->GetIntField(packet, env->GetFieldID(packetClass, "id", "I"));
+    cout << packetId << endl;
+    if (packet == NULL || packetId == -1) {
+        //null packet
+        return;
+    }
+    if (packetId == 1) {
+        //force logout
+    }
+    if (packetId == 3) {
+        //ResultPacket
+        jclass resultPacketClass = env->FindClass("common.networking.packet.packets.result.ResultPacket");
+        if (!env->IsInstanceOf(packet, resultPacketClass)) {
+            //invalid result packet
+            return;
+        }
+        int resultId = env->GetIntField(packet, env->GetFieldID(resultPacketClass, "resultType", "I"));
+        //process packet
+    }
+    //unsupported packet type
     return;
 }
 
