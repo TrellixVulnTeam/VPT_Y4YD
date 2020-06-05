@@ -17,11 +17,11 @@ JNIEXPORT void JNICALL Java_client_ClientJNI_main
 
 /*
  * Class:     client_ClientJNI
- * Method:    forceLogout
- * Signature: ()V
+ * Method:    recievePacket
+ * Signature: (Lcommon/networking/packet/Packet;)V
  */
-JNIEXPORT void JNICALL Java_client_ClientJNI_forceLogout
-  (JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_client_ClientJNI_recievePacket
+  (JNIEnv *, jclass, jobject);
 
 /*
  * Class:     client_ClientJNI
