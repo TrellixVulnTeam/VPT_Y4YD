@@ -9,7 +9,7 @@ extern "C" {
 #endif
 /*
  * Class:     VPT
- * Method:    main1
+ * Method:    cppMain
  * Signature: ([Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_VPT_cppMain
@@ -17,11 +17,11 @@ JNIEXPORT void JNICALL Java_VPT_cppMain
 
 /*
  * Class:     VPT
- * Method:    forceLogout
- * Signature: ()V
+ * Method:    recievePacket
+ * Signature: (Ljava/lang/Object;)V
  */
-JNIEXPORT void JNICALL Java_VPT_forceLogout
-  (JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_VPT_recievePacket
+  (JNIEnv *, jclass, jobject);
 
 /*
  * Class:     VPT
