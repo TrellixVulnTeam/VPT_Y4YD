@@ -31,8 +31,9 @@ public:
 	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	void draw();
 	void update();
-	void ChangeText();
+	void ChangeText(string text);
 	TTF_Font* font_m;
+	string font_path;
 	SDL_Texture* texture;
 	SDL_Rect* srcR, destR;
 	SDL_Color textcolor_m;
@@ -59,4 +60,23 @@ private:
 	int text_h_m;
 	int x_offset_m;
 	int y_offset_m;
+};
+
+class TextField : public AppObject{
+public:
+	TextField(string font_path, int textsize, int x_offset, int y_offset);
+	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
+	void draw();
+	void input(SDL_Event e);
+	void update();
+	void TextFieldupdate(int CollisionVal);
+private:
+	Text* text_m;
+	string font_path_m;
+	int textsize_m;
+	string message;
+	int x_offset_m;
+	int y_offset_m;
+	int CollisionVal_m;
+	bool hasclicked;
 };
