@@ -9,10 +9,10 @@ extern "C" {
 #endif
 /*
  * Class:     client_ClientJNI
- * Method:    main
+ * Method:    cppMain
  * Signature: ([Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_client_ClientJNI_main
+JNIEXPORT void JNICALL Java_client_ClientJNI_cppMain
   (JNIEnv *, jclass, jobjectArray);
 
 /*

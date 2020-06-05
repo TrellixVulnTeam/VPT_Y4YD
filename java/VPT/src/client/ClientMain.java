@@ -81,7 +81,7 @@ public final class ClientMain {
         });
         recieveThread.setDaemon(true);
         recieveThread.start();
-        ClientJNI.main(args);
+        ClientJNI.cppMain(args);
     }
     
     public static void sendPacket(Packet p) throws IOException {

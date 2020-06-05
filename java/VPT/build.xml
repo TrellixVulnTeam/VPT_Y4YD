@@ -71,7 +71,4 @@
 
     -->
     
-    <target depends="-javadoc-build" name="-pre-jar">
-    </target>
-    
 </project>

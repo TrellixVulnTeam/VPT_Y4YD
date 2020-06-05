@@ -8,7 +8,7 @@ public final class ClientJNI {
         System.loadLibrary("Client.dll");
     }
     
-    public static native void main(String[] args);
+    public static native void cppMain(String[] args);
     public static native void recievePacket(Packet packet);
     public static native void socketClosed();
     
