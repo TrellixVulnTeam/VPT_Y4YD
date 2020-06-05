@@ -1,6 +1,7 @@
 package server;
 
 import common.Constants;
+import common.networking.packet.Packet;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.ForceLogoutPacket;
@@ -77,7 +78,11 @@ public class ConnectionHandler {
         onUserDeletion = this::onUserDeletion;
         while(!connection.socket.isClosed()) {
             try {
-                pos.writePacket(PacketHandler.process(pis.readPacket(), onUserDeletion, connection));
+                Packet packet = PacketHandler.process(pis.readPacket(), onUserDeletion, connection);
+                if(packet == null) {
+                    continue;
+                }
+                pos.writePacket(packet);
             } catch(IOException e) {
                 if(e instanceof EOFException) {
                     try {

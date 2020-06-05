@@ -61,11 +61,16 @@ public final class ClientMain {
         Thread recieveThread = new Thread(() -> {
             while(socket.isClosed()) {
                 try {
-                    ClientJNI.recievePacket(pis.readPacket());
+                    Packet packet = pis.readPacket();
+                    if(packet == null || packet.id == PacketId.NULL.id) {
+                        continue;
+                    }
+                    ClientJNI.recievePacket(packet);
                 } catch(Exception e) {
                     if(e instanceof EOFException) {
                         try {
                             socket.close();
+                            break;
                         } catch(IOException exc) {}
                     }
                     if(socket.isClosed()) {

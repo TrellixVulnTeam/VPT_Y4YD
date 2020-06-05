@@ -30,6 +30,9 @@ public final class PacketHandler {
      */
     public static ResultPacket process(Packet p, Runnable onUserDeletion, SSLConnection connection) {
         try {
+            if(p == null || p.id == PacketId.NULL.id) {
+                return null;
+            }
             if(p.id == PacketId.LOGIN.id) {
                 RequestService.request(connection, "Login", ServerConstants.USER_SPEC_REQUESTS_TE);
                 User currentUser = LoginService.getCurrentUser();
