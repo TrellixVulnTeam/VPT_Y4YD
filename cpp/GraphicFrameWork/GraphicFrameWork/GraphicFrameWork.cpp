@@ -61,7 +61,7 @@ JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray j
 
 JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet)
 {
-    jclass packetClass = env->FindClass("common.networking.packet.Packet");
+    jclass packetClass = env->FindClass("common/networking/packet/Packet");
     if (!env->IsInstanceOf(packet, packetClass)) {
         //Not a packet
         return;
@@ -77,7 +77,7 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
     }
     if (packetId == 3) {
         //ResultPacket
-        jclass resultPacketClass = env->FindClass("common.networking.packet.packets.result.ResultPacket");
+        jclass resultPacketClass = env->FindClass("common/networking/packet/packets/result/ResultPacket");
         if (!env->IsInstanceOf(packet, resultPacketClass)) {
             //invalid result packet
             return;
