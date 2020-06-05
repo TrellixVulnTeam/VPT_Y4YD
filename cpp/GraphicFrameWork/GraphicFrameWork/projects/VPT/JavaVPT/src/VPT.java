@@ -13,7 +13,7 @@ static{
     }
 }
 static native void cppMain(String args[]);
-static native void forceLogout();
+static native void recievePacket(Object obj);
 static native void socketClosed();
 public static void CallBack(){System.out.println("TEST");};
 public static void main(String args[]) {  

@@ -5,12 +5,12 @@
 #include <SDL_ttf.h>
 #include <jni.h>
 #include "projects/VPT/client.h"
-#include "projects/VPT/VPT.h"
 #include <vector>
+#include "projects/VPT/VPT.h"
 using namespace std;
 vector <AppInstance*> instances;
 JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv *env, jclass claz, jobjectArray ja);
-JNIEXPORT void JNICALL Java_VPT_forceLogout(JNIEnv* env, jclass claz);
+JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet);
 JNIEXPORT void JNICALL Java_VPT_socketClosed(JNIEnv* env, jclass claz);
 int main(int argc, char* argv[])
 {
@@ -59,7 +59,7 @@ JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray j
     return;
 }
 
-JNIEXPORT void JNICALL Java_VPT_forceLogout(JNIEnv* env, jclass claz)
+JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet)
 {
     return;
 }
