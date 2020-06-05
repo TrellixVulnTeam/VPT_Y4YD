@@ -1,7 +1,9 @@
 cd projects
 cd VPT
 cd JavaVPT
+cd src
 DEL Client.dll
+cd ..
 cd ..
 cd ..
 cd ..
