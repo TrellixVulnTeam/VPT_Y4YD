@@ -14,7 +14,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -24,10 +23,8 @@
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
-*.exe
 *.out
 *.app
 
@@ -44,11 +41,9 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
-*.zip
 *.tar.gz
 *.rar
 
@@ -66,6 +61,8 @@ hs_err_pid*
 /c++/VPT/Server/x64/Debug/
 /c++/VPT/x64/
 
+*.ipch
+
 #/java/VPT/nbproject/private/
 #/java/VPT/build/
 #/java/VPT/build.xml
@@ -74,3 +71,14 @@ hs_err_pid*
 /java/VPT/nbproject/private
 /java/VPT/build/
 #/java/VPT/dist/
+/cpp/GraphicFrameword/.vs/GraphicFrameWork/v16/
+/cpp/GraphicFrameword/.vs/GraphicFrameWork/v16/ipch/AutoPCH
+/cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/JavaVPT/JavaVPT/nbproject/private/
+/cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/JavaVPT/nbproject/private/
+/cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/JavaVPT/JavaVPTNB/nbproject/private/
+/cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/JavaVPTNB/nbproject/private/
+/cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/JavaVPTNB/build/
+/cpp/GraphicFrameWork/.vs/GraphicFrameWork/v16/Browse.VC.db
+/cpp/GraphicFrameWork/.vs/GraphicFrameWork/v16/Browse.VC.opendb
+/cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/JavaVPT/nbproject/private/
+/cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/JavaVPT/build/
