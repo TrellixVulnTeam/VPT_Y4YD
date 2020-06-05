@@ -12,7 +12,7 @@ extern "C" {
  * Method:    main1
  * Signature: ([Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_VPT_main1
+JNIEXPORT void JNICALL Java_VPT_cppMain
   (JNIEnv *, jclass, jobjectArray);
 
 /*
