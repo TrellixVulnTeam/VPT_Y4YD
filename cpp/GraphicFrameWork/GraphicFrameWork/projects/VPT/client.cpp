@@ -12,7 +12,7 @@ void client::client::Init(const char* window_title, int w, int h)
 	//init objects here
 
 	//text init
-	text = new Text(path, "Test3", SDL_Color{0,0,0,255}, 60);
+	text = new Text(path, "Test4", SDL_Color{0,0,0,255}, 60);
 	text->Init(renderer, 100, 100, 100, 100);
 	//text init
 

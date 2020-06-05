@@ -2,7 +2,6 @@ package client;
 
 import common.Constants;
 import common.networking.packet.Packet;
-import common.networking.packet.PacketId;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
 import common.networking.packet.packets.ServerStatusPacket;
@@ -20,13 +19,36 @@ import java.security.cert.CertificateException;
 import javax.net.ssl.SSLSocket;
 import javax.swing.JOptionPane;
 
+/**
+ * Provides an entry point for the client side of the VPT
+ */
 public final class ClientMain {
     
+    /**
+     * A SSLConnection binding the {@link #socket} containing the connection to its corresponding packet streams
+     */
     private static SSLConnection connection = null;
+    /**
+     * The SSLSocket holding the client's connection to the server
+     */
     private static SSLSocket socket = null;
+    /**
+     * The PacketInputStream used to receive data from the server
+     */
     private static PacketInputStream pis = null;
+    /**
+     * The PacketOutputStream used to send data from the server
+     */
     private static PacketOutputStream pos = null;
+    /**
+     * Controls whether the native client code is notified when the {@link #socket} is closed. This ensures that the native code is not notified of a close it initiated.
+     */
+    private static boolean doNativeSocketCloseNotify = true;
     
+    /**
+     * The entry point for the client side of the VPT
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         if(GraphicsEnvironment.isHeadless()) {
             System.err.println("Cannot run in headless enviornment");
@@ -74,7 +96,9 @@ public final class ClientMain {
                         } catch(IOException exc) {}
                     }
                     if(socket.isClosed()) {
-                        ClientJNI.socketClosed();
+                        if(doNativeSocketCloseNotify) {
+                            ClientJNI.socketClosed();
+                        }
                         break;
                     } else {
                         if(ClientConstants.BRANCH.id <= Constants.Branch.ALPHA.id) {
@@ -89,14 +113,29 @@ public final class ClientMain {
         ClientJNI.cppMain(args);
     }
     
-    public static void sendPacket(Packet p) throws IOException {
-        pos.writePacket(p);
+    /**
+     * Sends a packet to to the server
+     * @param packet the Packet to send to the server
+     * @throws IOException if an error occurs sending the packet
+     */
+    public static void sendPacket(Packet packet) throws IOException {
+        pos.writePacket(packet);
     }
     
+    /**
+     * Closes the connection to the server
+     * @throws IOException if an error occurs closing the connection
+     */
     public static void closeSocket() throws IOException {
+        doNativeSocketCloseNotify = false;
         socket.close();
     }
     
+    /**
+     * Notifies the user of an error while connecting to the server and terminates the program
+     * @param error a message describing the error
+     * @param e the exception causing the error
+     */
     private static void handleStartupError(String error, Exception e) {
         if(ClientConstants.BRANCH.id <= Constants.Branch.ALPHA.id) {
             System.err.println(error + ": ");
@@ -107,6 +146,13 @@ public final class ClientMain {
         System.exit(1);
     }
 
+    /**
+     * Checks that the client and server are of compatible versions and branches and notifies the user if there is an error
+     * @param minClientVersion the server's minimum supported client version
+     * @param maxClientVersion the server's maximum supported client version
+     * @param serverBranchId the {@link Constants#Branch#id} of the {@link Constants#Branch} of the server
+     * @param serverStatusPacket a ServerStatusPacket representing the status of the server
+     */
     private static void checkConnection(double minClientVersion, double maxClientVersion, int serverBranchId, ServerStatusPacket serverStatusPacket) {
         boolean isClientDev = ClientConstants.BRANCH.id <= Constants.Branch.ALPHA.id;
         boolean isServerDev = serverBranchId <= Constants.Branch.ALPHA.id;
