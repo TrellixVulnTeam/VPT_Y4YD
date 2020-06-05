@@ -1,6 +1,5 @@
 client
 common
-common.networking
 common.networking.packet
 common.networking.packet.packets
 common.networking.packet.packets.result
