@@ -61,15 +61,7 @@ public final class ClientMain {
         Thread recieveThread = new Thread(() -> {
             while(socket.isClosed()) {
                 try {
-                    Packet packet = pis.readPacket();
-                    if(packet.id == PacketId.NULL.id) {
-                        continue;
-                    }
-                    if(packet.id == PacketId.FORCE_LOGOUT.id) {
-                        ClientJNI.forceLogout();
-                        continue;
-                    }
-                    //Send Packet To Client
+                    ClientJNI.recievePacket(pis.readPacket());
                 } catch(Exception e) {
                     if(e instanceof EOFException) {
                         try {
@@ -90,6 +82,14 @@ public final class ClientMain {
         recieveThread.setDaemon(true);
         recieveThread.start();
         ClientJNI.main(args);
+    }
+    
+    public static void sendPacket(Packet p) throws IOException {
+        pos.writePacket(p);
+    }
+    
+    public static void closeSocket() throws IOException {
+        socket.close();
     }
     
     private static void handleStartupError(String error, Exception e) {
