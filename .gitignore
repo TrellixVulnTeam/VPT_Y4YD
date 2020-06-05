@@ -61,6 +61,8 @@ hs_err_pid*
 /c++/VPT/Server/x64/Debug/
 /c++/VPT/x64/
 
+*.ipch
+
 #/java/VPT/nbproject/private/
 #/java/VPT/build/
 #/java/VPT/build.xml
