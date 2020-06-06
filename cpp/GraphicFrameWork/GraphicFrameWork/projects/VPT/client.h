@@ -4,6 +4,9 @@
 #include "../../Component.h"
 #include <cstdlib> 
 #include <ctime> 
+#include "Packet.h"
+#include <mutex>
+#include <queue>
 using namespace std;
 
 namespace client {
@@ -33,11 +36,15 @@ namespace client {
 		void Draw();
 		void Update();
 		void Input();
+		static void QueuePacket(Packet *p);
+		static Packet* PollPacketQueue();
 		AppData appdata;
 	private:
 		TextField* tf;
 		Text *text;
 		TextField* tf1;
+		static queue<Packet*> PacketQueue;
+		static mutex PacketQueueLock;
 	};
 
 };

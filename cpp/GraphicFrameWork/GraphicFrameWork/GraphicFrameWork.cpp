@@ -61,8 +61,9 @@ JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray j
     return;
 }
 
-JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet)
+JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packetIn)
 {
+    jobject packet = env->NewGlobalRef(packetIn);
     jclass packetClass = env->FindClass("common/networking/packet/Packet");
     if (!env->IsInstanceOf(packet, packetClass)) {
         //Not a packet
@@ -75,7 +76,7 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
         return;
     }
     if (packetId == PacketId_FORCE_LOGOUT) {
-        //force logout
+        client::client::QueuePacket(new Packet(packet, packetId,  ResultId_NULL));
     }
     if (packetId == PacketId_RESULT) {
         //ResultPacket
@@ -89,7 +90,7 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
             //null result packet
             return;
         }
-        //process packet
+        client::client::QueuePacket(new Packet(packet, packetId, resultId));
     }
     //unsupported packet type
     return;

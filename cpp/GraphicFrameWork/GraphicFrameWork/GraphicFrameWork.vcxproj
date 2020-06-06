@@ -162,6 +162,7 @@ call UpdateDll.bat</Command>
     <ClCompile Include="GraphicFrameWork.cpp" />
     <ClCompile Include="Instance.cpp" />
     <ClCompile Include="projects\VPT\client.cpp" />
+    <ClCompile Include="projects\VPT\Packet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppObject.h" />
@@ -169,6 +170,7 @@ call UpdateDll.bat</Command>
     <ClInclude Include="Include.h" />
     <ClInclude Include="Instance.h" />
     <ClInclude Include="projects\VPT\client.h" />
+    <ClInclude Include="projects\VPT\Packet.h" />
     <ClInclude Include="projects\VPT\PacketId.h" />
     <ClInclude Include="projects\VPT\ResultId.h" />
   </ItemGroup>

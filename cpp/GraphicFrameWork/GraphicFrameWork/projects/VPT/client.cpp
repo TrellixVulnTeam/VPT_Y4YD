@@ -95,5 +95,25 @@ void client::client::Input()
 			object->input(e);
 		}
 	}
-	
+
+}
+
+void client::client::QueuePacket(Packet *p) {
+	PacketQueueLock.lock();
+	PacketQueue.push(p);
+	PacketQueueLock.unlock();
+}
+
+Packet* client::client::PollPacketQueue() {
+	Packet* out;
+	PacketQueueLock.lock();
+	if (PacketQueue.empty()) {
+		out = nullptr;
+	}
+	else {
+		out = PacketQueue.front();
+		PacketQueue.pop();
+	}
+	PacketQueueLock.unlock();
+	return out;
 }

@@ -30,6 +30,9 @@
     <ClCompile Include="projects\VPT\client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="projects\VPT\Packet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Instance.h">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="projects\VPT\ResultId.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\Packet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
