@@ -48,6 +48,7 @@ void AppObject::ChangeImage(const char* img_path)
 
 Text::Text(string font, string text, SDL_Color textcolor, int textsize)
 {
+	message = text;
 	textsize_m = textsize;
 	textcolor_m = textcolor;
 	font_path = font;
@@ -84,9 +85,16 @@ void Text::update()
 	destR.y = y_m;
 }
 
+void Text::GetTextSize()
+{
+	if(TTF_SizeText(font_m, message.c_str(), &text_w, &text_h) != -1){
+		//cout << "Width : " << text_w << " Height: " << text_h << std::endl;
+	}
+}
+
 void Text::ChangeText(string text)
 {
-	font_m = TTF_OpenFont(font_path.c_str(), textsize_m);
+	message = text;
 	tmpsurface = TTF_RenderText_Blended(font_m, text.c_str(), textcolor_m);
 	texture = SDL_CreateTextureFromSurface(renderer_m, tmpsurface);
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
@@ -191,7 +199,7 @@ void TextField::input(SDL_Event e)
 		SDL_StopTextInput();
 	}
 	if (hasclicked == true) {
-		if (e.type == SDL_TEXTINPUT) {
+		if (e.type == SDL_TEXTINPUT && !hasTextReachedBorder()) {
 			message = message + e.text.text;
 		}
 		if (e.type == SDL_KEYDOWN) {
@@ -209,11 +217,22 @@ void TextField::update()
 	destR.w = width;
 	destR.x = x_m;
 	destR.y = y_m;
-	text_m->update();
 	text_m->ChangeText(message);
+	text_m->GetTextSize();
+	text_m->update();
 }
 
 void TextField::TextFieldupdate(int CollisionVal)
 {
 	CollisionVal_m = CollisionVal;
+}
+
+bool TextField::hasTextReachedBorder()
+{	
+	if (text_m->text_w + x_offset_m + 20 < width) {
+		return false;
+	}
+	else {
+		return true;
+	}
 }

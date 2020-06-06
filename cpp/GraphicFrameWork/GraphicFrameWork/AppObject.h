@@ -31,9 +31,11 @@ public:
 	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	void draw();
 	void update();
+	void GetTextSize();
 	void ChangeText(string text);
 	TTF_Font* font_m;
 	string font_path;
+	string message;
 	SDL_Texture* texture;
 	SDL_Rect* srcR, destR;
 	SDL_Color textcolor_m;
@@ -41,6 +43,7 @@ public:
 	int width, height;
 	int x_m, y_m;
 	int textsize_m;
+	int text_w, text_h;
 	SDL_Surface* tmpsurface;
 };
 
@@ -51,7 +54,6 @@ public:
 	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	void draw();
 	void input(SDL_Event e);
-private:
 	const char* hovered_image_path;
 	const char* image_path1;
 	int CollisionVal_m;
@@ -70,7 +72,7 @@ public:
 	void input(SDL_Event e);
 	void update();
 	void TextFieldupdate(int CollisionVal);
-private:
+	bool hasTextReachedBorder();
 	Text* text_m;
 	string font_path_m;
 	int textsize_m;
