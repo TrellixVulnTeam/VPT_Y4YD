@@ -120,6 +120,7 @@ public class PacketInputStream extends FilterInputStream implements ObjectInput 
     }
 
     @Override
+    @Deprecated
     public String readLine() throws IOException {
         return ois.readLine();
     }

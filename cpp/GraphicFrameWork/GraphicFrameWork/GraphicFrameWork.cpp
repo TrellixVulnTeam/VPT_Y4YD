@@ -7,6 +7,8 @@
 #include "projects/VPT/client.h"
 #include <vector>
 #include "projects/VPT/VPT.h"
+#include "projects/VPT/PacketId.h"
+#include "projects/VPT/ResultId.h"
 using namespace std;
 vector <AppInstance*> instances;
 JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv *env, jclass claz, jobjectArray ja);
@@ -68,14 +70,14 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
     }
     int packetId = env->GetIntField(packet, env->GetFieldID(packetClass, "id", "I"));
     cout << packetId << endl;
-    if (packet == NULL || packetId == -1) {
+    if (packet == NULL || packetId == PacketId_NULL) {
         //null packet
         return;
     }
-    if (packetId == 1) {
+    if (packetId == PacketId_FORCE_LOGOUT) {
         //force logout
     }
-    if (packetId == 3) {
+    if (packetId == PacketId_RESULT) {
         //ResultPacket
         jclass resultPacketClass = env->FindClass("common/networking/packet/packets/result/ResultPacket");
         if (!env->IsInstanceOf(packet, resultPacketClass)) {
@@ -83,6 +85,10 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
             return;
         }
         int resultId = env->GetIntField(packet, env->GetFieldID(resultPacketClass, "resultType", "I"));
+        if (resultId == ResultId_NULL) {
+            //null result packet
+            return;
+        }
         //process packet
     }
     //unsupported packet type
