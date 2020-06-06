@@ -37,6 +37,10 @@ void AppObject::update()
 	destR.y = y_m;
 }
 
+void AppObject::input(SDL_Event e)
+{
+}
+
 void AppObject::ChangeImage(const char* img_path)
 {
 	image_path = img_path;
@@ -185,18 +189,19 @@ void TextField::draw()
 
 void TextField::input(SDL_Event e)
 {
-	if (e.type == SDL_MOUSEBUTTONUP && CollisionVal_m != -1) {
-		if (message == "Type") {
-			message = "";
+	if (e.type == SDL_MOUSEBUTTONUP) {
+		cout << id << " " << CollisionVal_m << endl;
+		if (CollisionVal_m != -1) {
+			if (message == "Type") {
+				message = "";
+			}
+			hasclicked = true;
+			cout << "focus" << endl;
 		}
-		hasclicked = true;
-		SDL_StartTextInput();
-		cout << "focus" << endl;
-	}
-	if (e.type == SDL_MOUSEBUTTONUP && CollisionVal_m == -1) {
-		hasclicked = false;
-		cout << "out of focus" << endl;
-		SDL_StopTextInput();
+		else {
+			hasclicked = false;
+			cout << "out of focus" << endl;
+		}
 	}
 	if (hasclicked == true) {
 		if (e.type == SDL_TEXTINPUT && !hasTextReachedBorder()) {

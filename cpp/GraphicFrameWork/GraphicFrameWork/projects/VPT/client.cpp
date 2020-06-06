@@ -11,9 +11,16 @@ void client::client::Init(const char* window_title, int w, int h)
 	string img_path = "..\\";
 	//init objects here
 
+	//AppObjects vector because is need for collision component
+	AppObjects.push_back(new AppObject());
+	AppObjects[0]->PreInit("");
+	AppObjects[0]->Init(renderer, 1, 1, 0, 0);
+	//AppObjects vector because is need for collision component
+
 	//text init
-	text = new Text(path, "VPT TEST", SDL_Color{0, 0, 0, 255}, 100);
+	text = new Text(path, "VPT", SDL_Color{ 0, 0, 0, 255 }, 100);
 	text->Init(renderer, 0, 0, 270, 0);
+	AppObjects.push_back(text);
 	//text init
 
 	//button init
@@ -23,52 +30,60 @@ void client::client::Init(const char* window_title, int w, int h)
 	TextFieldData tfd;
 	tf = new TextField(path, tfd.textsize, tfd.x_offset, tfd.y_offset);
 	tf->Init(renderer, tfd.w, tfd.h, 270, 160);
-	tf->id = 12;
+	AppObjects.push_back(tf);
+	tf1 = new TextField(path, tfd.textsize, tfd.x_offset, tfd.y_offset);
+	tf1->Init(renderer, tfd.w, tfd.h, 270, 270);
+	AppObjects.push_back(tf1);
 	//tg init
 
-	//AppObjects vector because is need for collision component
-	AppObjects.push_back(new AppObject());
-	AppObjects[0]->PreInit("");
-	AppObjects[0]->Init(renderer, 1, 1, 0, 0);
-	//AppObjects vector because is need for collision component
-
+	for (unsigned int i = 0; i < AppObjects.size(); i++) {
+		AppObjects[i]->id = i;
+	}
 	//init objects here
 
 
 	//init components here
-	cm.AttachComponent(new CollisionBox(AppObjects), tf);
+	for (AppObject* object : AppObjects) {
+		if (TextField* TextFieldObj = dynamic_cast<TextField*>(object)) {
+			cm.AttachComponent(new CollisionBox(AppObjects), object);
+		}
+	}
 	//init components here
 }
 
 void client::client::Draw()
 {
 	SDL_RenderClear(renderer);
-	tf->draw();
-	text->draw();
+	for (AppObject* object : AppObjects) {
+		object->draw();
+	}
 	SDL_RenderPresent(renderer);
 }
 
 void client::client::Update()
 {
 	int UpdateVal;
-	tf->update();
-	text->update();
-	for (unsigned int i = 0; i < cm.UpdateSectorComponents.size(); i++) {
-		UpdateVal = cm.UpdateSectorComponents[i]->run(AppObjects);
-		//cout << UpdateVal << endl;
-		if (cm.UpdateSectorComponents[i]->parent_m->id == 10) {
-
+	for (AppObject* object : AppObjects) {
+		object->update();
+	}
+	for (Component* c : cm.UpdateSectorComponents) {
+		UpdateVal = c->run(AppObjects);
+		AppObject* object1 = AppObjects[c->parent_m->id];
+		if (TextField* TextFieldObj = dynamic_cast<TextField*>(object1)) {
+			SDL_StartTextInput();
+			TextFieldObj->TextFieldupdate(UpdateVal);
+			
 		}
-		if (cm.UpdateSectorComponents[i]->parent_m->id == 12) {
-			tf->TextFieldupdate(UpdateVal);
+		else {
+			SDL_StopTextInput();
 		}
 	}
 }
 
 void client::client::Input()
 {
-	for (unsigned int i = 0; i < cm.InputSectorComponents.size(); i++) {
-		cm.InputSectorComponents[i]->run(AppObjects);
+	for (Component* c: cm.InputSectorComponents) {
+		c->run(AppObjects);
 	}
 	if (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT) { running = false; }
@@ -76,7 +91,9 @@ void client::client::Input()
 			AppObjects[0]->x_m = e.motion.x;
 			AppObjects[0]->y_m = e.motion.y;
 		}
-		tf->input(e);
+		for (AppObject* object : AppObjects) {
+			object->input(e);
+		}
 	}
 	
 }

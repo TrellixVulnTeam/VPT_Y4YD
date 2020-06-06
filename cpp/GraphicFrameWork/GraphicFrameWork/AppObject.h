@@ -14,6 +14,7 @@ public:
 	virtual void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	virtual void draw();
 	virtual void update();
+	virtual void input(SDL_Event e);
 	virtual void ChangeImage(const char* img_path);
 	const char* image_path;
 	SDL_Texture* texture;
@@ -79,6 +80,6 @@ public:
 	string message;
 	int x_offset_m;
 	int y_offset_m;
-	int CollisionVal_m;
+	int CollisionVal_m = -1;
 	bool hasclicked;
 };

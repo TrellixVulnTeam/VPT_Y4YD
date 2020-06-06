@@ -23,6 +23,9 @@ namespace client {
 	struct buttondata {
 
 	};
+
+
+	 
 	class client : public AppInstance{
 	public:
 		client();
@@ -34,6 +37,7 @@ namespace client {
 	private:
 		TextField* tf;
 		Text *text;
+		TextField* tf1;
 	};
 
 };
