@@ -1,6 +1,9 @@
 
 import java.io.File;
 
+/**
+ * A test class mirroring the structure of ClientJNI with code to call cppMain
+ */
 class VPT  {  
 static{
     //See client.ClientJNI for explination
