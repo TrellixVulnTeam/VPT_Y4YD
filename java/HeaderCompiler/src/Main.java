@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
+/**
+ * A class used for building the main project and compiling certain enums to c++ header files defining macros
+ */
 public class Main {
     
     public static void main(String[] args) throws Exception {
