@@ -1,5 +1,7 @@
 #include "client.h"
 const string path = "..\\PrinceValiant.ttf";
+static queue<Packet*> PacketQueue;
+static mutex PacketQueueLock;
 
 client::client::client()
 {

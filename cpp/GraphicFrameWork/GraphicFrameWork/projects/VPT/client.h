@@ -43,8 +43,6 @@ namespace client {
 		TextField* tf;
 		Text *text;
 		TextField* tf1;
-		static queue<Packet*> PacketQueue;
-		static mutex PacketQueueLock;
 	};
 
 };
