@@ -41,7 +41,7 @@ public class Test implements Serializable {
         this.name = name;
         this.language = language;
         this.difficulty = difficulty;
-        this.questions = new ArrayList(questions);
+        this.questions = new ArrayList<>(questions);
     }
     
     /**

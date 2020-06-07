@@ -87,6 +87,8 @@ public final class RequestService {
      */
     public static class TooManyRequestsException extends Exception {
 
+        private static final long serialVersionUID = -6270044885011178939L;
+
         /**
          * The time (in nanoseconds) until the client can resend the request
          */

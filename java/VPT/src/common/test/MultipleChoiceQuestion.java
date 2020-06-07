@@ -63,7 +63,7 @@ public class MultipleChoiceQuestion extends Question {
     public MultipleChoiceQuestion(String question, int associatedPoints, boolean overrideMultipleAnswer, Collection<MultipleChoiceAnswer> answers) {
         super(question, associatedPoints, QuestionType.MULTIPLE_CHOICE);
         this.overrideMultipleAnswer = overrideMultipleAnswer;
-        this.answers = new ArrayList(answers);
+        this.answers = new ArrayList<>(answers);
     }
     
     /**
@@ -83,6 +83,6 @@ public class MultipleChoiceQuestion extends Question {
      * @return a copy of the internal array of MultipleChoiceAnswers
      */
     public ArrayList<MultipleChoiceAnswer> getAnswers() {
-        return new ArrayList(answers);
+        return new ArrayList<>(answers);
     }
 }

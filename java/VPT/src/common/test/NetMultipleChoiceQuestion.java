@@ -62,14 +62,14 @@ public class NetMultipleChoiceQuestion extends NetQuestion {
     public NetMultipleChoiceQuestion(String question, int associatedPoints, boolean overrideMultipleAnswer, Collection<String> answers) {
         super(question, associatedPoints, QuestionType.MULTIPLE_CHOICE);
         this.overrideMultipleAnswer = overrideMultipleAnswer;
-        this.answers = new ArrayList(answers);
+        this.answers = new ArrayList<>(answers);
     }
     
     /**
      * Retrieves a copy of the internal array of answers
      * @return a copy of the internal array of answers
      */
-    public ArrayList<MultipleChoiceAnswer> getAnswers() {
-        return new ArrayList(answers);
+    public ArrayList<String> getAnswers() {
+        return new ArrayList<>(answers);
     }
 }

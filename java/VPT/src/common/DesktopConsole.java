@@ -23,8 +23,7 @@ public final class DesktopConsole {
     *         The behaviour on a
     *         {@code null} argument depends on the <a
     *         href="../util/Formatter.html#syntax">conversion</a>.
-     * @throws IllegalStateException If no valid console implementation could be found
-     */
+    */
     public static void format​(String fmt, Object... args) {
         JOptionPane.showMessageDialog(null, String.format(fmt, args), "VPT", JOptionPane.PLAIN_MESSAGE);
     }
@@ -47,16 +46,14 @@ public final class DesktopConsole {
     *         The behavior on a
     *         {@code null} argument depends on the <a
     *         href="../util/Formatter.html#syntax">conversion</a>.
-     * @throws IllegalStateException If no valid console implementation could be found
      */
     public static void printf​(String format, Object... args) {
-        format(format, args);
+        format​(format, args);
     }
     
     /**
      * Reads a single line of text from the user
      * @return A string containing the line read from the user
-     * @throws IllegalStateException IllegalStateException If no valid console implementation could be found
      */
     public static String readLine() {
         return JOptionPane.showInputDialog(null, "", "VPT", JOptionPane.PLAIN_MESSAGE);
@@ -76,7 +73,6 @@ public final class DesktopConsole {
     *         {@code null} argument depends on the <a
     *         href="../util/Formatter.html#syntax">conversion</a>.r
      * @return A string containing the line read from the user
-     * @throws IllegalStateException IllegalStateException If no valid console implementation could be found
      */
     public static String readLine​(String fmt, Object... args) {
         return JOptionPane.showInputDialog(null, String.format(fmt, args), "VPT", JOptionPane.PLAIN_MESSAGE);
@@ -86,7 +82,6 @@ public final class DesktopConsole {
     /**
      * Reads a password or passphrase from the user
      * @return A character array containing the password or passphrase read from the user
-     * @throws IllegalStateException IllegalStateException If no valid console implementation could be found
      * @see java.io.Console#readPassword() 
      * @see DesktopConsole#readPassword() 
      */
@@ -110,7 +105,6 @@ public final class DesktopConsole {
     *         {@code null} argument depends on the <a
     *         href="../util/Formatter.html#syntax">conversion</a>.r
      * @return A character array containing the password or passphrase read from the user
-     * @throws IllegalStateException IllegalStateException If no valid console implementation could be found
      * @see java.io.Console#readPassword​(java.lang.String, java.lang.Object...) 
      * @see DesktopConsole#readPassword​(java.lang.String, java.lang.Object...) 
      */

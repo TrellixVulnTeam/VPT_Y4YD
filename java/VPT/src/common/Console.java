@@ -69,7 +69,7 @@ public final class Console {
         if(allowSystem && (preferSystem || !allowDesktop)) {
             systemConsole.format(fmt, args);
         } else {
-            DesktopConsole.format(fmt, args);
+            DesktopConsole.format​(fmt, args);
         }
     }
     
@@ -98,7 +98,7 @@ public final class Console {
     public void printf​(String format, Object... args) throws IllegalStateException {
         checkState();
         if(allowSystem && (preferSystem || !allowDesktop)) {
-            systemConsole.printf​(format, args);
+            systemConsole.printf(format, args);
         } else {
             DesktopConsole.printf​(format, args);
         }
@@ -143,7 +143,7 @@ public final class Console {
         if(allowSystem && (preferSystem || !allowDesktop)) {
             return systemConsole.readLine(fmt, args);
         } else {
-            return DesktopConsole.readLine(fmt, args);
+            return DesktopConsole.readLine​(fmt, args);
         }
     }
     
@@ -184,7 +184,7 @@ public final class Console {
     public char[] readPassword​(String fmt, Object... args) throws IllegalStateException {
         checkState();
         if(allowSystem && (preferSystem || !allowDesktop)) {
-            return systemConsole.readPassword​(fmt, args);
+            return systemConsole.readPassword(fmt, args);
         } else {
             return DesktopConsole.readPassword​(fmt, args);
         }

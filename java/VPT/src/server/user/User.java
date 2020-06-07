@@ -112,7 +112,7 @@ public class User extends PublicUser {
         LoginService.checkAccess(this);
         readWriteLock.writeLock().lock();
         try {
-            if(this.isVisible != this.isVisible) {
+            if(isVisible != this.isVisible) {
                 this.isVisible = isVisible;
                 UserStore.notifyVisibilityChange(this);
                 UserStore.notifyUserChange(this);

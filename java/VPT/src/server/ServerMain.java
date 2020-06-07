@@ -52,7 +52,7 @@ public final class ServerMain {
         createDirs();
         try {
             try {
-                char[] sslKeystorePassword = console.readPassword("Enter SSL Keystore Password: ");
+                char[] sslKeystorePassword = console.readPassword​("Enter SSL Keystore Password: ");
                 KeyStore sslKeystore = KeyStore.getInstance(new File(ServerConstants.SERVER_DIR + File.separator + "SSLKeystore.keystore"), sslKeystorePassword);
                 SSLConfig.initServer(sslKeystore, sslKeystorePassword, "sslkey");
             } catch(CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException e) {

@@ -57,7 +57,7 @@ public final class UserStore {
     /**
      * Contains methods to be run on the deletion of users
      */
-    private static final ConcurrentHashMap<String, ArrayList<Runnable>> deletionSubscribers = new ConcurrentHashMap();
+    private static final ConcurrentHashMap<String, ArrayList<Runnable>> deletionSubscribers = new ConcurrentHashMap<>();
     /**
      * Protects access to {@link #deletionSubscribers}
      */
