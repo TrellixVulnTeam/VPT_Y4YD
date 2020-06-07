@@ -164,8 +164,9 @@ void Button::input(SDL_Event e)
 	}
 }
 
-TextField::TextField(string placeHolderText, string font_path, int textsize, int x_offset, int y_offset)
+TextField::TextField(string placeHolderText, string font_path, int textsize, int x_offset, int y_offset, char pwChar)
 {
+	pwChar_m = pwChar;
 	placeHolderText_m = placeHolderText;
 	font_path_m = font_path;
 	textsize_m = textsize;
@@ -221,7 +222,7 @@ void TextField::input(SDL_Event e)
 }
 
 void TextField::updateText() {
-	text_m->ChangeText(message == "" && !hasclicked ? placeHolderText_m : message);
+	text_m->ChangeText(message == "" && !hasclicked ? placeHolderText_m : pwChar_m == 0 ? message : string(message.length(), pwChar_m));
 }
 
 void TextField::update()

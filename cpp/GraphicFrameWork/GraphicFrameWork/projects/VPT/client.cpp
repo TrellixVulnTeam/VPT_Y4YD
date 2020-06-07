@@ -37,7 +37,7 @@ void client::client::Init(const char* window_title, int w, int h)
 	tf = new TextField("Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset);
 	tf->Init(renderer, tfd.w, tfd.h, 270, 160);
 	AppObjects.push_back(tf);
-	tf1 = new TextField("Different Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset);
+	tf1 = new TextField("Different Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset, '*');
 	tf1->Init(renderer, tfd.w, tfd.h, 270, 270);
 	AppObjects.push_back(tf1);
 	//tg init

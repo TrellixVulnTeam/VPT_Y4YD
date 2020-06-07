@@ -71,7 +71,7 @@ public:
 
 class TextField : public AppObject{
 public:
-	TextField(string placeHolderText, string font_path, int textsize, int x_offset, int y_offset);
+	TextField(string placeHolderText, string font_path, int textsize, int x_offset, int y_offset, const char pwChar = 0);
 	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	void draw();
 	void input(SDL_Event e);
@@ -79,6 +79,7 @@ public:
 	void collide(int CollisionVal);
 	void updateText();
 	bool hasTextReachedBorder();
+	char pwChar_m;
 	Text* text_m;
 	string placeHolderText_m;
 	string font_path_m;
