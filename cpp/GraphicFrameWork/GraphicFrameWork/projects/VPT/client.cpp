@@ -2,6 +2,7 @@
 const string path = "..\\PrinceValiant.ttf";
 static queue<Packet*> PacketQueue;
 static mutex PacketQueueLock;
+static JNIEnv* je;
 
 client::client::client()
 {
@@ -26,6 +27,9 @@ void client::client::Init(const char* window_title, int w, int h)
 	//text init
 
 	//button init
+	button = new Button("..\\CButtonUP.png", "..\\CButtonP.png", nullptr, 0, 0, 0,0);
+	button->Init(renderer, 100, 100, 270, 400);
+	AppObjects.push_back(button);
 	//button init
 
 	//tf init
@@ -47,6 +51,9 @@ void client::client::Init(const char* window_title, int w, int h)
 	//init components here
 	for (AppObject* object : AppObjects) {
 		if (TextField* TextFieldObj = dynamic_cast<TextField*>(object)) {
+			cm.AttachComponent(new CollisionBox(AppObjects), object);
+		}
+		if (Button* ButtonObj = dynamic_cast<Button*>(object)) {
 			cm.AttachComponent(new CollisionBox(AppObjects), object);
 		}
 	}
@@ -79,6 +86,9 @@ void client::client::Update()
 		else {
 			SDL_StopTextInput();
 		}
+		if (Button* ButtonObj = dynamic_cast<Button*>(object1)) {
+			ButtonObj->button_update(UpdateVal);
+		}
 	}
 }
 
@@ -98,6 +108,37 @@ void client::client::Input()
 		}
 	}
 
+}
+
+void client::client::PacketProcess()
+{
+	Packet* packet = PollPacketQueue();
+	if (packet == nullptr) {
+		return;
+	}
+	je->DeleteGlobalRef(packet->packetObj_m);
+}
+
+void client::client::Loop()
+{
+	while (running) {
+		framestart = SDL_GetTicks();
+		PacketProcess();
+		Update();
+		Input();
+		Draw();
+		frametime = SDL_GetTicks() - framestart;
+		if (FrameDelay > frametime) {
+			SDL_Delay(FrameDelay - frametime);
+		}
+		cnt++;
+	}
+	Cleanup();
+}
+
+void client::client::SetJNIEnv(JNIEnv* e)
+{
+	je = e;
 }
 
 void client::client::QueuePacket(Packet *p) {

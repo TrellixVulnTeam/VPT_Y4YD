@@ -36,13 +36,17 @@ namespace client {
 		void Draw();
 		void Update();
 		void Input();
+		void PacketProcess();
+		void Loop();
+		static void SetJNIEnv(JNIEnv* e);
 		static void QueuePacket(Packet *p);
 		static Packet* PollPacketQueue();
 		AppData appdata;
 	private:
 		TextField* tf;
 		Text *text;
-		TextField* tf1;
+		TextField* tf1; \
+		Button* button;
 	};
 
 };

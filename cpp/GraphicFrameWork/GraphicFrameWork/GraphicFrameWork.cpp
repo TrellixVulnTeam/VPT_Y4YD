@@ -41,6 +41,7 @@ JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray j
 {
     jmethodID mid = env->GetStaticMethodID(claz, "CallBack", "()V");
     env->CallStaticVoidMethod(claz, mid);
+    client::client::SetJNIEnv(env);
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         cout << "SDL init worked" << endl;
     }
