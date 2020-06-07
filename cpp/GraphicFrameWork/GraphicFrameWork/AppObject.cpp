@@ -180,7 +180,9 @@ void TextField::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
 	message = "";
 	text_m = new Text(font_path_m, message, SDL_Color{0, 0, 0, 255}, textsize_m);
 	text_m->Init(renderer_m, 0, 0, x_m + x_offset_m, y_m + y_offset_m);
+	text_m->ChangeText(placeHolderText_m);
 	hasclicked = false;
+	hasclicked_prev = false;
 }
 
 void TextField::draw()
@@ -192,24 +194,34 @@ void TextField::draw()
 void TextField::input(SDL_Event e)
 {
 	if (e.type == SDL_MOUSEBUTTONUP) {
+		hasclicked_prev = hasclicked;
 		if (CollisionVal_m != -1) {
 			hasclicked = true;
 		}
 		else {
 			hasclicked = false;
 		}
+		if (hasclicked != hasclicked_prev) {
+			updateText();
+		}
 	}
 	if (hasclicked == true) {
 		if (e.type == SDL_TEXTINPUT && !hasTextReachedBorder()) {
 			message = message + e.text.text;
+			updateText();
 		}
 		if (e.type == SDL_KEYDOWN) {
 			//message = message + SDL_GetKeyName(e.key.keysym.sym);
 			if (e.key.keysym.sym == SDLK_BACKSPACE && message.size() != 0) {
 				message.pop_back();
+				updateText();
 			}
 		}
 	}
+}
+
+void TextField::updateText() {
+	text_m->ChangeText(message == "" && !hasclicked ? placeHolderText_m : message);
 }
 
 void TextField::update()
@@ -218,7 +230,6 @@ void TextField::update()
 	destR.w = width;
 	destR.x = x_m;
 	destR.y = y_m;
-	text_m->ChangeText(message == ""  && !hasclicked ? placeHolderText_m : message);
 	text_m->GetTextSize();
 	text_m->update();
 }

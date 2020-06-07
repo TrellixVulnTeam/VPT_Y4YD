@@ -77,6 +77,7 @@ public:
 	void input(SDL_Event e);
 	void update();
 	void collide(int CollisionVal);
+	void updateText();
 	bool hasTextReachedBorder();
 	Text* text_m;
 	string placeHolderText_m;
@@ -87,4 +88,5 @@ public:
 	int y_offset_m;
 	int CollisionVal_m = -1;
 	bool hasclicked;
+	bool hasclicked_prev;
 };
