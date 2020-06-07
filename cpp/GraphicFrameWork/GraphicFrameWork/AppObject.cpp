@@ -37,6 +37,10 @@ void AppObject::update()
 	destR.y = y_m;
 }
 
+void AppObject::collide(int UpdateVal) {
+
+}
+
 void AppObject::input(SDL_Event e)
 {
 }
@@ -119,22 +123,17 @@ Button::Button(const char* img_path, const char* hovered_img_path, Text* text, i
 		x_offset_m = x_offset;
 		y_offset_m = y_offset;
 	}
-
+	isCollided = false;
 }
 
-void Button::button_update(int CollisionVal)
+void Button::collide(int CollisionVal)
 {
 	destR.h = height;
 	destR.w = width;
 	destR.x = x_m;
 	destR.y = y_m;
 	CollisionVal_m = CollisionVal;
-	if (CollisionVal != -1) {
-		ChangeImage(hovered_image_path);
-	}
-	if (CollisionVal == -1) {
-		ChangeImage(image_path1);
-	}
+	isCollided = CollisionVal != -1;
 	if (text_m != nullptr) {
 		text_m->update();
 	}
@@ -146,11 +145,13 @@ void Button::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
 	if (text_m != nullptr) {
 		text_m->Init(renderer_m, text_w_m, text_h_m, x_m + x_offset_m, y_m + y_offset_m);
 	}
+	normalTexture = IMG_LoadTexture(renderer_m, image_path);
+	pressedTexture = IMG_LoadTexture(renderer_m, hovered_image_path);
 }
 
 void Button::draw()
 {
-	SDL_RenderCopy(renderer_m, texture, NULL, &destR);
+	SDL_RenderCopy(renderer_m, isCollided ? pressedTexture : normalTexture, NULL, &destR);
 	if (text_m != nullptr) {
 		text_m->draw();
 	}
@@ -163,8 +164,9 @@ void Button::input(SDL_Event e)
 	}
 }
 
-TextField::TextField(string font_path, int textsize, int x_offset, int y_offset)
+TextField::TextField(string placeHolderText, string font_path, int textsize, int x_offset, int y_offset)
 {
+	placeHolderText_m = placeHolderText;
 	font_path_m = font_path;
 	textsize_m = textsize;
 	x_offset_m = x_offset;
@@ -175,7 +177,7 @@ void TextField::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
 {
 	PreInit("..\\..\\..\\textbox1.png");
 	BasicInit(renderer, w, h, x, y);
-	message = "Type";
+	message = "";
 	text_m = new Text(font_path_m, message, SDL_Color{0, 0, 0, 255}, textsize_m);
 	text_m->Init(renderer_m, 0, 0, x_m + x_offset_m, y_m + y_offset_m);
 	hasclicked = false;
@@ -190,17 +192,11 @@ void TextField::draw()
 void TextField::input(SDL_Event e)
 {
 	if (e.type == SDL_MOUSEBUTTONUP) {
-		cout << id << " " << CollisionVal_m << endl;
 		if (CollisionVal_m != -1) {
-			if (message == "Type") {
-				message = "";
-			}
 			hasclicked = true;
-			cout << "focus" << endl;
 		}
 		else {
 			hasclicked = false;
-			cout << "out of focus" << endl;
 		}
 	}
 	if (hasclicked == true) {
@@ -222,12 +218,12 @@ void TextField::update()
 	destR.w = width;
 	destR.x = x_m;
 	destR.y = y_m;
-	text_m->ChangeText(message);
+	text_m->ChangeText(message == ""  && !hasclicked ? placeHolderText_m : message);
 	text_m->GetTextSize();
 	text_m->update();
 }
 
-void TextField::TextFieldupdate(int CollisionVal)
+void TextField::collide(int CollisionVal)
 {
 	CollisionVal_m = CollisionVal;
 }

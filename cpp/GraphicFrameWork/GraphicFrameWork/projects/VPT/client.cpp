@@ -34,10 +34,10 @@ void client::client::Init(const char* window_title, int w, int h)
 
 	//tf init
 	TextFieldData tfd;
-	tf = new TextField(path, tfd.textsize, tfd.x_offset, tfd.y_offset);
+	tf = new TextField("Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset);
 	tf->Init(renderer, tfd.w, tfd.h, 270, 160);
 	AppObjects.push_back(tf);
-	tf1 = new TextField(path, tfd.textsize, tfd.x_offset, tfd.y_offset);
+	tf1 = new TextField("Different Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset);
 	tf1->Init(renderer, tfd.w, tfd.h, 270, 270);
 	AppObjects.push_back(tf1);
 	//tg init
@@ -50,12 +50,7 @@ void client::client::Init(const char* window_title, int w, int h)
 
 	//init components here
 	for (AppObject* object : AppObjects) {
-		if (TextField* TextFieldObj = dynamic_cast<TextField*>(object)) {
-			cm.AttachComponent(new CollisionBox(AppObjects), object);
-		}
-		if (Button* ButtonObj = dynamic_cast<Button*>(object)) {
-			cm.AttachComponent(new CollisionBox(AppObjects), object);
-		}
+		cm.AttachComponent(new CollisionBox(AppObjects), object);
 	}
 	//init components here
 }
@@ -72,23 +67,19 @@ void client::client::Draw()
 void client::client::Update()
 {
 	int UpdateVal;
-	for (AppObject* object : AppObjects) {
-		object->update();
-	}
 	for (Component* c : cm.UpdateSectorComponents) {
 		UpdateVal = c->run(AppObjects);
 		AppObject* object1 = AppObjects[c->parent_m->id];
 		if (TextField* TextFieldObj = dynamic_cast<TextField*>(object1)) {
 			SDL_StartTextInput();
-			TextFieldObj->TextFieldupdate(UpdateVal);
-			
 		}
 		else {
 			SDL_StopTextInput();
 		}
-		if (Button* ButtonObj = dynamic_cast<Button*>(object1)) {
-			ButtonObj->button_update(UpdateVal);
-		}
+		object1->collide(UpdateVal);
+	}
+	for (AppObject* object : AppObjects) {
+		object->update();
 	}
 }
 
