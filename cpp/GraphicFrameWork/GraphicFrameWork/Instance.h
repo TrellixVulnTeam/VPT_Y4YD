@@ -31,7 +31,7 @@ public:
 	const int FPS = 60;
 	const int FrameDelay = 1000 / FPS;
 	Uint32 framestart;
-	int frametime;
+	int frametime = INT_MAX;
 	int cnt;
 	//
 

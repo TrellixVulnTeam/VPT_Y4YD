@@ -113,15 +113,14 @@ void client::client::PacketProcess()
 void client::client::Loop()
 {
 	while (running) {
-		framestart = SDL_GetTicks();
 		PacketProcess();
 		Update();
 		Input();
-		Draw();
-		frametime = SDL_GetTicks() - framestart;
-		if (FrameDelay > frametime) {
-			SDL_Delay(FrameDelay - frametime);
+		if (frametime > FrameDelay) {
+			framestart = SDL_GetTicks();
+			Draw();
 		}
+		frametime = SDL_GetTicks() - framestart;
 		cnt++;
 	}
 	Cleanup();
