@@ -13,10 +13,7 @@ void AppObject::BasicInit(SDL_Renderer* renderer, int w, int h, int x, int y)
 	height = h;
 	x_m = x;
 	y_m = y;
-	SDL_Surface* tmpsurface;
-	tmpsurface = IMG_Load(image_path);
-	texture = SDL_CreateTextureFromSurface(renderer_m, tmpsurface);
-	SDL_FreeSurface(tmpsurface);
+	texture = IMG_LoadTexture(renderer_m, image_path);
 }
 
 void AppObject::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
@@ -48,10 +45,7 @@ void AppObject::input(SDL_Event e)
 void AppObject::ChangeImage(const char* img_path)
 {
 	image_path = img_path;
-	SDL_Surface* tmpsurface;
-	tmpsurface = IMG_Load(image_path);
-	texture = SDL_CreateTextureFromSurface(renderer_m, tmpsurface);
-	SDL_FreeSurface(tmpsurface);
+	texture = IMG_LoadTexture(renderer_m, image_path);
 }
 
 Text::Text(string font, string text, SDL_Color textcolor, int textsize)
@@ -180,9 +174,10 @@ TextField::TextField(string placeHolderText, string font_path, int textsize, int
 	y_offset_m = y_offset;
 }
 
-void TextField::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
+void TextField::Init(string projectDir, SDL_Renderer* renderer, int w, int h, int x, int y)
 {
-	PreInit("..\\..\\..\\textbox1.png");
+	string temp = string("..\\..\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\") + "..\\..\\textbox1.png";
+	PreInit(temp.c_str());
 	BasicInit(renderer, w, h, x, y);
 	message = "";
 	text_m = new Text(font_path_m, message, SDL_Color{0, 0, 0, 255}, textsize_m);

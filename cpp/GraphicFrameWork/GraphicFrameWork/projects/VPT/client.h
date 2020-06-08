@@ -7,7 +7,7 @@
 #include "Packet.h"
 #include <mutex>
 #include <queue>
-#define USE_DEBUG_CLIENT
+//#define USE_DEBUG_CLIENT
 using namespace std;
 
 namespace client {

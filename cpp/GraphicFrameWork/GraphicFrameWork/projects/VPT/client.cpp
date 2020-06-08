@@ -1,6 +1,6 @@
 #include "client.h"
 #ifndef USE_DEBUG_CLIENT
-const string dir = "..\\..\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT";
+const string dir = "..\\..\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\";
 #else
 const string dir = "..\\";
 #endif
@@ -40,10 +40,10 @@ void client::client::Init(const char* window_title, int w, int h)
 	//tf init
 	TextFieldData tfd;
 	tf = new TextField("Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset);
-	tf->Init(renderer, tfd.w, tfd.h, 270, 160);
+	tf->Init(dir, renderer, tfd.w, tfd.h, 270, 160);
 	AppObjects.push_back(tf);
 	tf1 = new TextField("Different Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset, '*');
-	tf1->Init(renderer, tfd.w, tfd.h, 270, 270);
+	tf1->Init(dir, renderer, tfd.w, tfd.h, 270, 270);
 	AppObjects.push_back(tf1);
 	//tg init
 
@@ -118,7 +118,7 @@ void client::client::PacketProcess()
 void client::client::Loop()
 {
 	while (running) {
-		PacketProcess();
+		//PacketProcess();
 		Update();
 		Input();
 		if (frametime > FrameDelay) {
