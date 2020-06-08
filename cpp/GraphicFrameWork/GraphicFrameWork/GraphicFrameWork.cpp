@@ -6,14 +6,25 @@
 #include <jni.h>
 #include "projects/VPT/client.h"
 #include <vector>
+#define USE_DEBUG_CLIENT
+#ifndef USE_DEBUG_CLIENT
+#include "projects/VPT/client_ClientJNI.h"
+#else
 #include "projects/VPT/VPT.h"
+#endif
 #include "projects/VPT/PacketId.h"
 #include "projects/VPT/ResultId.h"
 using namespace std;
 vector <AppInstance*> instances;
-JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv *env, jclass claz, jobjectArray ja);
+#ifndef USE_DEBUG_CLIENT
+JNIEXPORT void JNICALL Java_client_ClientJNI_cppMain(JNIEnv* env, jclass claz, jobjectArray ja);
+JNIEXPORT void JNICALL Java_client_ClientJNI_recievePacket(JNIEnv* env, jclass claz, jobject packet);
+JNIEXPORT void JNICALL Java_client_ClientJNI_socketClosed(JNIEnv* env, jclass claz);
+#else
+JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray ja);
 JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet);
 JNIEXPORT void JNICALL Java_VPT_socketClosed(JNIEnv* env, jclass claz);
+#endif
 int main(int argc, char* argv[])
 {
 
@@ -37,8 +48,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray ja)
-{
+void cppMain(JNIEnv* env, jclass claz, jobjectArray ja) {
     jmethodID mid = env->GetStaticMethodID(claz, "CallBack", "()V");
     env->CallStaticVoidMethod(claz, mid);
     client::client::SetJNIEnv(env);
@@ -62,8 +72,7 @@ JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray j
     return;
 }
 
-JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packetIn)
-{
+void recievePacket(JNIEnv* env, jclass claz, jobject packetIn) {
     jobject packet = env->NewGlobalRef(packetIn);
     jclass packetClass = env->FindClass("common/networking/packet/Packet");
     if (!env->IsInstanceOf(packet, packetClass)) {
@@ -77,7 +86,7 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
         return;
     }
     if (packetId == PacketId_FORCE_LOGOUT) {
-        client::client::QueuePacket(new Packet(packet, packetId,  ResultId_NULL));
+        client::client::QueuePacket(new Packet(packet, packetId, ResultId_NULL));
     }
     if (packetId == PacketId_RESULT) {
         //ResultPacket
@@ -97,7 +106,38 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
     return;
 }
 
-JNIEXPORT void JNICALL Java_VPT_socketClosed(JNIEnv* env, jclass claz)
-{
+void socketClosed(JNIEnv* env, jclass claz) {
     return;
 }
+
+#ifndef USE_DEBUG_CLIENT
+JNIEXPORT void JNICALL Java_client_ClientJNI_cppMain(JNIEnv* env, jclass claz, jobjectArray ja)
+{
+    cppMain(env, claz, ja);
+}
+
+JNIEXPORT void JNICALL Java_client_ClientJNI_recievePacket(JNIEnv* env, jclass claz, jobject packetIn)
+{
+    recievePacket(env, claz, packetIn);
+}
+
+JNIEXPORT void JNICALL Java_client_ClientJNI_socketClosed(JNIEnv* env, jclass claz)
+{
+    socketClosed(env, claz);
+}
+#else
+JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray ja)
+{
+    cppMain(env, claz, ja);
+}
+
+JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packetIn)
+{
+    recievePacket(env, claz, packetIn);
+}
+
+JNIEXPORT void JNICALL Java_VPT_socketClosed(JNIEnv* env, jclass claz)
+{
+    socketClosed(env, claz);
+}
+#endif
