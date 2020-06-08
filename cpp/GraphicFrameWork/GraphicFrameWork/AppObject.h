@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <SDL_ttf.h>
+#include <vector>
 using namespace std;
 class AppObject
 {
@@ -90,4 +91,22 @@ public:
 	int CollisionVal_m = -1;
 	bool hasclicked;
 	bool hasclicked_prev;
+};
+
+class Overlay : public AppObject {
+public:
+	Overlay(string font, string text, SDL_Color bacgroundColor, SDL_Color textColor, int textsize, int x_offset, int y_offset, Uint32 displayTime, vector<AppObject*>* overlays);
+	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
+	void Init(SDL_Renderer* renderer, int x, int y);
+	void draw();
+	void update();
+	Text* text_m;
+	SDL_Color bacgroundColor_m;
+	int x_offset_m;
+	int y_offset_m;
+	Uint32 displayTime_m;
+	bool hasStart;
+	Uint32 startTime;
+	SDL_Rect* bounds;
+	vector<AppObject*>* overlays_m;
 };

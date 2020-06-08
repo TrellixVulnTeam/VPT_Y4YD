@@ -28,6 +28,7 @@ public:
 	bool running = true;
 	ComponentManager cm;
 	vector <AppObject*> AppObjects;
+	vector <AppObject*> Overlays;
 	const int FPS = 60;
 	const int FrameDelay = 1000 / FPS;
 	Uint32 framestart;

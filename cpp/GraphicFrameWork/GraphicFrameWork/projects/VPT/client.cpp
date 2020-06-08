@@ -19,6 +19,10 @@ void client::client::Init(const char* window_title, int w, int h)
 	string img_path = dir;
 	//init objects here
 
+	Overlay* overlay = new Overlay(path, "Test Overlay", SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 100, 10, 10, 3000, &Overlays);
+	overlay->Init(renderer, 200, 20);
+	addOverlay(overlay);
+
 	//AppObjects vector because is need for collision component
 	AppObjects.push_back(new AppObject());
 	AppObjects[0]->PreInit("");
@@ -66,6 +70,11 @@ void client::client::Draw()
 	for (AppObject* object : AppObjects) {
 		object->draw();
 	}
+	for (AppObject* overlay : Overlays) {
+		if (overlay != nullptr) {
+			overlay->draw();
+		}
+	}
 	SDL_RenderPresent(renderer);
 }
 
@@ -86,6 +95,11 @@ void client::client::Update()
 	for (AppObject* object : AppObjects) {
 		object->update();
 	}
+	for (AppObject* overlay : Overlays) {
+		if (overlay != nullptr) {
+			overlay->update();
+		}
+	}
 }
 
 void client::client::Input()
@@ -103,7 +117,11 @@ void client::client::Input()
 			object->input(e);
 		}
 	}
-
+	for (AppObject* overlay : Overlays) {
+		if (overlay != nullptr) {
+			overlay->input(e);
+		}
+	}
 }
 
 void client::client::PacketProcess()
@@ -154,4 +172,21 @@ Packet* client::client::PollPacketQueue() {
 	}
 	PacketQueueLock.unlock();
 	return out;
+}
+
+void client::client::addOverlay(AppObject* overlay) {
+	int id = -1;
+	for (int i = 0; i < Overlays.size(); i++) {
+		if (Overlays[i] == nullptr) {
+			id = i;
+			break;
+		}
+	}
+	if (id != -1) {
+		overlay->id = id;
+		Overlays[id] = overlay;
+		return;
+	}
+	overlay->id = Overlays.size();
+	Overlays.push_back(overlay);
 }

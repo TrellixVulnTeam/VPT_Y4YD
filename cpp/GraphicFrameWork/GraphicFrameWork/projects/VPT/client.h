@@ -39,6 +39,7 @@ namespace client {
 		void Input();
 		void PacketProcess();
 		void Loop();
+		void addOverlay(AppObject* overlay);
 		static void SetJNIEnv(JNIEnv* e);
 		static void QueuePacket(Packet *p);
 		static Packet* PollPacketQueue();

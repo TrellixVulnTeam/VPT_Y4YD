@@ -250,3 +250,60 @@ bool TextField::hasTextReachedBorder()
 		return true;
 	}
 }
+
+Overlay::Overlay(string font, string text, SDL_Color bacgroundColor, SDL_Color textColor, int textsize, int x_offset, int y_offset, Uint32 displayTime, vector<AppObject*>* overlays) {
+	text_m = new Text(font, text, textColor, textsize);
+	bacgroundColor_m = bacgroundColor;
+	x_offset_m = x_offset;
+	y_offset_m = y_offset;
+	displayTime_m = displayTime;
+	hasStart = false;
+	overlays_m = overlays;
+	id = -1;
+	bounds = nullptr;
+	startTime = 0;
+}
+
+void Overlay::Init(SDL_Renderer* renderer, int w, int h, int x, int y) {
+	renderer_m = renderer;
+	width = w;
+	height = h;
+	x_m = x;
+	y_m = y;
+	text_m->Init(renderer, w, h, x + x_offset_m, y + y_offset_m);
+	bounds = new SDL_Rect{ x, y, w, h };
+}
+
+void Overlay::Init(SDL_Renderer* renderer, int x, int y) {
+	renderer_m = renderer;
+	x_m = x;
+	y_m = y;
+	text_m->Init(renderer, 0, 0, x + x_offset_m, y + y_offset_m);
+	width = text_m->width+x_offset_m+x_offset_m;
+	height = text_m->height + y_offset_m + y_offset_m;;
+	bounds = new SDL_Rect{ x, y, width, height };
+}
+
+void Overlay::draw() {
+	if (!hasStart) {
+		hasStart = true;
+		startTime = SDL_GetTicks();
+	}
+	Uint8 r, g, b, a;
+	SDL_GetRenderDrawColor(renderer_m, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(renderer_m, bacgroundColor_m.r, bacgroundColor_m.g, bacgroundColor_m.b, bacgroundColor_m.a);
+	SDL_RenderFillRect(renderer_m, bounds);
+	SDL_SetRenderDrawColor(renderer_m, r, g, b, a);
+	text_m->draw();
+}
+
+void Overlay::update() {
+	if (hasStart) {
+		if (SDL_GetTicks() - startTime > displayTime_m) {
+			if (id != -1) {
+				(*overlays_m)[id] = nullptr;
+			}
+		}
+		text_m->update();
+	}
+}
