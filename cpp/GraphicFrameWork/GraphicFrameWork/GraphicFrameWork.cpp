@@ -6,7 +6,6 @@
 #include <jni.h>
 #include "projects/VPT/client.h"
 #include <vector>
-#define USE_DEBUG_CLIENT
 #ifndef USE_DEBUG_CLIENT
 #include "projects/VPT/client_ClientJNI.h"
 #else

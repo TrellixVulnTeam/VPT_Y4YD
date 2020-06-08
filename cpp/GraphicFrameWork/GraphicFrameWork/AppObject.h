@@ -51,13 +51,13 @@ public:
 
 class Button : public AppObject {
 public:
-	Button(const char* img_path, const char* hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset);
+	Button(string img_path, string hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset);
 	void collide(int CollisionVal);
 	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	void draw();
 	void input(SDL_Event e);
-	const char* hovered_image_path;
-	const char* image_path1;
+	string hovered_image_path;
+	string image_path1;
 	int CollisionVal_m;
 	Text* text_m;
 	int text_w_m;

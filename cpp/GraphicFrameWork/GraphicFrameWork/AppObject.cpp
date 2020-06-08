@@ -108,9 +108,8 @@ void Text::ChangeText(string text)
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
 }
 
-Button::Button(const char* img_path, const char* hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset)
+Button::Button(string img_path, string hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset)
 {
-	image_path = img_path;
 	image_path1 = img_path;
 	hovered_image_path = hovered_img_path;
 	if (text == nullptr) {
@@ -141,12 +140,19 @@ void Button::collide(int CollisionVal)
 
 void Button::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
 {
-	BasicInit(renderer, w, h, x, y);
+	//BasicInit(renderer, w, h, x, y);
+	//same as BasicInit
+	renderer_m = renderer;
+	width = w;
+	height = h;
+	x_m = x;
+	y_m = y;
+
 	if (text_m != nullptr) {
 		text_m->Init(renderer_m, text_w_m, text_h_m, x_m + x_offset_m, y_m + y_offset_m);
 	}
-	normalTexture = IMG_LoadTexture(renderer_m, image_path);
-	pressedTexture = IMG_LoadTexture(renderer_m, hovered_image_path);
+	normalTexture = IMG_LoadTexture(renderer_m, image_path1.c_str());
+	pressedTexture = IMG_LoadTexture(renderer_m, hovered_image_path.c_str());
 }
 
 void Button::draw()

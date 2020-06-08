@@ -1,5 +1,10 @@
 #include "client.h"
-const string path = "..\\PrinceValiant.ttf";
+#ifndef USE_DEBUG_CLIENT
+const string dir = "..\\..\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT";
+#else
+const string dir = "..\\";
+#endif
+const string path = dir + "PrinceValiant.ttf";
 static queue<Packet*> PacketQueue;
 static mutex PacketQueueLock;
 static JNIEnv* je;
@@ -11,7 +16,7 @@ client::client::client()
 void client::client::Init(const char* window_title, int w, int h)
 {
 	BasicInit(window_title, w, h);
-	string img_path = "..\\";
+	string img_path = dir;
 	//init objects here
 
 	//AppObjects vector because is need for collision component
@@ -27,7 +32,7 @@ void client::client::Init(const char* window_title, int w, int h)
 	//text init
 
 	//button init
-	button = new Button("..\\CButtonUP.png", "..\\CButtonP.png", nullptr, 0, 0, 0,0);
+	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0);
 	button->Init(renderer, 100, 100, 270, 400);
 	AppObjects.push_back(button);
 	//button init
