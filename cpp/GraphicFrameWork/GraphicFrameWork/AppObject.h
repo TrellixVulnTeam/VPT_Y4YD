@@ -52,7 +52,7 @@ public:
 
 class Button : public AppObject {
 public:
-	Button(string img_path, string hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset);
+	Button(string img_path, string hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset, void(*onclick)());
 	void collide(int CollisionVal);
 	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	void draw();
@@ -68,6 +68,7 @@ public:
 	SDL_Texture* normalTexture;
 	SDL_Texture* pressedTexture;
 	bool isCollided;
+	void(*onclick_m)();
 };
 
 class TextField : public AppObject{
@@ -91,6 +92,7 @@ public:
 	int CollisionVal_m = -1;
 	bool hasclicked;
 	bool hasclicked_prev;
+	
 };
 
 class Overlay : public AppObject {
@@ -110,3 +112,4 @@ public:
 	SDL_Rect* bounds;
 	vector<AppObject*>* overlays_m;
 };
+

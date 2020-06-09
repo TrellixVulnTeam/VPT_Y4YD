@@ -12,16 +12,18 @@ static JNIEnv* je;
 client::client::client()
 {
 }
-
+void onclick() {
+	cout << "test" << endl;
+}
 void client::client::Init(const char* window_title, int w, int h)
 {
 	BasicInit(window_title, w, h);
 	string img_path = dir;
 	//init objects here
 
-	Overlay* overlay = new Overlay(path, "Test Overlay", SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 100, 10, 10, 3000, &Overlays);
-	overlay->Init(renderer, 200, 20);
-	addOverlay(overlay);
+	//Overlay* overlay = new Overlay(path, "Test Overlay", SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 100, 10, 10, 3000, &Overlays);
+	//overlay->Init(renderer, 200, 20);
+	//addOverlay(overlay);
 
 	//AppObjects vector because is need for collision component
 	AppObjects.push_back(new AppObject());
@@ -36,7 +38,7 @@ void client::client::Init(const char* window_title, int w, int h)
 	//text init
 
 	//button init
-	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0);
+	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0, onclick);
 	button->Init(renderer, 100, 100, 270, 400);
 	AppObjects.push_back(button);
 	//button init

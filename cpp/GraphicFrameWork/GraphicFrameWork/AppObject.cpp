@@ -102,7 +102,7 @@ void Text::ChangeText(string text)
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
 }
 
-Button::Button(string img_path, string hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset)
+Button::Button(string img_path, string hovered_img_path, Text* text, int text_w, int text_h, int x_offset, int y_offset, void(*onclick)())
 {
 	image_path1 = img_path;
 	hovered_image_path = hovered_img_path;
@@ -117,6 +117,7 @@ Button::Button(string img_path, string hovered_img_path, Text* text, int text_w,
 		y_offset_m = y_offset;
 	}
 	isCollided = false;
+	onclick_m = onclick;
 }
 
 void Button::collide(int CollisionVal)
@@ -160,7 +161,7 @@ void Button::draw()
 void Button::input(SDL_Event e)
 {
 	if (e.type == SDL_MOUSEBUTTONUP && CollisionVal_m != -1) {
-		cout << "test" << endl;
+		onclick_m();
 	}
 }
 
