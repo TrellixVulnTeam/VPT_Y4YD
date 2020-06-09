@@ -176,7 +176,7 @@ TextField::TextField(string placeHolderText, string font_path, int textsize, int
 
 void TextField::Init(string projectDir, SDL_Renderer* renderer, int w, int h, int x, int y)
 {
-	string temp = string("..\\..\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\") + "..\\..\\textbox1.png";
+	string temp = projectDir + "..\\..\\textbox1.png";
 	PreInit(temp.c_str());
 	BasicInit(renderer, w, h, x, y);
 	message = "";
