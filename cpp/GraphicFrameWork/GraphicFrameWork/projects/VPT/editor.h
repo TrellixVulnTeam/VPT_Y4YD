@@ -14,15 +14,25 @@ namespace editor {
 	
 	class PlaceableBounding : public AppObject{
 	public:
-		PlaceableBounding() {};
+		PlaceableBounding() { };
 		virtual string PrintReleventData();
+		int collideid;
 	};
+
 	class PlaceableButton : public PlaceableBounding {
 	public:
-		PlaceableButton() {};
+		PlaceableButton() { };
 		string PrintReleventData() {
-			return "Button, " + to_string(x_m) + ", " + to_string(y_m) + ", " + to_string(width) + ", " + to_string(height);
+			return "Button," + to_string(x_m) + "," + to_string(y_m) + "," + to_string(width) + "," + to_string(height);
 		};
+	};
+
+	struct TextBoxData {
+		int textsize = 30;
+		int x_offset = 125;
+		int y_offset = 25;
+		int w = 500;
+		int h = 100;
 	};
 	class editor : public AppInstance {
 	public:
@@ -33,7 +43,9 @@ namespace editor {
 		void Input();
 		void Loop();
 	private:
-
+		int UpdateVal;
+		bool ButtontbClicked;
+		TextBox* tb;
 	};
 	
 }

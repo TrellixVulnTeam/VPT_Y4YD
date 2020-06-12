@@ -95,6 +95,20 @@ public:
 	
 };
 
+class TextBox : public AppObject {
+public:
+	TextBox(string font_path, int textsize, int x_offset, int y_offset, string text);
+	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
+	void draw();
+	void update();
+	int x_offset_m;
+	int y_offset_m;
+	Text* text_m;
+	string font_path_m;
+	int textsize_m;
+	string message;
+};
+
 class Overlay : public AppObject {
 public:
 	Overlay(string font, string text, SDL_Color bacgroundColor, SDL_Color textColor, int textsize, int x_offset, int y_offset, Uint32 displayTime, vector<AppObject*>* overlays);

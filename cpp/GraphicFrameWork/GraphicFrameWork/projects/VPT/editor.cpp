@@ -6,8 +6,18 @@ void editor::editor::Init(const char* window_title, int w, int h)
 	AppObjects.push_back(new AppObject());
 	AppObjects[0]->PreInit("");
 	AppObjects[0]->Init(renderer, 1, 1, 0, 0);
+	
+	TextBoxData tbd;
+	tb = new TextBox("C:\\Users\\richa\\source\\repos\\VPT\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\PrinceValiant.ttf", 
+	tbd.textsize, tbd.x_offset, tbd.y_offset, "Button");
+	tb->Init(renderer, tbd.w, tbd.h, 0, 0);
+	AppObjects.push_back(tb);
 
+	for (unsigned int i = 0; i < AppObjects.size(); i++) {
+		AppObjects[i]->id = i;
+	}
 
+	cm.AttachComponent(new CollisionBox(AppObjects), AppObjects[AppObjects.size() - 1]);
 }
 
 void editor::editor::Draw()
@@ -21,11 +31,23 @@ void editor::editor::Draw()
 
 void editor::editor::Update()
 {
-	int UpdateVal;
 	for (Component* c : cm.UpdateSectorComponents) {
 		UpdateVal = c->run(AppObjects);
-		AppObject* object1 = AppObjects[c->parent_m->id];
-		object1->collide(UpdateVal);
+		AppObject* object = AppObjects[c->parent_m->id];
+		if (TextBox* obj = dynamic_cast<TextBox*>(object)) {
+			if (UpdateVal != -1) {
+				if (obj->message == "Button") {
+					ButtontbClicked = true;
+				}
+			}
+			else {
+				ButtontbClicked = false;
+			}
+
+		}
+		else {
+			ButtontbClicked = false;
+		}
 	}
 	for (AppObject* object : AppObjects) {
 		object->update();
@@ -52,21 +74,13 @@ void editor::editor::Input()
 			}
 		}
 		if (e.type == SDL_MOUSEBUTTONUP) {
-			int totalidval = 0;
-			for (AppObject* object : AppObjects) {
-				if (object->id == 1) {
-					totalidval++;
-					AppObjects[AppObjects.size() - 1]->id = 0;
-				}
-				if (object->id == 0) {
-					totalidval += 0;
-				}
-			}
-			if (totalidval == 0) {
+			if (ButtontbClicked == true){
 				AppObjects.push_back(new PlaceableButton());
 				AppObjects[AppObjects.size() - 1]->PreInit("C:\\Users\\richa\\source\\repos\\VPT\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\bounding.png");
-				AppObjects[AppObjects.size() - 1]->Init(renderer, 100, 100, AppObjects[0]->x_m, AppObjects[0]->y_m);
+				AppObjects[AppObjects.size() - 1]->Init(renderer, 100, 100,400, 400);
 				AppObjects[AppObjects.size() - 1]->id = 1;
+				AppObjects[AppObjects.size() - 1]->x_m = AppObjects[0]->x_m;
+				AppObjects[AppObjects.size() - 1]->y_m = AppObjects[0]->y_m;
 			}
 		}
 		for (AppObject* object : AppObjects) {

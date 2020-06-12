@@ -368,3 +368,37 @@ void CheckBox::collide(int CollisionVal)
 		checkboxes[i]->collide(CollisionVal);
 	}
 }
+
+TextBox::TextBox(string font_path, int textsize, int x_offset, int y_offset, string text)
+{
+	font_path_m = font_path;
+	textsize_m = textsize;
+	message = text;
+	x_offset_m = x_offset;
+	y_offset_m = y_offset;
+}
+
+
+void TextBox::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
+{
+	PreInit("C:\\Users\\richa\\source\\repos\\VPT\\cpp\\GraphicFrameWork\\GraphicFrameWork\\textbox1.png");
+	BasicInit(renderer, w, h, x, y);
+	text_m = new Text(font_path_m, message, SDL_Color{ 0, 0, 0, 255 }, textsize_m);
+	text_m->Init(renderer_m, 0, 0, x_m + x_offset_m, y_m + y_offset_m);
+}
+
+void TextBox::draw()
+{
+	SDL_RenderCopy(renderer_m, texture, NULL, &destR);
+	text_m->draw();
+}
+
+void TextBox::update()
+{
+	destR.h = height;
+	destR.w = width;
+	destR.x = x_m;
+	destR.y = y_m;
+	text_m->GetTextSize();
+	text_m->update();
+}
