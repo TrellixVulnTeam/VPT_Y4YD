@@ -113,3 +113,20 @@ public:
 	vector<AppObject*>* overlays_m;
 };
 
+class CheckBox : public AppObject{
+public:
+	CheckBox(string font, int textsize, int x_offset, int y_offset, string backround_img);
+	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
+	void draw();
+	void AddCheckBox(string text);
+	void input(SDL_Event e);
+	void update();
+	void collide(int CollisionVal);
+	string font_m;
+	int textsize_m;
+	vector <Button*> checkboxes;
+	int x_offset_m;
+	int y_offset_m;
+	string backround_img_m;
+	void onclick() {};
+};

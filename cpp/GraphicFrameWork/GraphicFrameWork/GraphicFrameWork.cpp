@@ -5,6 +5,7 @@
 #include <SDL_ttf.h>
 #include <jni.h>
 #include "projects/VPT/client.h"
+#include "projects/VPT/editor.h"
 #include <vector>
 #ifndef USE_DEBUG_CLIENT
 #include "projects/VPT/client_ClientJNI.h"
@@ -40,8 +41,8 @@ int main(int argc, char* argv[])
     else {
         cout << "TTf init worked" << endl;
     }
-    instances.push_back(new client::client());
-    client::AppData appdata;
+    instances.push_back(new editor::editor());
+    editor::AppData appdata;
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
     return 0;
@@ -64,8 +65,8 @@ void cppMain(JNIEnv* env, jclass claz, jobjectArray ja) {
     else {
         cout << "TTf init worked" << endl;
     }
-    instances.push_back(new client::client());
-    client::AppData appdata;
+    instances.push_back(new editor::editor());
+    editor::AppData appdata;
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
     return;

@@ -48,6 +48,7 @@ void AppObject::ChangeImage(const char* img_path)
 	texture = IMG_LoadTexture(renderer_m, image_path);
 }
 
+
 Text::Text(string font, string text, SDL_Color textcolor, int textsize)
 {
 	message = text;
@@ -306,5 +307,64 @@ void Overlay::update() {
 			}
 		}
 		text_m->update();
+	}
+}
+
+CheckBox::CheckBox(string font, int textsize, int x_offset, int y_offset, string backround_img)
+{
+	textsize_m = textsize;
+	x_offset_m = x_offset;
+	y_offset_m = y_offset;
+	backround_img_m = backround_img;
+}
+
+void CheckBox::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
+{
+	PreInit(backround_img_m.c_str());
+	BasicInit(renderer, w, h, x, y);
+}
+
+void CheckBox::draw()
+{
+	SDL_RenderCopy(renderer_m, texture, NULL, &destR);
+	for (unsigned int i = 0; i < checkboxes.size(); i++) {
+		checkboxes[i]->draw();
+	}
+}
+
+void CheckBox::AddCheckBox(string text)
+{
+	//checkboxes.push_back(new Button("", "", new Text(font_m, text, SDL_Color{0,0,0,255}, textsize_m)));
+	if (checkboxes.size() - 1 == 0) {
+		checkboxes[checkboxes.size() - 1]->Init(renderer_m, 100, 100, x_m, y_m);
+	}
+	else {
+		checkboxes[checkboxes.size() - 1]->Init(renderer_m, 100, 100, x_m, (checkboxes.size() - 1) * 100);
+	}
+}
+
+void CheckBox::input(SDL_Event e)
+{
+	for (unsigned int i = 0; i < checkboxes.size(); i++) {
+		checkboxes[i]->input(e);
+	}
+}
+
+void CheckBox::update()
+{
+	destR.h = height;
+	destR.w = width;
+	destR.x = x_m;
+	destR.y = y_m;
+	for (unsigned int i = 0; i < checkboxes.size(); i++) {
+		checkboxes[i]->update();
+	}
+}
+
+
+void CheckBox::collide(int CollisionVal)
+{
+	for (unsigned int i = 0; i < checkboxes.size(); i++) {
+		checkboxes[i]->collide(CollisionVal);
 	}
 }

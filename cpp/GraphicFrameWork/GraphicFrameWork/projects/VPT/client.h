@@ -50,5 +50,4 @@ namespace client {
 		TextField* tf1; 
 		Button* button;
 	};
-
 };

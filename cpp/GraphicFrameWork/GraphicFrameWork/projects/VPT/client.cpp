@@ -12,7 +12,7 @@ static JNIEnv* je;
 client::client::client()
 {
 }
-void onclick() {
+void onclick1() {
 	cout << "test" << endl;
 }
 void client::client::Init(const char* window_title, int w, int h)
@@ -38,7 +38,7 @@ void client::client::Init(const char* window_title, int w, int h)
 	//text init
 
 	//button init
-	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0, onclick);
+	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0, onclick1);
 	button->Init(renderer, 100, 100, 270, 400);
 	AppObjects.push_back(button);
 	//button init
