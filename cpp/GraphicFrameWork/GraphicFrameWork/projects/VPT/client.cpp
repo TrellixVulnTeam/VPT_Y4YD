@@ -55,14 +55,12 @@ void client::client::Init(const char* window_title, int w, int h)
 
 	for (unsigned int i = 0; i < AppObjects.size(); i++) {
 		AppObjects[i]->id = i;
+		cm.AttachComponent(new CollisionBox(AppObjects), AppObjects[i]);
 	}
 	//init objects here
 
 
 	//init components here
-	for (AppObject* object : AppObjects) {
-		cm.AttachComponent(new CollisionBox(AppObjects), object);
-	}
 	//init components here
 }
 
