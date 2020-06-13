@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 public class Main {
 
+    public static String projectName;
+    
     public static void main(String[] args) throws IOException {
         File cppTemplateFile = new File(args[0]);
         File hTemplateFile = new File(args[1]);
@@ -22,7 +24,6 @@ public class Main {
         ArrayList<Line> cppTemplateData = parseTemplate(cppTemplateFile);
         ArrayList<Line> hTemplateData = parseTemplate(hTemplateFile);
         HashMap<String, ArrayList<String>> componentData = new HashMap<>();
-        String projectName;
         Pattern htcbPattern = Pattern.compile("#+\\[");
         try(BufferedReader br = new BufferedReader(new FileReader(componentTemplateFile))) {
             ArrayList<String> objectData = new ArrayList<>();
@@ -141,7 +142,7 @@ public class Main {
                     }
                     StringInt lineParts = extractInt(comp);
                     if(lineParts.i == -1) {
-                        outLine += lineParts.string;
+                        outLine += lineParts.string.startsWith("p") ? projectName + lineParts.string.substring(1) : lineParts.string;
                         continue;
                     }
                     String arg;
