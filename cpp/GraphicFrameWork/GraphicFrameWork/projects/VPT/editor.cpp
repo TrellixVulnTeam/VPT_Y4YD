@@ -17,7 +17,9 @@ void editor::editor::Init(const char* window_title, int w, int h)
 		AppObjects[i]->id = i;
 	}
 
-	cm.AttachComponent(new CollisionBox(AppObjects), AppObjects[AppObjects.size() - 1]);
+	for (unsigned int t = 0; t < AppObjects.size(); t++) {
+		cm.AttachComponent(new CollisionBox(AppObjects), AppObjects[t]);
+	}
 }
 
 void editor::editor::Draw()
@@ -36,22 +38,21 @@ void editor::editor::Update()
 		AppObject* object = AppObjects[c->parent_m->id];
 		if (TextBox* obj = dynamic_cast<TextBox*>(object)) {
 			if (UpdateVal != -1) {
-				if (obj->message == "Button") {
-					ButtontbClicked = true;
-				}
+				message_m = obj->message;
+				
 			}
 			else {
-				ButtontbClicked = false;
+				message_m = "";
 			}
-
 		}
 		else {
-			ButtontbClicked = false;
+			message_m = "";
 		}
 	}
 	for (AppObject* object : AppObjects) {
 		object->update();
 	}
+	cout << message_m << endl;
 }
 
 void editor::editor::Input()
@@ -74,10 +75,14 @@ void editor::editor::Input()
 			}
 		}
 		if (e.type == SDL_MOUSEBUTTONUP) {
-			if (ButtontbClicked == true){
+			AppObjSelected selectedval = Selected();
+			if (selectedval.selected == true) {
+				AppObjects[selectedval.index]->id = 0;
+			}
+			if (message_m == "Button") {
 				AppObjects.push_back(new PlaceableButton());
 				AppObjects[AppObjects.size() - 1]->PreInit("C:\\Users\\richa\\source\\repos\\VPT\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\bounding.png");
-				AppObjects[AppObjects.size() - 1]->Init(renderer, 100, 100,400, 400);
+				AppObjects[AppObjects.size() - 1]->Init(renderer, 100, 100, 400, 400);
 				AppObjects[AppObjects.size() - 1]->id = 1;
 				AppObjects[AppObjects.size() - 1]->x_m = AppObjects[0]->x_m;
 				AppObjects[AppObjects.size() - 1]->y_m = AppObjects[0]->y_m;
@@ -104,6 +109,19 @@ void editor::editor::Loop()
 	}
 	Cleanup();
 }
+
+editor::AppObjSelected editor::editor::Selected()
+{
+	for (unsigned int i = 0; i < AppObjects.size(); i++) {
+		if (PlaceableBounding* obj = dynamic_cast<PlaceableBounding*>(AppObjects[i])) {
+			if (AppObjects[i]->id == 1) {
+				return AppObjSelected{ true, i};
+			}
+		}
+	}
+	return AppObjSelected{false, NULL};
+}
+
 
 string editor::PlaceableBounding::PrintReleventData()
 {

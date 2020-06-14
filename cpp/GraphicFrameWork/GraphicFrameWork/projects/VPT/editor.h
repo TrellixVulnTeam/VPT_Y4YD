@@ -5,6 +5,7 @@
 #include <cstdlib> 
 #include <ctime> 
 namespace editor {
+	struct AppObjSelected;
 	struct AppData
 	{
 		const char* win_name = "Editor";
@@ -12,6 +13,11 @@ namespace editor {
 		int h = 700;
 	};
 	
+	struct AppObjSelected {
+		bool selected;
+		unsigned int index;
+	};
+
 	class PlaceableBounding : public AppObject{
 	public:
 		PlaceableBounding() { };
@@ -25,6 +31,14 @@ namespace editor {
 		string PrintReleventData() {
 			return "Button," + to_string(x_m) + "," + to_string(y_m) + "," + to_string(width) + "," + to_string(height);
 		};
+	};
+
+	class PlaceableTextBox : public PlaceableBounding {
+	public:
+		PlaceableTextBox() {};
+		string PrintReleventData() {
+			return "TextBox," + to_string(x_m) + "," + to_string(y_m) + "," + to_string(width) + "," + to_string(height);
+		}
 	};
 
 	struct TextBoxData {
@@ -42,9 +56,10 @@ namespace editor {
 		void Update();
 		void Input();
 		void Loop();
+		AppObjSelected Selected();
 	private:
 		int UpdateVal;
-		bool ButtontbClicked;
+		string message_m;
 		TextBox* tb;
 	};
 	
