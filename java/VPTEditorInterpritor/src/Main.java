@@ -19,8 +19,8 @@ public class Main {
         File hTemplateFile = new File(args[1]);
         File componentTemplateFile = new File(args[2]);
         File editorDataFile = new File(args[3]);
-        File cppOutputFile = new File(args[2]);
-        File hOutputFile = new File(args[3]);
+        File cppOutputFile = new File(args[4]);
+        File hOutputFile = new File(args[5]);
         ArrayList<Line> cppTemplateData = parseTemplate(cppTemplateFile);
         ArrayList<Line> hTemplateData = parseTemplate(hTemplateFile);
         HashMap<String, ArrayList<String>> componentData = new HashMap<>();
@@ -123,21 +123,29 @@ public class Main {
     public static ArrayList<String> parseDynamic(Line line, HashMap<String, ArrayList<String>> componentData, ArrayList<String> editorData) {
         ArrayList<String> out = new ArrayList<>();
         editorData.forEach((component) -> {
-            String[] arguments = escapeSplit(component, ',');
+            String[] arguments = component.substring(1, component.length()-1).split("[^\\\\]\",\"");
+            for(int i = 0; i < arguments.length; i++) {
+                arguments[i] = arguments[i].replace("\\\"", "\"");
+            }
             ArrayList<String> componentLines = componentData.get(arguments[0]);
-            boolean ignoreNext = false;
             for(String compLine: componentLines) {
-                String outLine = line.preLine;
-                String[] lineComponents = escapeSplit(compLine, '$');
-                for(String comp: lineComponents) {
+                boolean ignoreNext = false;
+                String[] lineComponents = compLine.split("$");
+                String outLine = line.preLine + lineComponents[0];
+                for(int i = 1; i < lineComponents.length; i++) {
+                    String comp = lineComponents[i];
                     if(comp.length() == 0) {
                         if(!ignoreNext) {
                             outLine += "$";
                             ignoreNext = true;
+                        } else {
+                            ignoreNext = false;
                         }
+                        continue;
                     }
                     if(ignoreNext) {
                         outLine += comp;
+                        ignoreNext = false;
                         continue;
                     }
                     StringInt lineParts = extractInt(comp);
@@ -161,51 +169,8 @@ public class Main {
         return out;
     }
     
-    public static String[] escapeSplit(String str, char escapeChar) {
-        int elements = 1;
-        boolean isEscape = false;
-        for (char c : str.toCharArray()) {
-            if (isEscape) {
-                isEscape = false;
-                if(c == escapeChar) {
-                    elements--;
-                }
-                continue;
-            }
-            if (c == escapeChar) {
-                isEscape = true;
-                elements++;
-            }
-        }
-        isEscape = false;
-        String[] out = new String[elements];
-        int idx = 0;
-        String temp = "";
-        for(char c : str.toCharArray()) {
-            if (isEscape) {
-                isEscape = false;
-                if(c == escapeChar) {
-                    temp += escapeChar;
-                } else {
-                    out[idx] = temp;
-                    temp = "" + c;
-                    idx++;
-                }
-                continue;
-            }
-            if (c == '\\') {
-                isEscape = true;
-            } else {
-                temp += c;
-            }
-        }
-        out[idx] = temp;
-        return out;
-    }
-    
     public static StringInt extractInt(String str) {
-        String iP = "";
-        String rest = "";
+        String iP, rest;
         int idx = 0;
         for(char c: str.toCharArray()) {
             boolean cancel = false;
