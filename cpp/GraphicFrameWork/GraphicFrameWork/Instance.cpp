@@ -42,15 +42,20 @@ void AppInstance::BasicDraw()
 void AppInstance::BasicLoop()
 {
 	while (running) {
-		framestart = SDL_GetTicks();
-		Update();
-		Input();
-		Draw();
-		frametime = SDL_GetTicks() - framestart;
-		if (FrameDelay > frametime) {
-			SDL_Delay(FrameDelay - frametime);
+		while (running) {
+			Update();
+			Input();
+			if (frametime > FrameDelay) {
+				framestart = SDL_GetTicks();
+				Draw();
+			}
+			frametime = SDL_GetTicks() - framestart;
+			if (cnt == INT_MAX) {
+				cnt = 1;
+			}
+			cnt++;
 		}
-		cnt++;
+		Cleanup();
 	}
 	Cleanup();
 }

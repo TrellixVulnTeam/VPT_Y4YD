@@ -138,6 +138,9 @@ void client::client::Loop()
 			Draw();
 		}
 		frametime = SDL_GetTicks() - framestart;
+		if (cnt == INT_MAX) {
+			cnt = 1;
+		}
 		cnt++;
 	}
 	Cleanup();

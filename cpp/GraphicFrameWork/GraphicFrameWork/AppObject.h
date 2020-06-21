@@ -97,7 +97,8 @@ public:
 	int CollisionVal_m = -1;
 	bool hasclicked;
 	bool hasclicked_prev;
-	
+	int cursorPos;
+	Uint32 lastKeyPress;
 };
 
 class TextBox : public AppObject {

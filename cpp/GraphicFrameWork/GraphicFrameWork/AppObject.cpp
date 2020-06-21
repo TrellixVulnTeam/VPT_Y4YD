@@ -186,6 +186,8 @@ TextField::TextField(string placeHolderText, string font_path, int textsize, int
 	textsize_m = textsize;
 	x_offset_m = x_offset;
 	y_offset_m = y_offset;
+	cursorPos = 0;
+	lastKeyPress = 0;
 }
 
 void TextField::Init(string projectDir, SDL_Renderer* renderer, int w, int h, int x, int y)
@@ -205,6 +207,15 @@ void TextField::draw()
 {
 	SDL_RenderCopy(renderer_m, texture, NULL, &destR);
 	text_m->draw();
+	//Change every 600ms unless key press within 250ms
+	if (hasclicked && (SDL_GetTicks() / 600) % 2 >= 1 || SDL_GetTicks() - lastKeyPress <= 250) {
+		Utils::SDL_PushRendererState(renderer_m);
+		SDL_SetRenderDrawColor(renderer_m, 0, 0, 0, 255);
+		SDL_Rect textBounds = text_m->destR;
+		TTF_SizeText(text_m->font_m, text_m->message.substr(0, cursorPos).c_str(), &textBounds.w, &textBounds.h);
+		SDL_RenderFillRect(renderer_m, new SDL_Rect{ textBounds.x + textBounds.w, textBounds.y, 2, textBounds.h });
+		Utils::SDL_PopRendererState(renderer_m);
+	}
 }
 
 void TextField::input(SDL_Event e)
@@ -223,21 +234,34 @@ void TextField::input(SDL_Event e)
 	}
 	if (hasclicked == true) {
 		if (e.type == SDL_TEXTINPUT && !hasTextReachedBorder()) {
-			message = message + e.text.text;
+			message = message.substr(0, cursorPos) + e.text.text + message.substr(cursorPos, message.length());
+			cursorPos++;
 			updateText();
 		}
 		if (e.type == SDL_KEYDOWN) {
 			//message = message + SDL_GetKeyName(e.key.keysym.sym);
-			if (e.key.keysym.sym == SDLK_BACKSPACE && message.size() != 0) {
-				message.pop_back();
+			SDL_Keycode kc = e.key.keysym.sym;
+			if (kc == SDLK_BACKSPACE && cursorPos != 0) {
+				message = message.substr(0, ((size_t)cursorPos)-1) + message.substr(cursorPos, message.length());
+				cursorPos--;
 				updateText();
+			}
+			if (kc == SDLK_LEFT && cursorPos != 0) {
+				lastKeyPress = SDL_GetTicks();
+				cursorPos--;
+			}
+			if (kc == SDLK_RIGHT && cursorPos != message.length()) {
+				lastKeyPress = SDL_GetTicks();
+				cursorPos++;
 			}
 		}
 	}
 }
 
 void TextField::updateText() {
+	lastKeyPress = SDL_GetTicks();
 	text_m->ChangeText(message == "" && !hasclicked ? placeHolderText_m : pwChar_m == 0 ? message : string(message.length(), pwChar_m));
+	text_m->update();
 }
 
 void TextField::update()

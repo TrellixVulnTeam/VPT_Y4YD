@@ -94,22 +94,6 @@ void editor::editor::Input()
 	}
 }
 
-void editor::editor::Loop()
-{
-	while (running) {
-		//PacketProcess();
-		Update();
-		Input();
-		if (frametime > FrameDelay) {
-			framestart = SDL_GetTicks();
-			Draw();
-		}
-		frametime = SDL_GetTicks() - framestart;
-		cnt++;
-	}
-	Cleanup();
-}
-
 editor::AppObjSelected editor::editor::Selected()
 {
 	for (unsigned int i = 0; i < AppObjects.size(); i++) {
