@@ -7,7 +7,7 @@
 #include "Packet.h"
 #include <mutex>
 #include <queue>
-#define USE_DEBUG_CLIENT
+#include "RelativePaths.h"
 using namespace std;
 
 namespace client {

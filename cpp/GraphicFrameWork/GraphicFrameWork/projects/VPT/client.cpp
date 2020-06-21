@@ -1,10 +1,4 @@
 #include "client.h"
-#ifndef USE_DEBUG_CLIENT
-const string dir = "..\\..\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\";
-#else
-const string dir = "..\\";
-#endif
-const string path = dir + "PrinceValiant.ttf";
 static queue<Packet*> PacketQueue;
 static mutex PacketQueueLock;
 static JNIEnv* je;
@@ -32,7 +26,7 @@ void client::client::Init(const char* window_title, int w, int h)
 	//AppObjects vector because is need for collision component
 
 	//text init
-	text = new Text(path, "VPT", SDL_Color{ 0, 0, 0, 255 }, 100);
+	text = new Text(fontPath, "VPT", SDL_Color{ 0, 0, 0, 255 }, 100);
 	text->Init(renderer, 0, 0, 270, 0);
 	AppObjects.push_back(text);
 	//text init
@@ -45,10 +39,10 @@ void client::client::Init(const char* window_title, int w, int h)
 
 	//tf init
 	TextFieldData tfd;
-	tf = new TextField("Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset);
+	tf = new TextField("Text", fontPath, tfd.textsize, tfd.x_offset, tfd.y_offset);
 	tf->Init(dir, renderer, tfd.w, tfd.h, 270, 160);
 	AppObjects.push_back(tf);
-	tf1 = new TextField("Different Text", path, tfd.textsize, tfd.x_offset, tfd.y_offset, '*');
+	tf1 = new TextField("Different Text", fontPath, tfd.textsize, tfd.x_offset, tfd.y_offset, '*');
 	tf1->Init(dir, renderer, tfd.w, tfd.h, 270, 270);
 	AppObjects.push_back(tf1);
 	//tg init

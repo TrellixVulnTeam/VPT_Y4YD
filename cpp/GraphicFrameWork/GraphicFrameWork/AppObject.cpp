@@ -48,6 +48,18 @@ void AppObject::ChangeImage(const char* img_path)
 	texture = IMG_LoadTexture(renderer_m, image_path);
 }
 
+void AppObject::ApplyEffects() {
+	if (tint.a != 0) {
+		Utils::SDL_PushRendererState(renderer_m);
+		Utils::SDL_SetRenderDrawSDLColor(renderer_m, tint);
+		SDL_RenderFillRect(renderer_m, getBounds());
+		Utils::SDL_PopRendererState(renderer_m);
+	}
+}
+
+SDL_Rect* AppObject::getBounds() {
+	return new SDL_Rect{ x_m, y_m, width, height };
+}
 
 Text::Text(string font, string text, SDL_Color textcolor, int textsize)
 {
@@ -283,7 +295,7 @@ void Overlay::Init(SDL_Renderer* renderer, int x, int y) {
 	text_m->Init(renderer, 0, 0, x + x_offset_m, y + y_offset_m);
 	width = text_m->width+x_offset_m+x_offset_m;
 	height = text_m->height + y_offset_m + y_offset_m;;
-	bounds = new SDL_Rect{ x, y, width, height };
+	bounds = getBounds();
 }
 
 void Overlay::draw() {
@@ -401,4 +413,103 @@ void TextBox::update()
 	destR.y = y_m;
 	text_m->GetTextSize();
 	text_m->update();
+}
+
+SimpleButton::SimpleButton(Text* text, int x_offset, int y_offset, void(*onclick)(), Background* background, Border* border, SDL_Color hoverTint, SDL_Color clickTint)
+{
+	background_m = background;
+	border_m = border;
+	hoverTint_m = hoverTint;
+	clickTint_m = clickTint;
+	if (text == nullptr) {
+		text_m = nullptr;
+	}
+	else {
+		text_m = text;
+		x_offset_m = x_offset;
+		y_offset_m = y_offset;
+	}
+	isCollided = false;
+	isMouseDown = false;
+	onclick_m = onclick;
+}
+
+void SimpleButton::collide(int CollisionVal)
+{
+	destR.h = height;
+	destR.w = width;
+	destR.x = x_m;
+	destR.y = y_m;
+	CollisionVal_m = CollisionVal;
+	isCollided = CollisionVal != -1;
+	if (text_m != nullptr) {
+		text_m->update();
+	}
+}
+
+void SimpleButton::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
+{
+	//BasicInit(renderer, w, h, x, y);
+	//same as BasicInit
+	renderer_m = renderer;
+	width = w;
+	height = h;
+	x_m = x;
+	y_m = y;
+	if (text_m != nullptr) {
+		text_m->Init(renderer_m, 0, 0, x_m + x_offset_m, y_m + y_offset_m);
+		text_m->update();
+		text_w_m = text_m->width;
+		text_h_m = text_m->height;
+	}
+}
+
+void SimpleButton::Init(SDL_Renderer* renderer, int x, int y)
+{
+	renderer_m = renderer;
+	x_m = x;
+	y_m = y;
+	if (text_m != nullptr) {
+		text_m->Init(renderer_m, 0, 0, x_m + x_offset_m, y_m + y_offset_m);
+		text_m->update();
+		text_w_m = text_m->width;
+		text_h_m = text_m->height;
+	}
+	width = text_w_m + x_offset_m + x_offset_m;
+	height = text_h_m + y_offset_m + y_offset_m;
+}
+
+void SimpleButton::draw()
+{
+	if (isCollided) {
+		if (isMouseDown) {
+			tint = clickTint_m;
+		}
+		else {
+			tint = hoverTint_m;
+		}
+	}
+	else {
+		tint = SDL_Color{ 0, 0, 0, 0 };
+	}
+	const SDL_Rect* bounds = getBounds();
+	background_m->draw(renderer_m, bounds);
+	border_m->draw(renderer_m, bounds);
+	if (text_m != nullptr) {
+		text_m->draw();
+	}
+	ApplyEffects();
+}
+
+void SimpleButton::input(SDL_Event e)
+{
+	if (e.type == SDL_MOUSEBUTTONDOWN) {
+		isMouseDown = true;
+	}
+	if (e.type == SDL_MOUSEBUTTONUP) {
+		isMouseDown = false;
+		if (isCollided) {
+			onclick_m();
+		}
+	}
 }

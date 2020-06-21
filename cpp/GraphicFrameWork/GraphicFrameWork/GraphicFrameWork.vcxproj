@@ -161,20 +161,27 @@ call UpdateDll.bat</Command>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="GraphicFrameWork.cpp" />
     <ClCompile Include="Instance.cpp" />
+    <ClCompile Include="projects\VPT\Background.cpp" />
+    <ClCompile Include="projects\VPT\Border.cpp" />
     <ClCompile Include="projects\VPT\client.cpp" />
     <ClCompile Include="projects\VPT\editor.cpp" />
     <ClCompile Include="projects\VPT\Packet.cpp" />
+    <ClCompile Include="projects\VPT\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppObject.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Include.h" />
     <ClInclude Include="Instance.h" />
+    <ClInclude Include="projects\VPT\Background.h" />
+    <ClInclude Include="projects\VPT\Border.h" />
     <ClInclude Include="projects\VPT\client.h" />
     <ClInclude Include="projects\VPT\editor.h" />
     <ClInclude Include="projects\VPT\Packet.h" />
     <ClInclude Include="projects\VPT\PacketId.h" />
     <ClInclude Include="projects\VPT\ResultId.h" />
+    <ClInclude Include="projects\VPT\RelativePaths.h" />
+    <ClInclude Include="projects\VPT\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

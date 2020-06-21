@@ -1,5 +1,5 @@
 #include "editor.h"
-const string dir = "..\\";
+
 void editor::editor::Init(const char* window_title, int w, int h)
 {
 	BasicInit(window_title, w, h);
@@ -8,7 +8,7 @@ void editor::editor::Init(const char* window_title, int w, int h)
 	AppObjects[0]->Init(renderer, 1, 1, 0, 0);
 	
 	TextBoxData tbd;
-	tb = new TextBox("C:\\Users\\richa\\source\\repos\\VPT\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\PrinceValiant.ttf", 
+	tb = new TextBox(fontPath, 
 	tbd.textsize, tbd.x_offset, tbd.y_offset, "Button");
 	tb->Init(renderer, tbd.w, tbd.h, 0, 0);
 	AppObjects.push_back(tb);
@@ -52,13 +52,13 @@ void editor::editor::Update()
 	for (AppObject* object : AppObjects) {
 		object->update();
 	}
-	cout << message_m << endl;
+	//cout << message_m << endl;
 }
 
 void editor::editor::Input()
 {
-	for (Component* c : cm.InputSectorComponents) {
-		c->run(AppObjects);
+	for (Component* c : cm.UpdateSectorComponents) {
+		AppObjects[c->parent_m->id]->collide(c->run(AppObjects));
 	}
 	if (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT) { running = false; }

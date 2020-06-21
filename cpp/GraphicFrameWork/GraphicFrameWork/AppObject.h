@@ -5,11 +5,13 @@
 #include <string>
 #include <SDL_ttf.h>
 #include <vector>
+#include "projects/VPT/Background.h"
+#include "projects/VPT/Border.h"
 using namespace std;
 class AppObject
 {
 public:
-	AppObject() {};
+	AppObject() { tint = SDL_Color{ 0, 0, 0, 0 }; };
 	void PreInit(const char* img_path);
 	void BasicInit(SDL_Renderer* renderer, int w, int h, int x, int y);
 	virtual void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
@@ -18,6 +20,8 @@ public:
 	virtual void update();
 	virtual void input(SDL_Event e);
 	virtual void ChangeImage(const char* img_path);
+	virtual void ApplyEffects();
+	SDL_Rect* getBounds();
 	const char* image_path;
 	SDL_Texture* texture;
 	SDL_Renderer* renderer_m;
@@ -25,6 +29,7 @@ public:
 	int width, height;
 	int x_m, y_m;
 	int id;
+	SDL_Color tint;
 };
 
 class Text : public AppObject{
@@ -143,4 +148,27 @@ public:
 	int y_offset_m;
 	string backround_img_m;
 	void onclick() {};
+};
+
+class SimpleButton : public AppObject {
+public:
+	SimpleButton(Text* text, int x_offset, int y_offset, void(*onclick)(), 
+		Background* background = new SolidBackground(SDL_Color{ 210, 255, 255, 255 }), Border* border = new SolidBorder(SDL_Color{0, 0, 0, 255}, 5),
+		SDL_Color hoverTint = SDL_Color{255, 255, 255, 50}, SDL_Color clickTint = SDL_Color{ 255, 255, 255, 100 });
+	void collide(int CollisionVal);
+	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
+	void Init(SDL_Renderer* renderer, int x, int y);
+	void draw();
+	void input(SDL_Event e);
+	Background* background_m;
+	Border* border_m;
+	SDL_Color hoverTint_m, clickTint_m;
+	int CollisionVal_m;
+	Text* text_m;
+	int text_w_m;
+	int text_h_m;
+	int x_offset_m;
+	int y_offset_m;
+	bool isCollided, isMouseDown;
+	void(*onclick_m)();
 };

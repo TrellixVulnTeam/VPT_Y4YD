@@ -7,6 +7,7 @@
 #include "projects/VPT/client.h"
 #include "projects/VPT/editor.h"
 #include <vector>
+#include "projects/VPT/RelativePaths.h"
 #ifndef USE_DEBUG_CLIENT
 #include "projects/VPT/client_ClientJNI.h"
 #else

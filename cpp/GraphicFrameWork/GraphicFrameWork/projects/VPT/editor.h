@@ -4,6 +4,7 @@
 #include "../../Component.h"
 #include <cstdlib> 
 #include <ctime> 
+#include "RelativePaths.h"
 namespace editor {
 	struct AppObjSelected;
 	struct AppData
