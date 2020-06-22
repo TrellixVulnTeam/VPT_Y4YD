@@ -114,7 +114,7 @@ void Text::ChangeText(string text)
 	message = text;
 	string displayMessage = message.substr(textds, text.length());
 	if (textde != -1) {
-		displayMessage = displayMessage.substr(0, textde-textds);
+		displayMessage = displayMessage.substr(0, ((size_t)textde)-textds);
 	}
 	tmpsurface = TTF_RenderText_Blended(font_m, displayMessage.c_str(), textcolor_m);
 	texture = SDL_CreateTextureFromSurface(renderer_m, tmpsurface);
@@ -236,6 +236,43 @@ void TextField::input(SDL_Event e)
 		}
 		if (hasclicked != hasclicked_prev) {
 			updateText();
+		}
+		else if (hasclicked) {
+			int x, y;
+			SDL_GetMouseState(&x, &y);
+			SDL_Rect* textBounds = text_m->getBounds();
+			if (textBounds->x <= x) {
+				if(x <= textBounds->x + textBounds->w) {
+					x = x - textBounds->x;
+					int searchPos = text_m->textds;
+					int prevPxPos = 0;
+					int ncursorPos = -1;
+					while (searchPos <= text_m->textde) {
+						int glyphsize;
+						TTF_GlyphMetrics(text_m->font_m, text_m->message[searchPos], NULL, &glyphsize, NULL, NULL, NULL);
+						int center = (glyphsize - prevPxPos) / 2;
+						if (x >= prevPxPos && x < center) {
+							ncursorPos = searchPos;
+							break;
+						}
+						prevPxPos = prevPxPos + glyphsize;
+						if (x >= center && x <= prevPxPos) {
+							ncursorPos = searchPos+1;
+							break;
+						}
+						searchPos++;
+					}
+					if (ncursorPos == -1) {
+						ncursorPos = text_m->textde;
+					}
+					cursorPos = ncursorPos;
+				} else {
+					cursorPos = text_m->textde;
+				}
+			}
+			else {
+				cursorPos = text_m->textds;
+			}
 		}
 	}
 	if (hasclicked == true) {

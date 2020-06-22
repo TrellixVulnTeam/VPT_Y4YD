@@ -48,8 +48,6 @@ public:
 	SDL_Rect* srcR, destR;
 	SDL_Color textcolor_m;
 	SDL_Renderer* renderer_m;
-	int width, height;
-	int x_m, y_m;
 	int textsize_m;
 	int text_w, text_h;
 	SDL_Surface* tmpsurface;
