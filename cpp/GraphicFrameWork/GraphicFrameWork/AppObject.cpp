@@ -69,6 +69,8 @@ Text::Text(string font, string text, SDL_Color textcolor, int textsize)
 	font_path = font;
 	font_m = TTF_OpenFont(font.c_str(), textsize_m);
 	tmpsurface = TTF_RenderText_Blended(font_m, text.c_str(), textcolor_m);
+	textds = 0;
+	textde = -1;
 }
 
 void Text::BasicInit(SDL_Renderer* renderer, int w, int h, int x, int y)
@@ -110,7 +112,11 @@ void Text::GetTextSize()
 void Text::ChangeText(string text)
 {
 	message = text;
-	tmpsurface = TTF_RenderText_Blended(font_m, text.c_str(), textcolor_m);
+	string displayMessage = message.substr(textds, text.length());
+	if (textde != -1) {
+		displayMessage = displayMessage.substr(0, textde-textds);
+	}
+	tmpsurface = TTF_RenderText_Blended(font_m, displayMessage.c_str(), textcolor_m);
 	texture = SDL_CreateTextureFromSurface(renderer_m, tmpsurface);
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
 }
@@ -212,7 +218,7 @@ void TextField::draw()
 		Utils::SDL_PushRendererState(renderer_m);
 		SDL_SetRenderDrawColor(renderer_m, 0, 0, 0, 255);
 		SDL_Rect textBounds = text_m->destR;
-		TTF_SizeText(text_m->font_m, text_m->message.substr(0, cursorPos).c_str(), &textBounds.w, &textBounds.h);
+		TTF_SizeText(text_m->font_m, text_m->message.substr(text_m->textds, ((size_t)cursorPos)-text_m->textds).c_str(), &textBounds.w, &textBounds.h);
 		SDL_RenderFillRect(renderer_m, new SDL_Rect{ textBounds.x + textBounds.w, textBounds.y, 2, textBounds.h });
 		Utils::SDL_PopRendererState(renderer_m);
 	}
@@ -233,7 +239,14 @@ void TextField::input(SDL_Event e)
 		}
 	}
 	if (hasclicked == true) {
-		if (e.type == SDL_TEXTINPUT && !hasTextReachedBorder()) {
+		if (e.type == SDL_TEXTINPUT) {
+			if (message == "") {
+				text_m->textde = 0;
+			}
+			if (hasTextReachedBorder()) {
+				text_m->textds++;
+			}
+			text_m->textde++;
 			message = message.substr(0, cursorPos) + e.text.text + message.substr(cursorPos, message.length());
 			cursorPos++;
 			updateText();
@@ -243,14 +256,28 @@ void TextField::input(SDL_Event e)
 			SDL_Keycode kc = e.key.keysym.sym;
 			if (kc == SDLK_BACKSPACE && cursorPos != 0) {
 				message = message.substr(0, ((size_t)cursorPos)-1) + message.substr(cursorPos, message.length());
+				text_m->textde--;
+				if (cursorPos == text_m->textds || (text_m->textde == message.length() && text_m->textds != 0)) {
+					text_m->textds--;
+				}
 				cursorPos--;
 				updateText();
 			}
 			if (kc == SDLK_LEFT && cursorPos != 0) {
+				if (cursorPos == text_m->textds) {
+					text_m->textds--;
+					text_m->textde--;
+					updateText();
+				}
 				lastKeyPress = SDL_GetTicks();
 				cursorPos--;
 			}
 			if (kc == SDLK_RIGHT && cursorPos != message.length()) {
+				if (cursorPos == text_m->textde) {
+					text_m->textds++;
+					text_m->textde++;
+					updateText();
+				}
 				lastKeyPress = SDL_GetTicks();
 				cursorPos++;
 			}
@@ -260,7 +287,11 @@ void TextField::input(SDL_Event e)
 
 void TextField::updateText() {
 	lastKeyPress = SDL_GetTicks();
+	if (message == "") {
+		text_m->textde = -1;
+	}
 	text_m->ChangeText(message == "" && !hasclicked ? placeHolderText_m : pwChar_m == 0 ? message : string(message.length(), pwChar_m));
+	text_m->GetTextSize();
 	text_m->update();
 }
 
@@ -281,12 +312,7 @@ void TextField::collide(int CollisionVal)
 
 bool TextField::hasTextReachedBorder()
 {	
-	if (text_m->text_w + x_offset_m + 20 < width) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	return text_m->text_w + x_offset_m + 20 >= width;
 }
 
 Overlay::Overlay(string font, string text, SDL_Color bacgroundColor, SDL_Color textColor, int textsize, int x_offset, int y_offset, Uint32 displayTime, vector<AppObject*>* overlays) {

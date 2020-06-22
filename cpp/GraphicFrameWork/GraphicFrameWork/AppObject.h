@@ -53,6 +53,7 @@ public:
 	int textsize_m;
 	int text_w, text_h;
 	SDL_Surface* tmpsurface;
+	int textds, textde;
 };
 
 class Button : public AppObject {
