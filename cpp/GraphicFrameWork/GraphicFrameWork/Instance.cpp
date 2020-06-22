@@ -43,19 +43,49 @@ void AppInstance::BasicLoop()
 {
 	while (running) {
 		while (running) {
-			Update();
-			Input();
-			if (frametime > FrameDelay) {
-				framestart = SDL_GetTicks();
-				Draw();
+#ifndef USE_DEBUGGER
+			try {
+#endif
+				Update();
+				Input();
+				if (frametime > FrameDelay) {
+					framestart = SDL_GetTicks();
+					Draw();
+				}
+				frametime = SDL_GetTicks() - framestart;
+				if (cnt == INT_MAX) {
+					cnt = 1;
+				}
+				cnt++;
+#ifndef USE_DEBUGGER
 			}
-			frametime = SDL_GetTicks() - framestart;
-			if (cnt == INT_MAX) {
-				cnt = 1;
+			catch (const runtime_error & re) {
+				cout << "Runtime Error Occured: " << re.what() << endl;
+				reportError();
 			}
-			cnt++;
+			catch (const exception & ex) {
+				cout << "Exception Occured: " << ex.what() << endl;
+				reportError();
+			}
+			catch (...) {
+				cout << "Unknown Error Occured" << endl;
+				reportError();
+			}
+#endif
 		}
 		Cleanup();
 	}
 	Cleanup();
+}
+
+void AppInstance::reportError() {
+	if (SDL_GetTicks() - lastError > 50) {
+		numErrors = 0;
+	}
+	lastError = SDL_GetTicks();
+	numErrors++;
+	if (numErrors > 10) {
+		cout << "Multiple Errors Have Occured Within a Short Space of Time. Terminating..." << endl;
+		exit(EXIT_FAILURE);
+	}
 }

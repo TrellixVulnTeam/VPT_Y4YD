@@ -130,18 +130,37 @@ void client::client::PacketProcess()
 void client::client::Loop()
 {
 	while (running) {
-		//PacketProcess();
-		Update();
-		Input();
-		if (frametime > FrameDelay) {
-			framestart = SDL_GetTicks();
-			Draw();
+#ifndef USE_DEBUGGER
+		try {
+#endif
+			//PacketProcess();
+			Update();
+			Input();
+			if (frametime > FrameDelay) {
+				framestart = SDL_GetTicks();
+				Draw();
+			}
+			frametime = SDL_GetTicks() - framestart;
+			if (cnt == INT_MAX) {
+				cnt = 1;
+			}
+			cnt++;
+
+#ifndef USE_DEBUGGER
 		}
-		frametime = SDL_GetTicks() - framestart;
-		if (cnt == INT_MAX) {
-			cnt = 1;
+		catch (const runtime_error & re) {
+			cout << "Runtime Error Occured: " << re.what() << endl;
+			reportError();
 		}
-		cnt++;
+		catch (const exception & ex) {
+			cout << "Exception Occured: " << ex.what() << endl;
+			reportError();
+		}
+		catch (...) {
+			cout << "Unknown Error Occured" << endl;
+			reportError();
+		}
+#endif
 	}
 	Cleanup();
 }

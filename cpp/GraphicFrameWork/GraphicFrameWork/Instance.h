@@ -4,6 +4,7 @@
 #include "SDL_image.h"
 #include "AppObject.h"
 #include "Component.h"
+#define USE_DEBUGGER
 using namespace std;
 class AppInstance
 {
@@ -20,6 +21,7 @@ public:
 	void BasicLoop();
 	virtual void Loop() { BasicLoop(); }
 	virtual void Cleanup() {}
+	void reportError();
 
 	//
 	SDL_Window* Win;
@@ -34,6 +36,8 @@ public:
 	Uint32 framestart;
 	int frametime = INT_MAX;
 	int cnt;
+	int numErrors = 0;
+	Uint32 lastError = 0;
 	//
 
 };
