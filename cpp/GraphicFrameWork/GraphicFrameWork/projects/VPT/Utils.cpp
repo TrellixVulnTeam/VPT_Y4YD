@@ -57,17 +57,17 @@ void Utils::SDL_SetRenderDrawSDLColor(SDL_Renderer* renderer, SDL_Color color) {
 
 string Utils::readClipboard() {
 	if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(nullptr)) {
-		return NULL;
+		return string();
 	}
 	HANDLE hData = GetClipboardData(CF_TEXT);
 	if (hData == nullptr) {
 		CloseClipboard();
-		return NULL;
+		return string();
 	}
 	char* text = static_cast<char*>(GlobalLock(hData));
 	if (text == nullptr) {
 		CloseClipboard();
-		return NULL;
+		return string();
 	}
 	string out(text);
 	GlobalUnlock(hData);
