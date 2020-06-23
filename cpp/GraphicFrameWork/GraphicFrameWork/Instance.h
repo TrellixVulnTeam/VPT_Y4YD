@@ -4,7 +4,7 @@
 #include "SDL_image.h"
 #include "AppObject.h"
 #include "Component.h"
-#define USE_DEBUGGER
+#include "projects/VPT/Flags.h"
 using namespace std;
 class AppInstance
 {

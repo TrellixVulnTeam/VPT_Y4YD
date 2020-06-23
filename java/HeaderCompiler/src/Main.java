@@ -24,10 +24,7 @@ public class Main {
                 outputFile.createNewFile();
                 try(BufferedReader fr = new BufferedReader(new FileReader(srcDir + srcPath + ".java"));
                         BufferedWriter fw = new BufferedWriter(new FileWriter(outputFile))) {
-                    fw.append("#ifndef " + destName);
-                    fw.newLine();
-                    fw.append("#define " + destName);
-                    fw.newLine();
+                    fw.append("#pragma once");
                     String line;
                     while((line = fr.readLine()) != null) {
                         if(line.matches(".*\\(-?[0-9]+\\)[,;]")) {
@@ -35,11 +32,10 @@ public class Main {
                             String name = parts[0];
                             String idString = parts[1];
                             int id = Integer.parseInt(idString.substring(0, idString.length()-2));
-                            fw.append("#define " + destName + "_" + name + " " + id);
                             fw.newLine();
+                            fw.append("#define " + destName + "_" + name + " " + id);
                         }
                     }
-                    fw.append("#endif");
                 }
             }
         }

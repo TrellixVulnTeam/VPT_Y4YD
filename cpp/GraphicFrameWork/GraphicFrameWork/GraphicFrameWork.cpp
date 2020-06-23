@@ -42,16 +42,19 @@ int main(int argc, char* argv[])
     else {
         cout << "TTf init worked" << endl;
     }
+#ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
+#else
+    instances.push_back(new editor::editor());
+    editor::AppData appdata;
+#endif
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
     return 0;
 }
 
 void cppMain(JNIEnv* env, jclass claz, jobjectArray ja) {
-    jmethodID mid = env->GetStaticMethodID(claz, "CallBack", "()V");
-    env->CallStaticVoidMethod(claz, mid);
     client::client::SetJNIEnv(env);
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         cout << "SDL init worked" << endl;
@@ -66,8 +69,13 @@ void cppMain(JNIEnv* env, jclass claz, jobjectArray ja) {
     else {
         cout << "TTf init worked" << endl;
     }
+#ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
+#else
+    instances.push_back(new editor::editor());
+    editor::AppData appdata;
+#endif
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
     return;
