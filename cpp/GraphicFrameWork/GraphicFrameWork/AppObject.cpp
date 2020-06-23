@@ -194,6 +194,9 @@ TextField::TextField(string placeHolderText, string font_path, int textsize, int
 	y_offset_m = y_offset;
 	cursorPos = 0;
 	lastKeyPress = 0;
+	mouseDown = false;
+	selectionStart = 0;
+	selectionEnd = 0;
 }
 
 void TextField::Init(string projectDir, SDL_Renderer* renderer, int w, int h, int x, int y)
@@ -214,19 +217,61 @@ void TextField::draw()
 	SDL_RenderCopy(renderer_m, texture, NULL, &destR);
 	text_m->draw();
 	//Change every 600ms unless key press within 250ms
-	if (hasclicked && (SDL_GetTicks() / 600) % 2 >= 1 || SDL_GetTicks() - lastKeyPress <= 250) {
+	if (text_m->textds - 1 <= cursorPos && text_m->textde >= cursorPos && (SDL_GetTicks() / 600) % 2 >= 1 || SDL_GetTicks() - lastKeyPress <= 250) {
 		Utils::SDL_PushRendererState(renderer_m);
 		SDL_SetRenderDrawColor(renderer_m, 0, 0, 0, 255);
 		SDL_Rect textBounds = text_m->destR;
-		TTF_SizeText(text_m->font_m, text_m->message.substr(text_m->textds, ((size_t)cursorPos)-text_m->textds).c_str(), &textBounds.w, &textBounds.h);
+		textBounds.w = textToPxPos(cursorPos);
 		SDL_RenderFillRect(renderer_m, new SDL_Rect{ textBounds.x + textBounds.w, textBounds.y, 2, textBounds.h });
 		Utils::SDL_PopRendererState(renderer_m);
 	}
+	if (hasclicked && mouseDown) {
+		int mx, my;
+		SDL_GetMouseState(&mx, &my);
+		SDL_Rect* textBounds = text_m->getBounds();
+		if (!((cursorPos < text_m->textds - 1 && mx < textBounds->x) || (cursorPos > text_m->textde && mx > textBounds->x + textBounds->w))) {
+			mx = mx < textBounds->x ? textBounds->x : mx;
+			mx = mx > textBounds->x + textBounds-> w ? textBounds->x + textBounds->w : mx;
+			drawSelection(cursorPos, pxToTextPos(mx));
+		}
+	}
+	else if (selectionStart != selectionEnd) {
+		drawSelection(selectionStart, selectionEnd);
+	}
+}
+
+//ref2 MUST be on screen
+void TextField::drawSelection(int ref1, int ref2) {
+	Utils::SDL_PushRendererState(renderer_m);
+	SDL_SetRenderDrawColor(renderer_m, 180, 213, 255, 150);
+	SDL_Rect* textBounds = text_m->getBounds();
+	SDL_Rect* highlightBounds = NULL;
+	int pxRef2 = textToPxPos(ref2);
+	if (ref1 < text_m->textds - 1) {
+		highlightBounds = new SDL_Rect{ textBounds->x, textBounds->y, pxRef2, textBounds->h };
+	}
+	else if (ref1 > text_m->textde) {
+		highlightBounds = new SDL_Rect{ textBounds->x + pxRef2, textBounds->y, textBounds->w - pxRef2, textBounds->h };
+	}
+	else {
+		int pxRef1 = textToPxPos(ref1);
+		if (pxRef1 < pxRef2) {
+			highlightBounds = new SDL_Rect{ textBounds->x + pxRef1, textBounds->y, pxRef2 - pxRef1, textBounds->h };
+		}
+		else if (pxRef1 > pxRef2) {
+			highlightBounds = new SDL_Rect{ textBounds->x + pxRef2, textBounds->y, pxRef1 - pxRef2, textBounds->h };
+		}
+	}
+	if (highlightBounds != NULL) {
+		SDL_RenderFillRect(renderer_m, highlightBounds);
+	}
+	Utils::SDL_PopRendererState(renderer_m);
 }
 
 void TextField::input(SDL_Event e)
 {
-	if (e.type == SDL_MOUSEBUTTONUP) {
+	if (e.type == SDL_MOUSEBUTTONDOWN) {
+		mouseDown = true;
 		hasclicked_prev = hasclicked;
 		if (CollisionVal_m != -1) {
 			hasclicked = true;
@@ -234,6 +279,26 @@ void TextField::input(SDL_Event e)
 		else {
 			hasclicked = false;
 		}
+		if (hasclicked && hasclicked_prev) {
+			int x, y;
+			SDL_GetMouseState(&x, &y);
+			SDL_Rect* textBounds = text_m->getBounds();
+			if (textBounds->x <= x) {
+				if (x <= textBounds->x + textBounds->w) {
+					cursorPos = pxToTextPos(x);
+				}
+				else {
+					cursorPos = text_m->textde;
+				}
+			}
+			else {
+				cursorPos = text_m->textds;
+			}
+			selectionStart = cursorPos;
+			selectionEnd = cursorPos;
+		}
+	} else if(e.type == SDL_MOUSEBUTTONUP) {
+		mouseDown = false;
 		if (hasclicked != hasclicked_prev) {
 			updateText();
 		}
@@ -241,64 +306,61 @@ void TextField::input(SDL_Event e)
 			int x, y;
 			SDL_GetMouseState(&x, &y);
 			SDL_Rect* textBounds = text_m->getBounds();
-			if (textBounds->x <= x) {
-				if(x <= textBounds->x + textBounds->w) {
-					x = x - textBounds->x;
-					int searchPos = text_m->textds;
-					int prevPxPos = 0;
-					int ncursorPos = -1;
-					while (searchPos <= text_m->textde) {
-						int glyphsize;
-						TTF_GlyphMetrics(text_m->font_m, text_m->message[searchPos], NULL, &glyphsize, NULL, NULL, NULL);
-						int center = (glyphsize - prevPxPos) / 2;
-						if (x >= prevPxPos && x < center) {
-							ncursorPos = searchPos;
-							break;
-						}
-						prevPxPos = prevPxPos + glyphsize;
-						if (x >= center && x <= prevPxPos) {
-							ncursorPos = searchPos+1;
-							break;
-						}
-						searchPos++;
-					}
-					if (ncursorPos == -1) {
-						ncursorPos = text_m->textde;
-					}
-					cursorPos = ncursorPos;
-				} else {
-					cursorPos = text_m->textde;
-				}
-			}
-			else {
-				cursorPos = text_m->textds;
+			int clickPos = pxToTextPos(x);
+			if (clickPos != -1 && clickPos != cursorPos) {
+				selectionStart = cursorPos;
+				selectionEnd = clickPos;
+				cursorPos = clickPos;
 			}
 		}
 	}
 	if (hasclicked == true) {
 		if (e.type == SDL_TEXTINPUT) {
-			if (message == "") {
-				text_m->textde = 0;
+			if (selectionStart != selectionEnd) {
+				cursorPos = max(selectionStart, selectionEnd);
+				for (int i = 0; i < abs(selectionStart - selectionEnd); i++) {
+					bksp();
+				}
 			}
-			if (hasTextReachedBorder()) {
-				text_m->textds++;
-			}
-			text_m->textde++;
-			message = message.substr(0, cursorPos) + e.text.text + message.substr(cursorPos, message.length());
-			cursorPos++;
-			updateText();
+			append(e.text.text);
+			selectionStart = cursorPos;
+			selectionEnd = cursorPos;
 		}
 		if (e.type == SDL_KEYDOWN) {
 			//message = message + SDL_GetKeyName(e.key.keysym.sym);
 			SDL_Keycode kc = e.key.keysym.sym;
 			if (kc == SDLK_BACKSPACE && cursorPos != 0) {
-				message = message.substr(0, ((size_t)cursorPos)-1) + message.substr(cursorPos, message.length());
-				text_m->textde--;
-				if (cursorPos == text_m->textds || (text_m->textde == message.length() && text_m->textds != 0)) {
-					text_m->textds--;
+				if (selectionStart != selectionEnd) {
+					cursorPos = max(selectionStart, selectionEnd);
+					for (int i = 0; i < abs(selectionStart - selectionEnd); i++) {
+						bksp();
+					}
 				}
-				cursorPos--;
-				updateText();
+				else {
+					bksp();
+				}
+				selectionStart = cursorPos;
+				selectionEnd = cursorPos;
+			}
+			const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
+			bool shift = keyboardState[SDL_SCANCODE_LSHIFT] || keyboardState[SDL_SCANCODE_RSHIFT];
+			bool ctrl = keyboardState[SDL_SCANCODE_LCTRL] || keyboardState[SDL_SCANCODE_RCTRL];
+			if (kc == SDLK_c && selectionStart != selectionEnd) {
+				Utils::writeClipboard(message.substr(min(selectionStart, selectionEnd), abs(selectionStart - selectionEnd)));
+			}
+			if (kc == SDLK_v) {
+				string clipboardData = Utils::readClipboard();
+				if (!clipboardData.empty()) {
+					if (selectionStart != selectionEnd) {
+						cursorPos = max(selectionStart, selectionEnd);
+						for (int i = 0; i < abs(selectionStart - selectionEnd); i++) {
+							bksp();
+						}
+					}
+					append(clipboardData.c_str());
+					selectionStart = cursorPos;
+					selectionEnd = cursorPos;
+				}
 			}
 			if (kc == SDLK_LEFT && cursorPos != 0) {
 				if (cursorPos == text_m->textds) {
@@ -308,6 +370,9 @@ void TextField::input(SDL_Event e)
 				}
 				lastKeyPress = SDL_GetTicks();
 				cursorPos--;
+				if(!shift || ctrl)
+					selectionStart = cursorPos;
+				selectionEnd = cursorPos;
 			}
 			if (kc == SDLK_RIGHT && cursorPos != message.length()) {
 				if (cursorPos == text_m->textde) {
@@ -317,9 +382,83 @@ void TextField::input(SDL_Event e)
 				}
 				lastKeyPress = SDL_GetTicks();
 				cursorPos++;
+				if (!shift || ctrl)
+					selectionStart = cursorPos;
+				selectionEnd = cursorPos;
 			}
 		}
 	}
+}
+
+void TextField::append(const char* c) {
+	for (int i = 0; i < strlen(c); i++) {
+		append(c[i]);
+	}
+}
+
+void TextField::append(char c) {
+	if (message == "") {
+		text_m->textde = 0;
+	}
+	if (cursorPos >= text_m->textds - 1 && cursorPos <= text_m->textde) {
+		if (hasTextReachedBorder()) {
+			text_m->textds++;
+		}
+		text_m->textde++;
+	}
+	message = message.substr(0, cursorPos) + c + message.substr(cursorPos, message.length());
+	cursorPos++;
+	updateText();
+}
+
+void TextField::bksp() {
+	message = message.substr(0, ((size_t)cursorPos) - 1) + message.substr(cursorPos, message.length());
+	if (cursorPos >= text_m->textds - 1 && cursorPos <= text_m->textde) {
+		text_m->textde--;
+		if (cursorPos == text_m->textds || (text_m->textde == message.length() && text_m->textds != 0)) {
+			text_m->textds--;
+		}
+	}
+	cursorPos--;
+	updateText();
+}
+
+//Width from start of text
+int TextField::textToPxPos(int textPos) {
+	int out;
+	TTF_SizeText(text_m->font_m, text_m->message.substr(text_m->textds, ((size_t)textPos) - text_m->textds).c_str(), &out, NULL);
+	return out;
+}
+
+//px on screen (i.e. from mouse click)
+int TextField::pxToTextPos(int pxPos) {
+	SDL_Rect* textBounds = text_m->getBounds();
+	if (textBounds->x <= pxPos && pxPos <= textBounds->x + textBounds->w) {
+		pxPos = pxPos - textBounds->x;
+		int searchPos = text_m->textds;
+		int prevPxPos = 0;
+		int ncursorPos = -1;
+		while (searchPos <= text_m->textde) {
+			int glyphsize;
+			TTF_GlyphMetrics(text_m->font_m, text_m->message[searchPos], NULL, &glyphsize, NULL, NULL, NULL);
+			int center = (glyphsize - prevPxPos) / 2;
+			if (pxPos >= prevPxPos && pxPos < center) {
+				ncursorPos = searchPos;
+				break;
+			}
+			prevPxPos = prevPxPos + glyphsize;
+			if (pxPos >= center && pxPos <= prevPxPos) {
+				ncursorPos = searchPos + 1;
+				break;
+			}
+			searchPos++;
+		}
+		if (ncursorPos == -1) {
+			ncursorPos = text_m->textde;
+		}
+		return ncursorPos;
+	}
+	return -1;
 }
 
 void TextField::updateText() {

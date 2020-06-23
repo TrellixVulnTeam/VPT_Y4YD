@@ -2,6 +2,8 @@
 #include <SDL.h>
 #include <map>
 #include <vector>
+#include <Windows.h>
+#include <string>
 using namespace std;
 class Utils {
 public:
@@ -14,6 +16,8 @@ public:
 	static void SDL_SetRendererState(SDL_Renderer* renderer, SDL_RendererState state);
 	static SDL_Color SDL_GetRenderDrawSDLColor(SDL_Renderer* renderer);
 	static void SDL_SetRenderDrawSDLColor(SDL_Renderer* renderer, SDL_Color color);
+	static string readClipboard();
+	static void writeClipboard(string data);
 	template<typename kt, typename vt>
 	static bool contains(map<kt, vt> m, kt key);
 	template<typename kt, typename vt>

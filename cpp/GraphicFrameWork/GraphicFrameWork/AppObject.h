@@ -7,6 +7,7 @@
 #include <vector>
 #include "projects/VPT/Background.h"
 #include "projects/VPT/Border.h"
+#include <algorithm>
 using namespace std;
 class AppObject
 {
@@ -85,6 +86,12 @@ public:
 	void collide(int CollisionVal);
 	void updateText();
 	bool hasTextReachedBorder();
+	int pxToTextPos(int pxPos);
+	void drawSelection(int ref1, int ref2);
+	int textToPxPos(int textPos);
+	void append(const char* c);
+	void append(char c);
+	void bksp();
 	char pwChar_m;
 	Text* text_m;
 	string placeHolderText_m;
@@ -98,6 +105,8 @@ public:
 	bool hasclicked_prev;
 	int cursorPos;
 	Uint32 lastKeyPress;
+	bool mouseDown;
+	int selectionStart, selectionEnd;
 };
 
 class TextBox : public AppObject {

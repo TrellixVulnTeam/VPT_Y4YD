@@ -55,6 +55,47 @@ void Utils::SDL_SetRenderDrawSDLColor(SDL_Renderer* renderer, SDL_Color color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
+string Utils::readClipboard() {
+	if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(nullptr)) {
+		return NULL;
+	}
+	HANDLE hData = GetClipboardData(CF_TEXT);
+	if (hData == nullptr) {
+		CloseClipboard();
+		return NULL;
+	}
+	char* text = static_cast<char*>(GlobalLock(hData));
+	if (text == nullptr) {
+		CloseClipboard();
+		return NULL;
+	}
+	string out(text);
+	GlobalUnlock(hData);
+	CloseClipboard();
+	return out;
+}
+
+void Utils::writeClipboard(string data) {
+	if (!OpenClipboard(nullptr)) {
+		return;
+	}
+	EmptyClipboard();
+	HGLOBAL textMemObj = GlobalAlloc(GMEM_MOVEABLE, data.size()+1);
+	if (textMemObj == NULL) {
+		CloseClipboard();
+		return;
+	}
+	LPSTR copy = static_cast<LPSTR>(GlobalLock(textMemObj));
+	if (copy == NULL) {
+		CloseClipboard();
+		return;
+	}
+	memcpy(copy, data.c_str(), data.size()+1);
+	GlobalUnlock(textMemObj);
+	SetClipboardData(CF_TEXT, textMemObj);
+	CloseClipboard();
+}
+
 template<typename kt, typename vt>
 bool Utils::contains(map<kt, vt> m, kt key) {
 	return m.count(key) == 1;
