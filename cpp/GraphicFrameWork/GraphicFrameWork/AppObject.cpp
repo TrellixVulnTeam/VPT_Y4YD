@@ -619,7 +619,7 @@ TextBox::TextBox(string font_path, int textsize, int x_offset, int y_offset, str
 
 void TextBox::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
 {
-	PreInit("C:\\Users\\richa\\source\\repos\\VPT\\cpp\\GraphicFrameWork\\GraphicFrameWork\\textbox1.png");
+	PreInit((dir + "..\\..\\textbox1.png").c_str());
 	BasicInit(renderer, w, h, x, y);
 	text_m = new Text(font_path_m, message, SDL_Color{ 0, 0, 0, 255 }, textsize_m);
 	text_m->Init(renderer_m, 0, 0, x_m + x_offset_m, y_m + y_offset_m);

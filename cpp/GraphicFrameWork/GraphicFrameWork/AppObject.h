@@ -8,6 +8,7 @@
 #include "projects/VPT/Background.h"
 #include "projects/VPT/Border.h"
 #include <algorithm>
+#include "projects/VPT/RelativePaths.h"
 using namespace std;
 class AppObject
 {

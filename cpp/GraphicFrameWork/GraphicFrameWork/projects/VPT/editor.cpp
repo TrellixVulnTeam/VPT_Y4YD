@@ -81,7 +81,7 @@ void editor::editor::Input()
 			}
 			if (message_m == "Button") {
 				AppObjects.push_back(new PlaceableButton());
-				AppObjects[AppObjects.size() - 1]->PreInit("C:\\Users\\richa\\source\\repos\\VPT\\cpp\\GraphicFrameWork\\GraphicFrameWork\\projects\\VPT\\bounding.png");
+				AppObjects[AppObjects.size() - 1]->PreInit((dir + "bounding.png").c_str());
 				AppObjects[AppObjects.size() - 1]->Init(renderer, 100, 100, 400, 400);
 				AppObjects[AppObjects.size() - 1]->id = 1;
 				AppObjects[AppObjects.size() - 1]->x_m = AppObjects[0]->x_m;
