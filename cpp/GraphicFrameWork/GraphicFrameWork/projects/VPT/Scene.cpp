@@ -180,18 +180,7 @@ void LoginScreen::doLogin() {
 
 	Packet* loginResult = client::client::Request(env->PopLocalFrame(loginPacket));
 
-	bool isValidPacket;
-	switch (loginResult->resultType_m) {
-	case ResultId_ILLEGAL_ACCESS:
-	case ResultId_INVALID_REQUEST:
-	case ResultId_LOGIN:
-	case ResultId_SERVER_ERROR:
-	case ResultId_TOO_MANY_REQUESTS:
-		isValidPacket = true;
-		break;
-	default:
-		isValidPacket = false;
-	}
+	bool isValidPacket = Utils::ValidatePacketType(loginResult->resultType_m, ResultId_STANDARD_RESULT);
 
 	bool wasSuccessful;
 	string message;

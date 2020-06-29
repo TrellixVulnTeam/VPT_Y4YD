@@ -109,3 +109,18 @@ vt Utils::get(map<kt, vt> m, kt key) {
 	}
 	return ittr->second;
 }
+
+bool Utils::ValidatePacketType(int packetType, int expectedType) {
+	if (packetType == expectedType) {
+		return true;
+	}
+	switch (packetType) {
+	case ResultId_ILLEGAL_ACCESS:
+	case ResultId_INVALID_REQUEST:
+	case ResultId_SERVER_ERROR:
+	case ResultId_TOO_MANY_REQUESTS:
+		return true;
+	default:
+		return false;
+	}
+}

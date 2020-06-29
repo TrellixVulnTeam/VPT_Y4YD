@@ -4,6 +4,7 @@
 #include <vector>
 #include <Windows.h>
 #include <string>
+#include "ResultId.h"
 using namespace std;
 class Utils {
 public:
@@ -26,4 +27,5 @@ public:
 	static bool contains(map<kt, vt> m, kt key);
 	template<typename kt, typename vt>
 	static vt get(map<kt, vt> m, kt key);
+	static bool ValidatePacketType(int packetType, int expectedType);
 };
