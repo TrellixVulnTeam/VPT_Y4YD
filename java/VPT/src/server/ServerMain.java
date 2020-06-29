@@ -2,8 +2,9 @@ package server;
 
 import common.Console;
 import common.Constants;
+import common.networking.packet.PacketId;
 import common.networking.packet.packets.ServerStatus;
-import common.networking.packet.packets.ServerStatusPacket;
+import common.networking.packet.packets.SingleDataPacket;
 import common.networking.ssl.SSLConfig;
 import common.networking.ssl.SSLConnection;
 import java.io.File;
@@ -74,7 +75,7 @@ public final class ServerMain {
                     try {
                         SSLConnection connection = new SSLConnection((SSLSocket)server.accept(), false);
                         if(connection.socket.isConnected() && !connection.socket.isClosed()) {
-                            ServerStatusPacket status = new ServerStatusPacket(ServerStatus.OK);
+                            SingleDataPacket<ServerStatus> status = new SingleDataPacket<>(PacketId.SERVER_STATUS, ServerStatus.OK);
                             ConnectionHandler handler = new ConnectionHandler(connection, status);
                             if(status.data == ServerStatus.OK) {
                                 handler.handleConnection();

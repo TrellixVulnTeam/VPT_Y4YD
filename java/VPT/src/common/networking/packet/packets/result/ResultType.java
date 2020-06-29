@@ -26,17 +26,9 @@ public enum ResultType {
      */
     TOO_MANY_REQUESTS(3),
     /**
-     * Represents a response to a login request
+     * Represents a response to a request which consists of a success flag and a possible error message
      */
-    LOGIN(4),
-    /**
-     * Represents a response to a user creation request
-     */
-    CREATE_USER(5),
-    /**
-     * Represents a response to a user deletion request
-     */
-    DELETE_USER(6);
+    STANDARD_RESULT(4);
     
     /**
      * A unique id associated with this ResultType
