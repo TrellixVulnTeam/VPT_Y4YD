@@ -81,7 +81,7 @@ public final class ClientMain {
             handleStartupError("Error Initializing Connection", e);
         }
         Thread recieveThread = new Thread(() -> {
-            while(socket.isClosed()) {
+            while(!socket.isClosed()) {
                 try {
                     ClientJNI.recievePacket(pis.readPacket());
                 } catch(Exception e) {
