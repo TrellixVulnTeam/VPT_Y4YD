@@ -111,7 +111,7 @@ void AppInstance::addOverlay(AppObject* overlay) {
 		Overlays[id] = overlay;
 		return;
 	}
-	overlay->id = Overlays.size();
+	overlay->id = (int)Overlays.size();
 	Overlays.push_back(overlay);
 }
 

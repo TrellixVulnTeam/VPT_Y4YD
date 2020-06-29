@@ -8,11 +8,11 @@
 using namespace std;
 class Utils {
 public:
-	static struct SDL_Dimension {
+	struct SDL_Dimension {
 		int width;
 		int height;
 	};
-	static struct SDL_RendererState {
+	struct SDL_RendererState {
 		SDL_Color color;
 	};
 	static void SDL_PushRendererState(SDL_Renderer* renderer);

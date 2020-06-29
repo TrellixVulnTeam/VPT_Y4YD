@@ -590,7 +590,7 @@ void CheckBox::AddCheckBox(string text)
 		checkboxes[checkboxes.size() - 1]->Init(renderer_m, 100, 100, x_m, y_m);
 	}
 	else {
-		checkboxes[checkboxes.size() - 1]->Init(renderer_m, 100, 100, x_m, (checkboxes.size() - 1) * 100);
+		checkboxes[checkboxes.size() - 1]->Init(renderer_m, 100, 100, x_m, ((int)checkboxes.size() - 1) * 100);
 	}
 }
 
