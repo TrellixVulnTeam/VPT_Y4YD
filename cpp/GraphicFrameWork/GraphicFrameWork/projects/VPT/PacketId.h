@@ -8,4 +8,6 @@
 #define PacketId_SHUTDOWN 4
 #define PacketId_CREATE_USER 5
 #define PacketId_DELETE_USER 6
+#define PacketId_LOGOUT 7
+#define PacketId_CURRENT_USER_REQUEST 8
 #endif

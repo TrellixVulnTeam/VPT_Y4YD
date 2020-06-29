@@ -36,7 +36,15 @@ public enum PacketId {
     /**
      * Represents a Packet requesting the deletion of a user
      */
-    DELETE_USER(6);
+    DELETE_USER(6),
+    /**
+     * Represents a Packet requesting that the current user be logged out
+     */
+    LOGOUT(7),
+    /**
+     * Represents a Packet requesting information about the current user
+     */
+    CURRENT_USER_REQUEST(8);
     
     /**
      * A unique id associated with this PacketId
