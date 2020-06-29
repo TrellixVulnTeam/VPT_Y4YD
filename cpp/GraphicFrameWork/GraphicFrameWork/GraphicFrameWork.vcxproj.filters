@@ -47,5 +47,11 @@
     <ClInclude Include="projects\VPT\client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="projects\VPT\PacketId.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\ResultId.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -169,6 +169,8 @@ call UpdateDll.bat</Command>
     <ClInclude Include="Include.h" />
     <ClInclude Include="Instance.h" />
     <ClInclude Include="projects\VPT\client.h" />
+    <ClInclude Include="projects\VPT\PacketId.h" />
+    <ClInclude Include="projects\VPT\ResultId.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

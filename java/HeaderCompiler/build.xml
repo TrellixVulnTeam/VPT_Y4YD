@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="VPT" default="default" basedir=".">
-    <description>Builds, tests, and runs the project VPT.</description>
+<project name="VPTHeaderCompiler" default="default" basedir=".">
+    <description>Builds, tests, and runs the project VPTHeaderCompiler.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -58,7 +58,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="VPT-impl.jar">
+        <target name="run" depends="VPTHeaderCompiler-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>
@@ -70,29 +70,4 @@
     nbproject/build-impl.xml file. 
 
     -->
-    
-    <target name="do-headercompile" if="headercompilefilesexist">
-        <exec dir="${header-compiler-dir}" executable="${platform.home}/bin/java">
-            <arg value="-jar" />
-            <arg value="${header-compiler-dir}/dist/VPTHeaderCompiler.jar" />
-            <arg value="${src.dir.absolute}" />
-            <arg value="${enumsFile}" />
-            <arg value="${enumHeaderLocation}" />
-        </exec>
-    </target>
-    
-    <target name="-pre-jar">
-        <property name="src.dir.absolute" location="src" />
-        <property name="header-compiler-dir" location="../HeaderCompiler" />
-        <property name="enumsFile" location="globalEnums.txt" />
-        <property name="enumHeaderLocation" location="../../cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT" />
-        <condition property="headercompilefilesexist">
-            <and>
-                <available file="${header-compiler-dir}/dist/VPTHeaderCompiler.jar" />
-                <available file="${enumsFile}" />
-            </and>
-        </condition>
-        <antcall target="do-headercompile" />
-    </target>
-    
 </project>

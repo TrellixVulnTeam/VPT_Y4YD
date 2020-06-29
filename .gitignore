@@ -433,3 +433,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/java/HeaderCompiler/nbproject/private/
+/java/HeaderCompiler/build/
+/java/HeaderCompiler/dist/
