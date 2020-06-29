@@ -1,13 +1,18 @@
+#pragma once
 #include <iostream>
 #include "../../Instance.h"
 #include <vector>
 #include "../../Component.h"
 #include <cstdlib> 
 #include <ctime> 
-#include "Packet.h"
 #include <mutex>
+#include <condition_variable>
 #include <queue>
 #include "RelativePaths.h"
+#include "Scene.h"
+#include "PacketId.h"
+#include "Env.h"
+#include "Packet.h"
 using namespace std;
 
 namespace client {
@@ -39,10 +44,10 @@ namespace client {
 		void Input();
 		void PacketProcess();
 		void Loop();
-		void addOverlay(AppObject* overlay);
-		static void SetJNIEnv(JNIEnv* e);
 		static void QueuePacket(Packet *p);
 		static Packet* PollPacketQueue();
+		static void sendPacket(jobject packet);
+		static Packet* Request(jobject packet);
 		AppData appdata;
 	private:
 		TextField* tf;

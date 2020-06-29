@@ -55,7 +55,10 @@ int main(int argc, char* argv[])
 }
 
 void cppMain(JNIEnv* env, jclass claz, jobjectArray ja) {
-    client::client::SetJNIEnv(env);
+    JavaVM* vm = nullptr;
+    JavaVM** vmPtr = &vm;
+    env->GetJavaVM(vmPtr);
+    Env::SetJVM(vm);
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         cout << "SDL init worked" << endl;
     }

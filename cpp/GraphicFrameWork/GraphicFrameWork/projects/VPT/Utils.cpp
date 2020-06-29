@@ -5,7 +5,7 @@ void Utils::SDL_PushRendererState(SDL_Renderer* renderer) {
 		return;
 	}
 	if (!contains(states, renderer)) {
-		states.insert(pair<SDL_Renderer*, vector<SDL_RendererState>*>(renderer, new vector<SDL_RendererState>()));
+		states.insert(make_pair(renderer, new vector<SDL_RendererState>()));
 	}
 	get(states, renderer)->push_back(SDL_GetRendererState(renderer));
 }

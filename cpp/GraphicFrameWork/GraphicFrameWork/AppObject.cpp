@@ -1,7 +1,7 @@
 #include "AppObject.h"
 
 
-void AppObject::PreInit(const char* img_path)
+void AppObject::PreInit(string img_path)
 {
 	image_path = img_path;
 }
@@ -13,7 +13,7 @@ void AppObject::BasicInit(SDL_Renderer* renderer, int w, int h, int x, int y)
 	height = h;
 	x_m = x;
 	y_m = y;
-	texture = IMG_LoadTexture(renderer_m, image_path);
+	texture = IMG_LoadTexture(renderer_m, image_path.c_str());
 }
 
 void AppObject::Init(SDL_Renderer* renderer, int w, int h, int x, int y)
@@ -42,10 +42,10 @@ void AppObject::input(SDL_Event e)
 {
 }
 
-void AppObject::ChangeImage(const char* img_path)
+void AppObject::ChangeImage(string img_path)
 {
 	image_path = img_path;
-	texture = IMG_LoadTexture(renderer_m, image_path);
+	texture = IMG_LoadTexture(renderer_m, image_path.c_str());
 }
 
 void AppObject::ApplyEffects() {
@@ -217,7 +217,7 @@ void TextField::draw()
 	SDL_RenderCopy(renderer_m, texture, NULL, &destR);
 	text_m->draw();
 	//Change every 600ms unless key press within 250ms
-	if (text_m->textds - 1 <= cursorPos && text_m->textde >= cursorPos && (SDL_GetTicks() / 600) % 2 >= 1 || SDL_GetTicks() - lastKeyPress <= 250) {
+	if (hasclicked && text_m->textds - 1 <= cursorPos && text_m->textde >= cursorPos && (SDL_GetTicks() / 600) % 2 >= 1 || SDL_GetTicks() - lastKeyPress <= 250) {
 		Utils::SDL_PushRendererState(renderer_m);
 		SDL_SetRenderDrawColor(renderer_m, 0, 0, 0, 255);
 		SDL_Rect textBounds = text_m->destR;
@@ -419,7 +419,8 @@ void TextField::bksp() {
 			text_m->textds--;
 		}
 	}
-	cursorPos--;
+	if(cursorPos > 0)
+		cursorPos--;
 	updateText();
 }
 
@@ -520,6 +521,18 @@ void Overlay::Init(SDL_Renderer* renderer, int x, int y) {
 	y_m = y;
 	text_m->Init(renderer, 0, 0, x + x_offset_m, y + y_offset_m);
 	width = text_m->width+x_offset_m+x_offset_m;
+	height = text_m->height + y_offset_m + y_offset_m;;
+	bounds = getBounds();
+}
+
+void Overlay::Init(int windowWidth, SDL_Renderer* renderer, int y) {
+	renderer_m = renderer;
+	int textWidth;
+	TTF_SizeText(text_m->font_m, text_m->message.c_str(), &textWidth, NULL);
+	x_m = (windowWidth - (x_offset_m + x_offset_m + textWidth)) / 2;
+	y_m = y;
+	text_m->Init(renderer, 0, 0, x_m + x_offset_m, y + y_offset_m);
+	width = text_m->width + x_offset_m + x_offset_m;
 	height = text_m->height + y_offset_m + y_offset_m;;
 	bounds = getBounds();
 }
@@ -641,7 +654,7 @@ void TextBox::update()
 	text_m->update();
 }
 
-SimpleButton::SimpleButton(Text* text, int x_offset, int y_offset, void(*onclick)(), Background* background, Border* border, SDL_Color hoverTint, SDL_Color clickTint)
+SimpleButton::SimpleButton(Text* text, int x_offset, int y_offset, function<void()> onclick, Background* background, Border* border, SDL_Color hoverTint, SDL_Color clickTint)
 {
 	background_m = background;
 	border_m = border;
@@ -738,4 +751,19 @@ void SimpleButton::input(SDL_Event e)
 			onclick_m();
 		}
 	}
+}
+
+LoadingSymbol::LoadingSymbol(double rotationSpeed, SDL_Color color, string imagePath) {
+	rotationSpeed_m = rotationSpeed;
+	color_m = color;
+	PreInit(dir + imagePath);
+}
+
+void LoadingSymbol::Init(SDL_Renderer* renderer, int w, int h, int x, int y) {
+	BasicInit(renderer, w, h, x, y);
+	SDL_SetTextureColorMod(texture, color_m.r, color_m.g, color_m.b);
+}
+
+void LoadingSymbol::draw() {
+	SDL_RenderCopyEx(renderer_m, texture, NULL, &destR, rotationSpeed_m * SDL_GetTicks(), NULL, SDL_FLIP_NONE);
 }

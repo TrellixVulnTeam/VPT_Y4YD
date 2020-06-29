@@ -9,22 +9,23 @@
 #include "projects/VPT/Border.h"
 #include <algorithm>
 #include "projects/VPT/RelativePaths.h"
+#include <functional>
 using namespace std;
 class AppObject
 {
 public:
 	AppObject() { tint = SDL_Color{ 0, 0, 0, 0 }; };
-	void PreInit(const char* img_path);
+	void PreInit(string img_path);
 	void BasicInit(SDL_Renderer* renderer, int w, int h, int x, int y);
 	virtual void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	virtual void collide(int CollisionVal);
 	virtual void draw();
 	virtual void update();
 	virtual void input(SDL_Event e);
-	virtual void ChangeImage(const char* img_path);
+	virtual void ChangeImage(string img_path);
 	virtual void ApplyEffects();
 	SDL_Rect* getBounds();
-	const char* image_path;
+	string image_path;
 	SDL_Texture* texture;
 	SDL_Renderer* renderer_m;
 	SDL_Rect* srcR, destR;
@@ -129,6 +130,7 @@ public:
 	Overlay(string font, string text, SDL_Color bacgroundColor, SDL_Color textColor, int textsize, int x_offset, int y_offset, Uint32 displayTime, vector<AppObject*>* overlays);
 	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
 	void Init(SDL_Renderer* renderer, int x, int y);
+	void Init(int windowWidth, SDL_Renderer* renderer, int y);
 	void draw();
 	void update();
 	Text* text_m;
@@ -162,7 +164,7 @@ public:
 
 class SimpleButton : public AppObject {
 public:
-	SimpleButton(Text* text, int x_offset, int y_offset, void(*onclick)(), 
+	SimpleButton(Text* text, int x_offset, int y_offset, function<void()> onclick, 
 		Background* background = new SolidBackground(SDL_Color{ 210, 255, 255, 255 }), Border* border = new SolidBorder(SDL_Color{0, 0, 0, 255}, 5),
 		SDL_Color hoverTint = SDL_Color{255, 255, 255, 50}, SDL_Color clickTint = SDL_Color{ 255, 255, 255, 100 });
 	void collide(int CollisionVal);
@@ -180,5 +182,15 @@ public:
 	int x_offset_m;
 	int y_offset_m;
 	bool isCollided, isMouseDown;
-	void(*onclick_m)();
+	function<void()> onclick_m;
+};
+
+class LoadingSymbol : public AppObject {
+public:
+	LoadingSymbol(double rotationSpeed = 0.35, SDL_Color color = SDL_Color{ 0, 0, 0, 255 }, string imagePath = "loading.png");
+	LoadingSymbol(SDL_Color color, double rotationSpeed = 0.5, string imagePath = "loading.png") : LoadingSymbol(rotationSpeed, color, imagePath) {};
+	void Init(SDL_Renderer* renderer, int w, int h, int x, int y);
+	void draw();
+	double rotationSpeed_m;
+	SDL_Color color_m;
 };

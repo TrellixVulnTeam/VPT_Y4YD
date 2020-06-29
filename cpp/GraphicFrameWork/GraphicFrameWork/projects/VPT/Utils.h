@@ -7,6 +7,10 @@
 using namespace std;
 class Utils {
 public:
+	static struct SDL_Dimension {
+		int width;
+		int height;
+	};
 	static struct SDL_RendererState {
 		SDL_Color color;
 	};

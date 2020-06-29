@@ -1,7 +1,10 @@
 #include "client.h"
 static queue<Packet*> PacketQueue;
 static mutex PacketQueueLock;
-static JNIEnv* je;
+static mutex PacketRecieveLock;
+static condition_variable PacketRecieveNotifier;
+static bool isPacketRecieveWaiting = false;
+static Packet* recievedPacket;
 
 client::client::client()
 {
@@ -28,29 +31,34 @@ void client::client::Init(const char* window_title, int w, int h)
 	//text init
 	text = new Text(fontPath, "VPT", SDL_Color{ 0, 0, 0, 255 }, 100);
 	text->Init(renderer, 0, 0, 270, 0);
-	AppObjects.push_back(text);
+	//AppObjects.push_back(text);
 	//text init
 
 	//button init
 	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0, onclick1);
 	button->Init(renderer, 100, 100, 270, 400);
-	AppObjects.push_back(button);
+	//AppObjects.push_back(button);
 	//button init
 
 	//tf init
 	TextFieldData tfd;
 	tf = new TextField("Text", fontPath, tfd.textsize, tfd.x_offset, tfd.y_offset);
 	tf->Init(dir, renderer, tfd.w, tfd.h, 270, 160);
-	AppObjects.push_back(tf);
+	//AppObjects.push_back(tf);
 	tf1 = new TextField("Different Text", fontPath, tfd.textsize, tfd.x_offset, tfd.y_offset, '*');
 	tf1->Init(dir, renderer, tfd.w, tfd.h, 270, 270);
-	AppObjects.push_back(tf1);
+	//AppObjects.push_back(tf1);
 	//tg init
+
+	LoadingSymbol* ls = new LoadingSymbol();
+	ls->Init(renderer, 100, 100, 100, 400);
+	//AppObjects.push_back(ls);
 
 	for (unsigned int i = 0; i < AppObjects.size(); i++) {
 		AppObjects[i]->id = i;
 		cm.AttachComponent(new CollisionBox(AppObjects), AppObjects[i]);
 	}
+	BeginLoadingScene(LoginScreen().Create());
 	//init objects here
 
 
@@ -64,6 +72,7 @@ void client::client::Draw()
 	for (AppObject* object : AppObjects) {
 		object->draw();
 	}
+	GetActiveScene().Draw();
 	for (AppObject* overlay : Overlays) {
 		if (overlay != nullptr) {
 			overlay->draw();
@@ -74,6 +83,29 @@ void client::client::Draw()
 
 void client::client::Update()
 {
+	/*if (SDL_GetTicks() >= 3000 && Overlays.empty()) {
+		Overlay* ol = new Overlay(fontPath, "This is it...Nothing else is implemented...", SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 40, 10, 10, 3000, &Overlays);
+		ol->Init(windowSize.width, renderer, 20);
+		addOverlay(ol);
+	}
+	if (SDL_GetTicks() >= 9000 && Overlays.size() == 1) {
+		Overlay* ol = new Overlay(fontPath, "Seriously...You should probably just close the program...", SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 40, 10, 10, 3000, &Overlays);
+		ol->Init(windowSize.width, renderer, 20);
+		addOverlay(ol);
+	}
+	if (SDL_GetTicks() >= 15000 && Overlays.size() == 2) {
+		Overlay* ol = new Overlay(fontPath, "Just...Go...", SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 40, 10, 10, 3000, &Overlays);
+		ol->Init(windowSize.width, renderer, 20);
+		addOverlay(ol);
+	}
+	if (SDL_GetTicks() >= 21000 && Overlays.size() == 3) {
+		Overlay* ol = new Overlay(fontPath, "Goodbye...", SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 40, 10, 10, 3000, &Overlays);
+		ol->Init(windowSize.width, renderer, 20);
+		addOverlay(ol);
+	}
+	if (SDL_GetTicks() >= 24000) {
+		running = false;
+	}*/
 	int UpdateVal;
 	for (Component* c : cm.UpdateSectorComponents) {
 		UpdateVal = c->run(AppObjects);
@@ -89,6 +121,7 @@ void client::client::Update()
 	for (AppObject* object : AppObjects) {
 		object->update();
 	}
+	GetActiveScene().Update();
 	for (AppObject* overlay : Overlays) {
 		if (overlay != nullptr) {
 			overlay->update();
@@ -110,6 +143,7 @@ void client::client::Input()
 		for (AppObject* object : AppObjects) {
 			object->input(e);
 		}
+		GetActiveScene().Input(e);
 	}
 	for (AppObject* overlay : Overlays) {
 		if (overlay != nullptr) {
@@ -124,7 +158,17 @@ void client::client::PacketProcess()
 	if (packet == nullptr) {
 		return;
 	}
-	je->DeleteGlobalRef(packet->packetObj_m);
+	if (packet->packetId_m == PacketId_FORCE_LOGOUT) {
+		//TODO: Do Something
+		delete packet;
+		return;
+	}
+	if (isPacketRecieveWaiting) {
+		lock_guard<mutex> prwlg(PacketRecieveLock);
+		recievedPacket = packet;
+		isPacketRecieveWaiting = false;
+		PacketRecieveNotifier.notify_one();
+	}
 }
 
 void client::client::Loop()
@@ -133,7 +177,8 @@ void client::client::Loop()
 #ifndef USE_DEBUGGER
 		try {
 #endif
-			//PacketProcess();
+			PacketProcess();
+			RunRequestedSDLFuncts();
 			Update();
 			Input();
 			if (frametime > FrameDelay) {
@@ -165,20 +210,14 @@ void client::client::Loop()
 	Cleanup();
 }
 
-void client::client::SetJNIEnv(JNIEnv* e)
-{
-	je = e;
-}
-
 void client::client::QueuePacket(Packet *p) {
-	PacketQueueLock.lock();
+	lock_guard<mutex> pqlg(PacketQueueLock);
 	PacketQueue.push(p);
-	PacketQueueLock.unlock();
 }
 
 Packet* client::client::PollPacketQueue() {
 	Packet* out;
-	PacketQueueLock.lock();
+	lock_guard<mutex> pqlg(PacketQueueLock);
 	if (PacketQueue.empty()) {
 		out = nullptr;
 	}
@@ -186,23 +225,22 @@ Packet* client::client::PollPacketQueue() {
 		out = PacketQueue.front();
 		PacketQueue.pop();
 	}
-	PacketQueueLock.unlock();
 	return out;
 }
 
-void client::client::addOverlay(AppObject* overlay) {
-	int id = -1;
-	for (int i = 0; i < Overlays.size(); i++) {
-		if (Overlays[i] == nullptr) {
-			id = i;
-			break;
-		}
-	}
-	if (id != -1) {
-		overlay->id = id;
-		Overlays[id] = overlay;
-		return;
-	}
-	overlay->id = Overlays.size();
-	Overlays.push_back(overlay);
+void client::client::sendPacket(jobject packet) {
+	JNIEnv* env = Env::GetJNIEnv();
+	jclass methodClass = env->FindClass("client/ClientMain");
+	jmethodID sendMethodId = env->GetStaticMethodID(methodClass, "sendPacket", "(Lcommon/networking/packet/Packet;)V");
+	env->CallStaticVoidMethod(methodClass, sendMethodId, packet);
+}
+
+Packet* client::client::Request(jobject packet) {
+	unique_lock<mutex> prwlg(PacketRecieveLock);
+	isPacketRecieveWaiting = true;
+	sendPacket(packet);
+	PacketRecieveNotifier.wait(prwlg);
+	Packet* out = recievedPacket;
+	isPacketRecieveWaiting = false;
+	return out;
 }

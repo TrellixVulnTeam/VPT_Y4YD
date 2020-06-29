@@ -1,9 +1,10 @@
 #include "Instance.h"
 
+mutex requestLock;
 
 AppInstance::AppInstance()
 {
-
+	backgroundColor = SDL_Color{ 225, 225, 225, 255 };
 }
 
 void AppInstance::BasicInit(const char* window_title, int w, int h)
@@ -12,7 +13,13 @@ void AppInstance::BasicInit(const char* window_title, int w, int h)
 	renderer = SDL_CreateRenderer(Win, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_ShowCursor(1);
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	Utils::SDL_SetRenderDrawSDLColor(renderer, backgroundColor);
+	isDisplayingScene = false;
+	isDynamicScene = false;
+	windowSize = Utils::SDL_Dimension();
+	SDL_GetWindowSize(Win, &windowSize.width, &windowSize.height);
+	currentScene = &LoadingScreen().Create();
+	currentScene->Init(this);
 }
 
 void AppInstance::BasicUpdate()
@@ -46,6 +53,7 @@ void AppInstance::BasicLoop()
 #ifndef USE_DEBUGGER
 			try {
 #endif
+				RunRequestedSDLFuncts();
 				Update();
 				Input();
 				if (frametime > FrameDelay) {
@@ -88,4 +96,51 @@ void AppInstance::reportError() {
 		cout << "Multiple Errors Have Occured Within a Short Space of Time. Terminating..." << endl;
 		exit(EXIT_FAILURE);
 	}
+}
+
+void AppInstance::addOverlay(AppObject* overlay) {
+	int id = -1;
+	for (int i = 0; i < Overlays.size(); i++) {
+		if (Overlays[i] == nullptr) {
+			id = i;
+			break;
+		}
+	}
+	if (id != -1) {
+		overlay->id = id;
+		Overlays[id] = overlay;
+		return;
+	}
+	overlay->id = Overlays.size();
+	Overlays.push_back(overlay);
+}
+
+void AppInstance::BeginLoadingScene(Scene& scene) {
+	isDisplayingScene = false;
+	isDynamicScene = dynamic_cast<DynamicScene*>(&scene) == nullptr;
+	currentScene = &scene;
+	currentScene->Init(this);
+}
+
+void AppInstance::FinishSceneLoading(Scene& scene) {
+	if (&scene == currentScene) {
+		isDisplayingScene = true;
+	}
+}
+
+Scene& AppInstance::GetActiveScene() {
+	return isDisplayingScene ? *currentScene : LoadingScreen().Create();
+}
+
+void AppInstance::RequestSDLFunct(function<void()> funct) {
+	lock_guard<mutex> rflg(requestLock);
+	requestedSDLFuncts.push_back(funct);
+}
+
+void AppInstance::RunRequestedSDLFuncts() {
+	lock_guard<mutex> rflg(requestLock);
+	for (function<void()> funct : requestedSDLFuncts) {
+		funct();
+	}
+	requestedSDLFuncts.clear();
 }

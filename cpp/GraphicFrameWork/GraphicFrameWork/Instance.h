@@ -1,11 +1,15 @@
 #pragma once
 #include <iostream>
+#include <functional>
+#include <mutex>
 #include "SDL.h"
 #include "SDL_image.h"
 #include "AppObject.h"
 #include "Component.h"
 #include "projects/VPT/Flags.h"
+#include "projects/VPT/Utils.h"
 using namespace std;
+class Scene;
 class AppInstance
 {
 public:
@@ -22,6 +26,12 @@ public:
 	virtual void Loop() { BasicLoop(); }
 	virtual void Cleanup() {}
 	void reportError();
+	void addOverlay(AppObject* overlay);
+	void BeginLoadingScene(Scene& scene);
+	void FinishSceneLoading(Scene& scene);
+	Scene& GetActiveScene();
+	void RequestSDLFunct(function<void()> funct);
+	virtual void RunRequestedSDLFuncts();
 
 	//
 	SDL_Window* Win;
@@ -38,7 +48,14 @@ public:
 	int cnt;
 	int numErrors = 0;
 	Uint32 lastError = 0;
+	Scene* currentScene;
+	bool isDisplayingScene;
+	bool isDynamicScene;
+	SDL_Color backgroundColor;
+	Utils::SDL_Dimension windowSize;
+	vector<function<void()>> requestedSDLFuncts;
 	//
 
 };
 
+#include "projects/VPT/Scene.h"

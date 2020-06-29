@@ -70,10 +70,15 @@ CollisionBox::CollisionBox(vector<AppObject*> AppObjects)
 int CollisionBox::run(vector <AppObject*> AppObjects)
 {
 	AppObjects_m = AppObjects;
-	for (unsigned int i = 0; i < AppObjects_m.size(); i++) {
-		if (isCollided(AppObjects_m[i]) &&  AppObjects_m[i]->id != parent_m->id) {
-			return i;
+	if (colNot0) {
+		for (unsigned int i = 0; i < AppObjects_m.size(); i++) {
+			if (isCollided(AppObjects_m[i]) && AppObjects_m[i]->id != parent_m->id) {
+				return i;
+			}
 		}
+	}
+	else if(AppObjects_m.size() > 0 && isCollided(AppObjects_m[0])) {
+		return 0;
 	}
 	return -1;
 }
