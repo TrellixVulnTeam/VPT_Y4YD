@@ -5,9 +5,9 @@ import common.networking.packet.PacketId;
 import common.networking.packet.packets.CreateUserPacket;
 import common.networking.packet.packets.DeleteUserPacket;
 import common.networking.packet.packets.LoginPacket;
-import common.networking.packet.packets.result.DefaultResults;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.packet.packets.result.ResultPacket;
+import common.networking.packet.packets.result.StandardResultPacket;
 import common.networking.ssl.SSLConnection;
 import java.io.IOException;
 import java.time.Duration;
@@ -45,24 +45,24 @@ public final class PacketHandler {
                 if(result) {
                     UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
                 }
-                return DefaultResults.login(result);
+                return new StandardResultPacket(result, result ? null : "Invalid Login");
             } else if(p.id == PacketId.CREATE_USER.id) {
                 RequestService.request(connection, "Create User", ServerConstants.USER_SPEC_REQUESTS_TE);
                 try {
                     CreateUserPacket packet = (CreateUserPacket)p;
                     UserStore.createUser(new User(packet.userId, packet.password, packet.isAdmin));
-                    return DefaultResults.createUser(true);
+                    return new StandardResultPacket(true);
                 } catch(IllegalArgumentException e) {
-                    return DefaultResults.createUser(false, e.getMessage());
+                    return new StandardResultPacket(false, e.getMessage());
                 }
             } else if(p.id == PacketId.DELETE_USER.id) {
                 RequestService.request(connection, "Delete User", ServerConstants.USER_ONET_REQUESTS_TE);
                 try {
                     DeleteUserPacket packet = (DeleteUserPacket)p;
                     UserStore.deleteUser(packet.data);
-                    return DefaultResults.deleteUser(true);
+                    return new StandardResultPacket(true);
                 } catch(IllegalArgumentException e) {
-                    return DefaultResults.deleteUser(false, e.getMessage());
+                    return new StandardResultPacket(false, e.getMessage());
                 }
             } else if(p.id == PacketId.SHUTDOWN.id) {
                 System.exit(0);

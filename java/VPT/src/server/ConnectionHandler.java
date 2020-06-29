@@ -2,10 +2,11 @@ package server;
 
 import common.Constants;
 import common.networking.packet.Packet;
+import common.networking.packet.PacketId;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
-import common.networking.packet.packets.ForceLogoutPacket;
-import common.networking.packet.packets.ServerStatusPacket;
+import common.networking.packet.packets.ServerStatus;
+import common.networking.packet.packets.SingleDataPacket;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.ssl.SSLConnection;
 import java.io.EOFException;
@@ -44,7 +45,7 @@ public class ConnectionHandler {
      * @param status a ServerStatusPacket describing the current status of the server
      * @throws IOException if there is an error writing headers to the streams
      */
-    public ConnectionHandler(SSLConnection connection, ServerStatusPacket status) throws IOException {
+    public ConnectionHandler(SSLConnection connection, SingleDataPacket<ServerStatus> status) throws IOException {
         this.connection = connection;
         pis = connection.pis;
         pos = connection.pos;
@@ -109,7 +110,7 @@ public class ConnectionHandler {
     private void onUserDeletion() {
         if(!connection.socket.isClosed()) {
             try {
-                pos.writePacket(new ForceLogoutPacket());
+                pos.writePacket(new Packet(PacketId.FORCE_LOGOUT));
             } catch(IOException e) {
                 if (ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id && !connection.socket.isClosed()) {
                     e.printStackTrace(System.err);

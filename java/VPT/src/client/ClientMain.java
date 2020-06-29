@@ -2,9 +2,11 @@ package client;
 
 import common.Constants;
 import common.networking.packet.Packet;
+import common.networking.packet.PacketId;
 import common.networking.packet.PacketInputStream;
 import common.networking.packet.PacketOutputStream;
-import common.networking.packet.packets.ServerStatusPacket;
+import common.networking.packet.packets.ServerStatus;
+import common.networking.packet.packets.SingleDataPacket;
 import common.networking.ssl.SSLConfig;
 import common.networking.ssl.SSLConnection;
 import java.awt.GraphicsEnvironment;
@@ -73,7 +75,7 @@ public final class ClientMain {
             double minClientVersion = pis.readDouble();
             double maxClientVersion = pis.readDouble();
             int serverBranchId = pis.readInt();
-            ServerStatusPacket serverStatusPacket = (ServerStatusPacket)pis.readPacket();
+            SingleDataPacket<ServerStatus> serverStatusPacket = (SingleDataPacket<ServerStatus>)pis.readPacket();
             checkConnection(minClientVersion, maxClientVersion, serverBranchId, serverStatusPacket);
         } catch(ClassCastException e) {
             handleStartupError("Invalid Server Status", e);
@@ -153,7 +155,7 @@ public final class ClientMain {
      * @param serverBranchId the {@link Constants#Branch#id} of the {@link Constants#Branch} of the server
      * @param serverStatusPacket a ServerStatusPacket representing the status of the server
      */
-    private static void checkConnection(double minClientVersion, double maxClientVersion, int serverBranchId, ServerStatusPacket serverStatusPacket) {
+    private static void checkConnection(double minClientVersion, double maxClientVersion, int serverBranchId, SingleDataPacket<ServerStatus> serverStatusPacket) {
         boolean isClientDev = ClientConstants.BRANCH.id <= Constants.Branch.ALPHA.id;
         boolean isServerDev = serverBranchId <= Constants.Branch.ALPHA.id;
         if(isServerDev && !isClientDev) {
