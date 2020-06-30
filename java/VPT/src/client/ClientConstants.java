@@ -1,6 +1,6 @@
 package client;
 
-import static common.Constants.Branch;
+import common.Constants.Branch;
 
 /**
  * Constants specific to the client side of the VPT

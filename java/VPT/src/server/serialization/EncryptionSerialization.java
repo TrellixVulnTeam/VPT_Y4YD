@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.InvalidKeyException;
@@ -45,7 +46,7 @@ public final class EncryptionSerialization {
      * @throws IOException if there was an error serializing the object
      */
     public static void serialize(Serializable o, String fileName, Key encryptionKey) throws InvalidKeyException, IOException {
-        fileName = fileName.replaceAll("/", File.separator);
+        fileName = fileName.replace("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -60,17 +61,14 @@ public final class EncryptionSerialization {
         
         try {
         
-            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
             file.createNewFile();
-            File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
+            File bkupFile = new File(ServerConstants.BACKUP_DIR + File.separator + fileName + ".bkup");
             bkupFile.createNewFile();
-            Files.copy(file.toPath(), bkupFile.toPath());
-            Utils.IVCipher cipher = Utils.createCipher(Cipher.ENCRYPT_MODE, encryptionKey);
+            Files.copy(file.toPath(), bkupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Cipher cipher = Utils.createCipher(Cipher.ENCRYPT_MODE, encryptionKey);
             DigestOutputStream digester = new DigestOutputStream(new FileOutputStream(file), Utils.createMD());
-            byte[] iv = cipher.iv;
-            digester.write(Utils.intToBytes(iv.length));
-            digester.write(iv);
-            try(ObjectOutputStream os = new ObjectOutputStream(new CipherOutputStream(digester, cipher.cipher))) {
+            try(ObjectOutputStream os = new ObjectOutputStream(new CipherOutputStream(digester, cipher))) {
                 os.writeObject(o);
                 digester.on(false);
                 os.writeObject(digester.getMessageDigest().digest());
@@ -98,7 +96,7 @@ public final class EncryptionSerialization {
      * @throws IOException if there was an error deserializing the object
      */
     public static Object deserialize(String fileName, Key decryptionKey) throws ClassNotFoundException, InvalidKeyException, InvalidObjectException, IOException {
-        fileName = fileName.replaceAll("/", File.separator);
+        fileName = fileName.replace("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -114,11 +112,10 @@ public final class EncryptionSerialization {
         try {
         
             Object output;
-            File file = new File(ServerConstants.SERVER_DIR);
+            File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
             DigestInputStream digester = new DigestInputStream(new FileInputStream(file), Utils.createMD());
             try(ObjectInputStream is = new ObjectInputStream(new CipherInputStream(digester,
-                    Utils.createCipher(Cipher.DECRYPT_MODE, decryptionKey,
-                            digester.readNBytes(Utils.bytesToInt(digester.readNBytes(Integer.BYTES)))).cipher))) {
+                    Utils.createCipher(Cipher.DECRYPT_MODE, decryptionKey)))) {
                 output = is.readObject();
                 digester.on(false);
                 try {

@@ -28,7 +28,11 @@ public enum ResultType {
     /**
      * Represents a response to a request which consists of a success flag and a possible error message
      */
-    STANDARD_RESULT(4);
+    STANDARD_RESULT(4),
+    /**
+     * Represents a response to a request which contains user data
+     */
+    USER_RESULT(5);
     
     /**
      * A unique id associated with this ResultType

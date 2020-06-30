@@ -25,7 +25,7 @@ class SSLTrustManager implements X509TrustManager {
      * @param keyStore the {@link KeyStore} to read from
      * @throws KeyStoreException if there is an error reading from the KeyStore
      */
-    public SSLTrustManager(KeyStore keyStore) throws KeyStoreException {
+    SSLTrustManager(KeyStore keyStore) throws KeyStoreException {
         Enumeration<String> aliases = keyStore.aliases();
         int foundCerts = 0;
         X509Certificate[] temp = new X509Certificate[keyStore.size()];

@@ -10,9 +10,13 @@ public final class Constants {
      */
     public static String SSL_MODE = "TLSv1.3";
     /**
-     * The algorithm to use for retrieving {@link javax.crypto.Cipher} instances
+     * The algorithm to use for retrieving {@link javax.crypto.Cipher} instances for secret keys
      */
-    public static String ENCRYPTION_MODE = "AES/CBC/PKCS5Padding";
+    public static String SECRET_ENCRYPTION_MODE = "AES/GCM/NoPadding";
+    /**
+     * The algorithm to use for retrieving {@link javax.crypto.Cipher} instances for asymmetric keys
+     */
+    public static String ASYMETRIC_ENCRYPTION_MODE = "RSA/ECB/PKCS1Padding";
     /**
      * The algorithm to use for retrieving {@link java.security.MessageDigest} instances
      */

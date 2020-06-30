@@ -71,6 +71,10 @@ public final class UserStore {
      */
     private static final ReentrantReadWriteLock publicKeyLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
     /**
+     * Represents the admin public key
+     */
+    private static PublicKey ADMIN_PUBLIC_KEY;
+    /**
      * A {@link Consumer} of users which saves them
      */
     private static final Consumer<User> saveUser = (user) -> {
@@ -206,7 +210,11 @@ public final class UserStore {
         if(LoginService.getCurrentUser().userId.equals(userId)) {
             return LoginService.getCurrentUser().getKey("USER_FILE_SECRET_KEY");
         } else if(LoginService.getCurrentUser().isAdmin()) {
-            //TODO: Implement key fetching
+            try {
+                return (Key)EncryptionSerialization.deserialize("Users/" + Utils.hash(userId), LoginService.getCurrentUser().getKey("ADMIN_PRIVATE_KEY"));
+            } catch(ClassNotFoundException | InvalidKeyException | IOException e) {
+                return null;
+            }
         }
         return null;
     }
@@ -337,6 +345,11 @@ public final class UserStore {
                 publicKeyLock.writeLock().unlock();
             }
             saveUser(user, true);
+            try {
+                EncryptionSerialization.serialize(user.getKey("USER_FILE_SECRET_KEY"), "Users/" + Utils.hash(user.userId) + ".usr.key", ADMIN_PUBLIC_KEY);
+            } catch(InvalidKeyException e) {
+                throw new IOException(e);
+            }
             users.put(user.userId, new WeakReference<>(user));
             if(user.isVisible()) {
                 attributeLock.writeLock().lock();
@@ -449,7 +462,7 @@ public final class UserStore {
         }
         try {
             EncryptionSerialization.serialize(user, "Users/" + Utils.hash(user.userId) + ".usr", user.getKey("USER_FILE_SECRET_KEY"));
-            MacSerialization.serialize(user, "Users/" + Utils.hash(user.userId) + ".usr.pub", (PrivateKey)user.getKey("USER_FILE_PRIVATE_KEY"));
+            MacSerialization.serialize(user.toNetPublicUser(), "Users/" + Utils.hash(user.userId) + ".usr.pub", (PrivateKey)user.getKey("USER_FILE_PRIVATE_KEY"));
         } catch(InvalidKeyException e) {
             throw new IOException(e);
         }
@@ -505,6 +518,7 @@ public final class UserStore {
         if(attributesFile.length() == 0) {
             return;
         }
+        @SuppressWarnings("unchecked")
         HashMap<String, ArrayList<UserAttribute>> attributes = (HashMap<String, ArrayList<UserAttribute>>)BackupSerialization.deserialize("Users/attributes.attrs");
         attributeLock.writeLock().lock();
         try {
@@ -547,6 +561,7 @@ public final class UserStore {
         if(keyFile.length() == 0) {
             return;
         }
+        @SuppressWarnings("unchecked")
         HashMap<String, PublicKey> keys = (HashMap<String, PublicKey>)BackupSerialization.deserialize("Users/publickeys.pks");
         publicKeyLock.writeLock().lock();
         try {
@@ -589,12 +604,17 @@ public final class UserStore {
         }
     }
     
+    public static void loadAdminKey() throws IOException, ClassNotFoundException {
+        ADMIN_PUBLIC_KEY = (PublicKey)BackupSerialization.deserialize("Users/ADMIN_PUBLIC.key");
+    }
+    
     /**
      * Searches all publicly available attributes for the specified criteria
      * @param search the search criteria
      * @return a ranked list of users fitting the criteria
      * @see #getPublicAttributes() 
      */
+    @SuppressWarnings("fallthrough")
     public static ArrayList<String> search(AttributeSearch search) {
         HashMap<String, ArrayList<UserAttribute>> attributes = getPublicAttributes();
         ArrayList<AttributeSearchCriteria> criteria = search.getCriteria();

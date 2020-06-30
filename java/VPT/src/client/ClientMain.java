@@ -75,6 +75,7 @@ public final class ClientMain {
             double minClientVersion = pis.readDouble();
             double maxClientVersion = pis.readDouble();
             int serverBranchId = pis.readInt();
+            @SuppressWarnings("unchecked")
             SingleDataPacket<ServerStatus> serverStatusPacket = (SingleDataPacket<ServerStatus>)pis.readPacket();
             checkConnection(minClientVersion, maxClientVersion, serverBranchId, serverStatusPacket);
         } catch(ClassCastException e) {
@@ -82,6 +83,7 @@ public final class ClientMain {
         } catch(IOException e) {
             handleStartupError("Error Initializing Connection", e);
         }
+        @SuppressWarnings("UseSpecificCatch")
         Thread recieveThread = new Thread(() -> {
             while(!socket.isClosed()) {
                 try {

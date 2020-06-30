@@ -5,7 +5,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import server.ServerConstants;
 
 /**
  * Contains the publicly accessible attributes of a {@link User}
@@ -15,7 +17,8 @@ public class PublicUser implements Serializable {
     /**
      * A lock protecting access to the properties of this User
      */
-    protected ReadWriteLock readWriteLock;
+    protected ReadWriteLock readWriteLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
+    
     private static final long serialVersionUID = 647217896180882120L;
 
     /**
@@ -68,6 +71,19 @@ public class PublicUser implements Serializable {
             return new NetPublicUser(userId, attributes.stream().map((attribute) -> attribute.toNetUserAttribute()).collect(Collectors.toList()));
         } finally {
             readWriteLock.readLock().unlock();
+        }
+    }
+    
+    public void addAttribute(User thisUser, UserAttribute attr) throws SecurityException {
+        if(thisUser != this) {
+            throw new SecurityException("Invalid User Reference");
+        }
+        LoginService.checkAccess(thisUser);
+        readWriteLock.writeLock().lock();
+        try {
+            attributes.add(attr);
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
     }
     

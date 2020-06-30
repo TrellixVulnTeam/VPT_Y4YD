@@ -7,11 +7,14 @@ import common.networking.packet.packets.DeleteUserPacket;
 import common.networking.packet.packets.LoginPacket;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.packet.packets.result.ResultPacket;
+import common.networking.packet.packets.result.ResultType;
+import common.networking.packet.packets.result.SingleResultPacket;
 import common.networking.packet.packets.result.StandardResultPacket;
 import common.networking.ssl.SSLConnection;
 import java.io.IOException;
 import java.time.Duration;
 import server.user.LoginService;
+import server.user.PublicUser;
 import server.user.User;
 import server.user.UserStore;
 
@@ -65,7 +68,19 @@ public final class PacketHandler {
                     return new StandardResultPacket(false, e.getMessage());
                 }
             } else if(p.id == PacketId.SHUTDOWN.id) {
+                RequestService.request(connection, "Shutdown", ServerConstants.USER_ONET_REQUESTS_TE);
                 System.exit(0);
+            } else if(p.id == PacketId.LOGOUT.id) {
+                RequestService.request(connection, "Logout", ServerConstants.USER_ONET_REQUESTS_TE);
+                LoginService.logout();
+                return new StandardResultPacket(true);
+            } else if(p.id == PacketId.CURRENT_USER_REQUEST.id) {
+                RequestService.request(connection, "Current User Info", ServerConstants.USER_NORM_REQUESTS_TE);
+                User currentUser = LoginService.getCurrentUser();
+                if(currentUser == null) {
+                    return new SingleResultPacket<PublicUser>(ResultType.USER_RESULT, false, "Not Logged In", null);
+                }
+                return new SingleResultPacket<PublicUser>(ResultType.USER_RESULT, true, null, currentUser);
             }
             return ErrorResultPacket.INVALID_REQUEST;
         } catch(RequestService.TooManyRequestsException e) {

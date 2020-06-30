@@ -9,6 +9,8 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -41,7 +43,7 @@ public final class MacSerialization {
      * @throws IOException if there was an error serializing the object
      */
     public static void serialize(Serializable o, String fileName, PrivateKey signingKey) throws InvalidKeyException, IOException {
-        fileName = fileName.replaceAll("/", File.separator);
+        fileName = fileName.replace("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -62,11 +64,15 @@ public final class MacSerialization {
             } catch(SignatureException e) {
                 throw new IOException(e);
             }
-            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
             file.createNewFile();
+            File bkupFile = new File(ServerConstants.BACKUP_DIR + File.separator + fileName + ".bkup");
+            bkupFile.createNewFile();
+            Files.copy(file.toPath(), bkupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
                 os.writeObject(signedObject);
             }
+            bkupFile.delete();
             
         } finally {
 
@@ -89,7 +95,7 @@ public final class MacSerialization {
      * @throws IOException if there was an error deserializing the object
      */
     public static Object deserialize(String fileName, PublicKey verificationKey) throws ClassNotFoundException, InvalidKeyException, InvalidObjectException, IOException {
-        fileName = fileName.replaceAll("/", File.separator);
+        fileName = fileName.replace("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -105,7 +111,7 @@ public final class MacSerialization {
         try {
         
             Object output;
-            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
             try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
                 try {
                     SignedObject signedObject = (SignedObject)is.readObject();

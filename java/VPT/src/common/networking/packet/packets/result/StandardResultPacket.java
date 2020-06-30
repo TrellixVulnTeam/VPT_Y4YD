@@ -4,6 +4,8 @@ package common.networking.packet.packets.result;
  * A class providing methods which create standard {@link ResultPacket}s
  */
 public class StandardResultPacket extends ResultPacket {
+
+    private static final long serialVersionUID = 8709136896480384738L;
     
     /**
      * Creates a new StandardResultPacket from the given information. This is equivalent to <code>new StandardResultPacket(result, null)</code>
