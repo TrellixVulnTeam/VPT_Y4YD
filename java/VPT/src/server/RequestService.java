@@ -87,6 +87,8 @@ public final class RequestService {
      */
     public static class TooManyRequestsException extends Exception {
 
+        private static final long serialVersionUID = -2685095853010933068L;
+
         /**
          * The time (in nanoseconds) until the client can resend the request
          */
@@ -124,7 +126,7 @@ public final class RequestService {
         /**
          * Creates a new LastRequest with 1 request, sets {@link #lastRequestTime} to {@link System#nanoTime()}, and lastTimeout to 0
          */
-        public LastRequest() {
+        LastRequest() {
             this(1, System.nanoTime(), 0);
         }
         
@@ -134,7 +136,7 @@ public final class RequestService {
          * @param lastRequestTime initializes {@link #lastRequestTime}
          * @param lastTimeout initializes {@link #lastTimeout}
          */
-        public LastRequest(int numRequests, long lastRequestTime, long lastTimeout) {
+        LastRequest(int numRequests, long lastRequestTime, long lastTimeout) {
             this.numRequests = numRequests;
             this.lastRequestTime = lastRequestTime;
             this.lastTimeout = lastTimeout;
@@ -187,6 +189,9 @@ public final class RequestService {
             setRequestTime();
         }
         
+    }
+
+    private RequestService() {
     }
     
 }

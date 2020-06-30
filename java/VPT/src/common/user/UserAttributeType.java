@@ -5,7 +5,7 @@ package common.user;
  */
 public enum UserAttributeType {
 
-    ;
+    USERNAME, USERICON;
     
     private UserAttributeType() {}
     

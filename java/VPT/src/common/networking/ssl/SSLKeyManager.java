@@ -43,7 +43,7 @@ class SSLKeyManager implements X509KeyManager {
      * @param password the password of the requested key
      * @param alias the alias of the requested key
      */
-    public SSLKeyManager(KeyStore keyStore, char[] password, String alias) {
+    SSLKeyManager(KeyStore keyStore, char[] password, String alias) {
         this.keyStore = keyStore;
         this.password = password;
         this.alias = alias;

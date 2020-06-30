@@ -20,7 +20,7 @@ public class MultipleChoiceQuestion extends Question {
     public MultipleChoiceQuestion(String question, int associatedPoints, Collection<MultipleChoiceAnswer> answers) {
         super(associatedPoints, QuestionType.MULTIPLE_CHOICE);
         this.question = question;
-        this.answers = new ArrayList(answers);
+        this.answers = new ArrayList<>(answers);
     }
     
     public static final Function<MultipleChoiceAnswer, String> answerConverter = answer -> answer.answer;

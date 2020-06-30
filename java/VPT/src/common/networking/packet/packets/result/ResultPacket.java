@@ -8,7 +8,7 @@ import common.networking.packet.PacketId;
  */
 public class ResultPacket extends Packet {
 
-    private static final long serialVersonUID = 2298268915644736483L;
+    private static final long serialVersionUID = 2298268915644736483L;
     
     /**
      * An integer representing the type of result packet

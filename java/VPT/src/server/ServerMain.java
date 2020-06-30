@@ -84,16 +84,16 @@ public final class ServerMain {
                             }
                         }
                     } catch(IOException e) {
-                        if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id)
+                        if(ServerConstants.BRANCH.id <= Constants.Branch.ALPHA.id) {
                             e.printStackTrace(System.err);
+                        }
                     }
                 }
             } catch(IOException e) {
                 e.printStackTrace(System.err);
             }
-        } catch(RuntimeException e) {
+        } finally {
             executor.shutdown();
-            throw e;
         }
     }
     
@@ -111,8 +111,8 @@ public final class ServerMain {
      * and {@link ServerConstants#BACKUP_DIR} for the working and backup directories respectively
      */
     private static void createDir(String dir) {
-        new File(ServerConstants.SERVER_DIR + File.separator + dir.replaceAll("/", File.separator)).mkdirs();
-        new File(ServerConstants.BACKUP_DIR + File.separator + dir.replaceAll("/", File.separator)).mkdirs();
+        new File(ServerConstants.SERVER_DIR + File.separator + dir.replace("/", File.separator)).mkdirs();
+        new File(ServerConstants.BACKUP_DIR + File.separator + dir.replace("/", File.separator)).mkdirs();
     }
     
     /**
@@ -137,6 +137,7 @@ public final class ServerMain {
      */
     private static void loadData() {
         try {
+            UserStore.loadAdminKey();
             UserStore.loadAttributes();
             UserStore.loadPublicKeys();
         } catch(ClassNotFoundException | IOException e) {

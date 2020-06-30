@@ -80,7 +80,7 @@ public final class PacketHandler {
                 if(currentUser == null) {
                     return new SingleResultPacket<PublicUser>(ResultType.USER_RESULT, false, "Not Logged In", null);
                 }
-                return new SingleResultPacket(ResultType.USER_RESULT, true, null, currentUser);
+                return new SingleResultPacket<PublicUser>(ResultType.USER_RESULT, true, null, currentUser);
             }
             return ErrorResultPacket.INVALID_REQUEST;
         } catch(RequestService.TooManyRequestsException e) {

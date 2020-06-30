@@ -74,7 +74,7 @@ public class User extends PublicUser {
         this.isVisible = isVisible;
         this.isAdmin = isAdmin;
         this.keyStore = new HashMap<>();
-        keyStore.put("USER_FILE_PUBLIC_KEY", Utils.createPasswordKey(password));
+        keyStore.put("USER_FILE_SECRET_KEY", Utils.createPasswordKey(password));
     }
     
     /**
@@ -234,6 +234,10 @@ public class User extends PublicUser {
         } finally {
             readWriteLock.readLock().unlock();
         }
+    }
+    
+    public void addAttribute(UserAttribute attr) throws SecurityException {
+        addAttribute(this, attr);
     }
     
 }

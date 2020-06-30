@@ -18,7 +18,7 @@ public class NetMultipleChoiceQuestion extends NetQuestion {
     public NetMultipleChoiceQuestion(String question, int associatedPoints, Collection<String> answers) {
         super(associatedPoints, QuestionType.MULTIPLE_CHOICE);
         this.question = question;
-        this.answers = new ArrayList(answers);
+        this.answers = new ArrayList<>(answers);
     }
     
 }

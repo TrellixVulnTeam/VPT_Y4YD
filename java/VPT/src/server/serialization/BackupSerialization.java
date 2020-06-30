@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import server.ServerConstants;
@@ -34,7 +35,7 @@ public final class BackupSerialization {
      * @throws IOException if there was an error serializing the object
      */
     public static void serialize(Serializable o, String fileName) throws IOException {
-        fileName = fileName.replaceAll("/", File.separator);
+        fileName = fileName.replace("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -49,11 +50,11 @@ public final class BackupSerialization {
         
         try {
             
-            File file = new File(ServerConstants.SERVER_DIR + fileName);
+            File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
             file.createNewFile();
-            File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
+            File bkupFile = new File(ServerConstants.BACKUP_DIR + File.separator + fileName + ".bkup");
             bkupFile.createNewFile();
-            Files.copy(file.toPath(), bkupFile.toPath());
+            Files.copy(file.toPath(), bkupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file))) {
                 os.writeObject(o);
             }
@@ -77,7 +78,7 @@ public final class BackupSerialization {
      * @throws IOException if there was an error deserializing the object
      */
     public static Object deserialize(String fileName) throws ClassNotFoundException, IOException {
-        fileName = fileName.replaceAll("/", File.separator);
+        fileName = fileName.replace("/", File.separator);
         synchronized(locks) {
             if(!locks.containsKey(fileName)) {
                 locks.put(fileName, new Object());
@@ -93,7 +94,7 @@ public final class BackupSerialization {
         try {
         
             Object output;
-            File file = new File(ServerConstants.SERVER_DIR);
+            File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
             try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(file))) {
                 output = is.readObject();
             }
@@ -116,14 +117,14 @@ public final class BackupSerialization {
      * @throws IOException if there was an error restoring the file
      */
     public static synchronized void restore(String fileName) throws FileNotFoundException, IOException {
-        fileName = fileName.replaceAll("/", File.separator);
-        File file = new File(ServerConstants.SERVER_DIR + fileName);
-        File bkupFile = new File(ServerConstants.BACKUP_DIR + fileName + ".bkup");
+        fileName = fileName.replace("/", File.separator);
+        File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
+        File bkupFile = new File(ServerConstants.BACKUP_DIR + File.separator + fileName + ".bkup");
         if(!bkupFile.exists()) {
             throw new FileNotFoundException("File: " + bkupFile.getAbsolutePath() + " does not exist");
         }
         file.createNewFile();
-        Files.copy(bkupFile.toPath(), file.toPath());
+        Files.copy(bkupFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
         bkupFile.delete();
     }
     
