@@ -48,12 +48,14 @@ public class SerializableImage implements Serializable {
         int[] outArr = new int[(width * height) + 2];
         outArr[0] = width;
         outArr[1] = height;
+        int iidx = 8;
         int idx = 2;
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                int argb = to32BPP(Arrays.copyOfRange(encodedData, idx, idx + 3));
+                int argb = to32BPP(Arrays.copyOfRange(encodedData, iidx, iidx + 3));
                 outArr[idx] = argb;
-                idx += 3;
+                iidx += 3;
+                idx++;
             }
         }
         return outArr;
@@ -74,7 +76,7 @@ public class SerializableImage implements Serializable {
         int r = (argb24 >> 22) & 127;
         int g = (argb24 >> 15) & 127;
         int b = (argb24 >> 8) & 127;
-        int argb32 = (a << 24) | (r << 16) | (g << 8) | b;
+        int argb32 = (a << 29) | (r << 17) | (g << 9) | (b << 1);
         return argb32;
     }
     

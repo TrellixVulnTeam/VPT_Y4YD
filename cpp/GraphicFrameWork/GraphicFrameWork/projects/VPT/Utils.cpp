@@ -143,12 +143,12 @@ SDL_Texture* Utils::CreateTextureFromImage(jobject image, SDL_Renderer* renderer
 	int width = imageData[0];
 	int height = imageData[1];
 	
-	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB32, SDL_TEXTUREACCESS_STATIC, width, height);
+	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, width, height);
 	Uint32* pixels = new Uint32[(size_t)dataSize-2];
 	
 	memcpy(pixels, &imageData[2], ((size_t)dataSize - 2) * sizeof(Uint32));
 
-	SDL_UpdateTexture(texture, NULL, pixels, width);
+	SDL_UpdateTexture(texture, NULL, pixels, width * sizeof(Uint32));
 
 	delete[] imageData;
 	delete[] pixels;
