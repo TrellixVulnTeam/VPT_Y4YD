@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <string>
 #include "ResultId.h"
+#include <jni.h>
+
 using namespace std;
 class Utils {
 public:
@@ -28,4 +30,5 @@ public:
 	template<typename kt, typename vt>
 	static vt get(map<kt, vt> m, kt key);
 	static bool ValidatePacketType(int packetType, int expectedType);
+	static SDL_Texture* CreateTextureFromImage(jobject image, SDL_Renderer* renderer, JNIEnv* env);
 };

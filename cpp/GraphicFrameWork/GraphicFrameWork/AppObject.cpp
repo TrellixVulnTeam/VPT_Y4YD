@@ -222,7 +222,8 @@ void TextField::draw()
 		SDL_SetRenderDrawColor(renderer_m, 0, 0, 0, 255);
 		SDL_Rect textBounds = text_m->destR;
 		textBounds.w = textToPxPos(cursorPos);
-		SDL_RenderFillRect(renderer_m, new SDL_Rect{ textBounds.x + textBounds.w, textBounds.y, 2, textBounds.h });
+		SDL_Rect* cursorBounds = new SDL_Rect{ textBounds.x + textBounds.w, textBounds.y, 2, textBounds.h };
+		SDL_RenderFillRect(renderer_m, cursorBounds);
 		Utils::SDL_PopRendererState(renderer_m);
 	}
 	if (hasclicked && mouseDown) {
@@ -315,6 +316,15 @@ void TextField::input(SDL_Event e)
 		}
 	}
 	if (hasclicked == true) {
+		if (cursorPos == -1) {
+			cursorPos = 0;
+		}
+		if (selectionStart == -1) {
+			selectionStart = 0;
+		}
+		if (selectionEnd == -1) {
+			selectionEnd = 0;
+		}
 		if (e.type == SDL_TEXTINPUT) {
 			if (selectionStart != selectionEnd) {
 				cursorPos = max(selectionStart, selectionEnd);

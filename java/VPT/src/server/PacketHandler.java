@@ -11,6 +11,7 @@ import common.networking.packet.packets.result.ResultType;
 import common.networking.packet.packets.result.SingleResultPacket;
 import common.networking.packet.packets.result.StandardResultPacket;
 import common.networking.ssl.SSLConnection;
+import common.user.NetPublicUser;
 import java.io.IOException;
 import java.time.Duration;
 import server.user.LoginService;
@@ -78,9 +79,9 @@ public final class PacketHandler {
                 RequestService.request(connection, "Current User Info", ServerConstants.USER_NORM_REQUESTS_TE);
                 User currentUser = LoginService.getCurrentUser();
                 if(currentUser == null) {
-                    return new SingleResultPacket<PublicUser>(ResultType.USER_RESULT, false, "Not Logged In", null);
+                    return new SingleResultPacket<NetPublicUser>(ResultType.USER_RESULT, false, "Not Logged In", null);
                 }
-                return new SingleResultPacket<PublicUser>(ResultType.USER_RESULT, true, null, currentUser);
+                return new SingleResultPacket<>(ResultType.USER_RESULT, true, null, currentUser.toNetPublicUser());
             }
             return ErrorResultPacket.INVALID_REQUEST;
         } catch(RequestService.TooManyRequestsException e) {

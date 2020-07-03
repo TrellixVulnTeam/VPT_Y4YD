@@ -584,7 +584,7 @@ public final class UserStore {
         publicKeyLock.writeLock().lock();
         try {
             publicKeysChanged = false;
-            BackupSerialization.serialize(getPublicAttributes(), "Users/publickeys.pks");
+            BackupSerialization.serialize(new HashMap<>(userPublicKeys), "Users/publickeys.pks");
         } finally {
             publicKeyLock.writeLock().unlock();
         }
