@@ -1,10 +1,10 @@
 #pragma once
 #include "../../Include.h"
-#include "Packet.h"
-#include "client.h"
+#include "projects/VPT/Packet.h"
+#include "projects/VPT/client.h"
 #include <map>
-#include "Utils.h"
-#include "ResultId.h"
+#include "projects/VPT/Utils.h"
+#include "projects/VPT/ResultId.h"
 
 class Scene {
 public:

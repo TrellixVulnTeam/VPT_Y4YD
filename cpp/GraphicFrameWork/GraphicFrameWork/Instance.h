@@ -58,4 +58,4 @@ public:
 
 };
 
-#include "projects/VPT/Scene.h"
+#include "Scene.h"

@@ -9,7 +9,7 @@
 #include <condition_variable>
 #include <queue>
 #include "RelativePaths.h"
-#include "Scene.h"
+#include "../../Scene.h"
 #include "PacketId.h"
 #include "Env.h"
 #include "Packet.h"

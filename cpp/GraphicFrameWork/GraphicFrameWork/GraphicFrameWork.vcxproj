@@ -167,9 +167,9 @@ call UpdateDll.bat</Command>
     <ClCompile Include="projects\VPT\editor.cpp" />
     <ClCompile Include="projects\VPT\Env.cpp" />
     <ClCompile Include="projects\VPT\Packet.cpp" />
-    <ClCompile Include="projects\VPT\Scene.cpp" />
     <ClCompile Include="projects\VPT\TestV.cpp" />
     <ClCompile Include="projects\VPT\Utils.cpp" />
+    <ClCompile Include="Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppObject.h" />
@@ -186,9 +186,9 @@ call UpdateDll.bat</Command>
     <ClInclude Include="projects\VPT\PacketId.h" />
     <ClInclude Include="projects\VPT\ResultId.h" />
     <ClInclude Include="projects\VPT\RelativePaths.h" />
-    <ClInclude Include="projects\VPT\Scene.h" />
     <ClInclude Include="projects\VPT\TestV.h" />
     <ClInclude Include="projects\VPT\Utils.h" />
+    <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
