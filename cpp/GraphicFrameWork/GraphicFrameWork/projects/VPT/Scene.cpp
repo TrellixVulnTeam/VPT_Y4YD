@@ -213,3 +213,20 @@ void LoginScreen::doLogin() {
 		instance->isDisplayingScene = true;
 	});
 }
+
+void StandardQuestion::LoadStaticComponents()
+{
+}
+
+void StandardQuestion::LoadComponents()
+{
+	prompt = new Text(fontPath, question_m, SDL_Color{ 0,0,0, 255 }, 40);
+	prompt->Init(instance->renderer, 0, 0, 0, 0);
+
+	client::TextFieldData tfd;
+	answer_box = new TextField("Answer", fontPath, tfd.textsize, tfd.x_offset, tfd.y_offset);
+	answer_box->Init(dir, instance->renderer, tfd.w, tfd.h, 0, 100);
+
+	Objects.push_back(prompt);
+	Objects.push_back(answer_box);
+}

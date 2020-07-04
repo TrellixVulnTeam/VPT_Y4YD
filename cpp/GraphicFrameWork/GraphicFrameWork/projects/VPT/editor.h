@@ -57,7 +57,6 @@ namespace editor {
 		void Draw();
 		void Update();
 		void Input();
-		void Loop();
 		AppObjSelected Selected();
 	private:
 		int UpdateVal;

@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -168,6 +168,7 @@ call UpdateDll.bat</Command>
     <ClCompile Include="projects\VPT\Env.cpp" />
     <ClCompile Include="projects\VPT\Packet.cpp" />
     <ClCompile Include="projects\VPT\Scene.cpp" />
+    <ClCompile Include="projects\VPT\TestV.cpp" />
     <ClCompile Include="projects\VPT\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +187,7 @@ call UpdateDll.bat</Command>
     <ClInclude Include="projects\VPT\ResultId.h" />
     <ClInclude Include="projects\VPT\RelativePaths.h" />
     <ClInclude Include="projects\VPT\Scene.h" />
+    <ClInclude Include="projects\VPT\TestV.h" />
     <ClInclude Include="projects\VPT\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

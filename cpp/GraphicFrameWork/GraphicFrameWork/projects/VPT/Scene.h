@@ -68,3 +68,15 @@ public:
 	static Text* text;
 	static SimpleButton* loginButton;
 };
+
+class StandardQuestion : public Scene {
+public:
+	StandardQuestion(string question) { question_m = question; }
+	virtual void LoadStaticComponents();
+	virtual void LoadComponents();
+	virtual Scene& Create() { return *new StandardQuestion(question_m); }
+	TextField* answer_box;
+	Text* prompt;
+	string question_m;
+};
+
