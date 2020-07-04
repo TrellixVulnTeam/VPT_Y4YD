@@ -58,13 +58,17 @@ public:
 
 class LoginScreen : public Scene {
 public:
+	LoginScreen() { userIcon = nullptr; }
 	virtual void LoadStaticComponents();
 	virtual void LoadComponents();
+	virtual void Draw();
 	void login();
 	void doLogin();
+	void getProfilePic();
 	virtual Scene& Create() { return *new LoginScreen(); }
 	TextField* usernameField;
 	TextField* passwordField;
+	SDL_Texture* userIcon;
 	static Text* text;
 	static SimpleButton* loginButton;
 };

@@ -9,7 +9,7 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 import server.serialization.BackupSerialization;
 import server.serialization.EncryptionSerialization;
@@ -36,11 +36,10 @@ public class CreateAdmin {
         //Load Attributes
         ArrayList<UserAttribute> attributes = new ArrayList<>();
         attributes.add(new SingleDataAttribute.StringSearch<>(UserAttributeType.USERNAME, "admin", user));
-        System.out.println(new File("../../cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT").getAbsolutePath());
         attributes.add(new SingleDataAttribute.NoSearch<>(UserAttributeType.USERICON, new SerializableImage(
                 ImageIO.read(new File("../../cpp/GraphicFrameWork/GraphicFrameWork/projects/VPT/DefaultProfilePicture.png"))), user));
         attributes.forEach(user::addAttribute);
-        ConcurrentHashMap<String, ArrayList<UserAttribute>> publicAttributes = new ConcurrentHashMap<>();
+        HashMap<String, ArrayList<UserAttribute>> publicAttributes = new HashMap<>();
         publicAttributes.put(user.userId, user.getAttributes());
         BackupSerialization.serialize(publicAttributes, "Users/attributes.attrs");
         
@@ -52,7 +51,7 @@ public class CreateAdmin {
         KeyPair adminKeys = Utils.createPseudoRandomAsymetricKey();
         user.setKey("ADMIN_PRIVATE_KEY", adminKeys.getPrivate());
         BackupSerialization.serialize(adminKeys.getPublic(), "Users/ADMIN_PUBLIC.key");
-        ConcurrentHashMap<String, PublicKey> userPublicKeys = new ConcurrentHashMap<>();
+        HashMap<String, PublicKey> userPublicKeys = new HashMap<>();
         userPublicKeys.put(user.userId, publicFileKeys.getPublic());
         BackupSerialization.serialize(userPublicKeys, "Users/publickeys.pks");
         

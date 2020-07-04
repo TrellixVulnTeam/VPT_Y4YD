@@ -3,6 +3,7 @@ package common;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -20,6 +21,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -100,22 +102,66 @@ public final class Utils {
     }
     
     /**
-     * Creates a {@link Cipher} using the encryption mode specified in {@link Constants#SECRET_ENCRYPTION_MODE} or {@link Constants#ASYMETRIC_ENCRYPTION_MODE}
+     * Creates a {@link Cipher} using the encryption mode specified in {@link Constants#ASYMETRIC_ENCRYPTION_MODE}
      * @param op the opmode to initialize the Cipher with
      * @param key the key to initialize the Cipher with
-     * @return A Cipher that uses the encryption mode specified in {@link Constants#SECRET_ENCRYPTION_MODE} or {@link Constants#ASYMETRIC_ENCRYPTION_MODE}
+     * @return A Cipher that uses the encryption mode specified in {@link Constants#ASYMETRIC_ENCRYPTION_MODE}
      * initialized with the given opmode and key.
      * @throws InvalidKeyException if the given key is invalid, or its keysize exceeds the maximum allowable keysize
      * @see Cipher#init(int, java.security.Key) 
      */
-    public static Cipher createCipher(int op, Key key) throws InvalidKeyException {
+    public static Cipher createAsymetricCipher(int op, Key key) throws InvalidKeyException {
         try {
-            Cipher cipher = Cipher.getInstance(key instanceof SecretKey ? Constants.SECRET_ENCRYPTION_MODE : Constants.ASYMETRIC_ENCRYPTION_MODE);
+            Cipher cipher = Cipher.getInstance(Constants.ASYMETRIC_ENCRYPTION_MODE);
             cipher.init(op, key);
             return cipher;
         } catch(NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace(System.err);
             return null;
+        }
+    }
+    
+    /**
+     * Creates a {@link Cipher} using the encryption mode specified in {@link Constants#SECRET_ENCRYPTION_MODE}
+     * @param op the opmode to initialize the Cipher with
+     * @param key the key to initialize the Cipher with
+     * @return An {@link IVCipher} that uses the encryption mode specified in {@link Constants#SECRET_ENCRYPTION_MODE}
+     * initialized with the given opmode and key.
+     * @throws InvalidKeyException if the given key is invalid, or its keysize exceeds the maximum allowable keysize
+     * @see Cipher#init(int, java.security.Key) 
+     */
+    public static IVCipher createCipher(int op, Key key) throws InvalidKeyException {
+        try {
+            Cipher cipher = Cipher.getInstance(Constants.SECRET_ENCRYPTION_MODE);
+            cipher.init(op, key);
+            return new IVCipher(cipher, cipher.getIV());
+        } catch(NoSuchAlgorithmException | NoSuchPaddingException e) {
+            e.printStackTrace(System.err);
+            return null;
+        }
+    }
+    
+    /**
+     * Creates a {@link Cipher} using the encryption mode specified in {@link Constants#SECRET_ENCRYPTION_MODE}
+     * @param op the opmode to initialize the Cipher with
+     * @param key the key to initialize the Cipher with
+     * @param iv the iv to initialize the cipher with
+     * @return An {@link IVCipher} that uses the encryption mode specified in {@link Constants#SECRET_ENCRYPTION_MODE}
+     * initialized with the given opmode and key.
+     * @throws InvalidKeyException if the given key is invalid, or its keysize exceeds the maximum allowable keysize
+     * @see Cipher#init(int, java.security.Key, java.security.spec.AlgorithmParameterSpec) 
+     * @see IvParameterSpec
+     */
+    public static IVCipher createCipher(int op, Key key, byte[] iv) throws InvalidKeyException {
+        try {
+            Cipher cipher = Cipher.getInstance(Constants.SECRET_ENCRYPTION_MODE);
+            cipher.init(op, key, new IvParameterSpec(iv));
+            return new IVCipher(cipher, iv);
+        } catch(NoSuchAlgorithmException | NoSuchPaddingException e) {
+            e.printStackTrace(System.err);
+            return null;
+        } catch(InvalidAlgorithmParameterException e) {
+            throw new InvalidKeyException(e);
         }
     }
     
@@ -318,6 +364,35 @@ public final class Utils {
          * @return the transformed input
          */
         public T transform(T o);
+        
+    }
+    
+    /**
+     * A class binding a {@link Cipher} to its iv
+     * @see Cipher#getIV() 
+     */
+    public static class IVCipher {
+        
+        /**
+         * The cipher used to initialize this IVCipher
+         */
+        public final Cipher cipher;
+        /**
+         * The iv of the cipher used to initialize this IVCipher
+         * @see Cipher#getIV() 
+         */
+        public final byte[] iv;
+
+        /**
+         * Creates a new IVCipher
+         * @param cipher a {@link Cipher}
+         * @param iv its iv
+         * @see Cipher#getIV() 
+         */
+        public IVCipher(Cipher cipher, byte[] iv) {
+            this.cipher = cipher;
+            this.iv = iv;
+        }
         
     }
     

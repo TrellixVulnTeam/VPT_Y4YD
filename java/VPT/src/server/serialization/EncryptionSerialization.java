@@ -21,6 +21,7 @@ import java.util.HashMap;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.SecretKey;
 import server.ServerConstants;
 
 /**
@@ -66,8 +67,21 @@ public final class EncryptionSerialization {
             File bkupFile = new File(ServerConstants.BACKUP_DIR + File.separator + fileName + ".bkup");
             bkupFile.createNewFile();
             Files.copy(file.toPath(), bkupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Cipher cipher = Utils.createCipher(Cipher.ENCRYPT_MODE, encryptionKey);
+            Cipher cipher;
+            byte[] iv;
+            if(encryptionKey instanceof SecretKey) {
+                Utils.IVCipher ivCipher = Utils.createCipher(Cipher.ENCRYPT_MODE, encryptionKey);
+                cipher = ivCipher.cipher;
+                iv = ivCipher.iv;
+            } else {
+                cipher = Utils.createAsymetricCipher(Cipher.ENCRYPT_MODE, encryptionKey);
+                iv = new byte[0];
+            }
             DigestOutputStream digester = new DigestOutputStream(new FileOutputStream(file), Utils.createMD());
+            if(encryptionKey instanceof SecretKey) {
+                digester.write(Utils.intToBytes(iv.length));
+                digester.write(iv);
+            }
             try(ObjectOutputStream os = new ObjectOutputStream(new CipherOutputStream(digester, cipher))) {
                 os.writeObject(o);
                 digester.on(false);
@@ -114,8 +128,14 @@ public final class EncryptionSerialization {
             Object output;
             File file = new File(ServerConstants.SERVER_DIR + File.separator + fileName);
             DigestInputStream digester = new DigestInputStream(new FileInputStream(file), Utils.createMD());
-            try(ObjectInputStream is = new ObjectInputStream(new CipherInputStream(digester,
-                    Utils.createCipher(Cipher.DECRYPT_MODE, decryptionKey)))) {
+            Cipher cipher;
+            if(decryptionKey instanceof SecretKey) {
+                cipher = Utils.createCipher(Cipher.DECRYPT_MODE, decryptionKey,
+                        digester.readNBytes(Utils.bytesToInt(digester.readNBytes(Integer.BYTES)))).cipher;
+            } else {
+                cipher = Utils.createAsymetricCipher(Cipher.DECRYPT_MODE, decryptionKey);
+            }
+            try(ObjectInputStream is = new ObjectInputStream(new CipherInputStream(digester, cipher))) {
                 output = is.readObject();
                 digester.on(false);
                 try {

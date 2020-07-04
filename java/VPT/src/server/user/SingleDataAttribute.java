@@ -16,6 +16,7 @@ public abstract class SingleDataAttribute<T extends Serializable> extends UserAt
     
     public SingleDataAttribute(UserAttributeType type, T data, User user) {
         super(type);
+        this.data = data;
         this.user = user;
     }
 

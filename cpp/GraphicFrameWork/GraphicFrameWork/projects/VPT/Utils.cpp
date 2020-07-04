@@ -124,3 +124,37 @@ bool Utils::ValidatePacketType(int packetType, int expectedType) {
 		return false;
 	}
 }
+
+#pragma warning(push)
+#pragma warning(disable:6385)
+#pragma warning(disable:6386)
+SDL_Texture* Utils::CreateTextureFromImage(jobject image, SDL_Renderer* renderer, JNIEnv* env) {
+	env->PushLocalFrame(1);
+
+	jclass imageClass = env->FindClass("common/SerializableImage");
+	jmethodID dataRetrievalMessageId = env->GetMethodID(imageClass, "exportToSDL", "()[I");
+	jintArray rawImageData = (jintArray)env->CallObjectMethod(image, dataRetrievalMessageId);
+
+	jsize dataSize = env->GetArrayLength(rawImageData);
+	jint* rawImageDataArr = env->GetIntArrayElements(rawImageData, nullptr);
+	Uint32* imageData = new Uint32[dataSize];
+	memcpy(imageData, rawImageDataArr, dataSize * sizeof(Uint32));
+	env->ReleaseIntArrayElements(rawImageData, rawImageDataArr, 0);
+	int width = imageData[0];
+	int height = imageData[1];
+	
+	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, width, height);
+	Uint32* pixels = new Uint32[(size_t)dataSize-2];
+	
+	memcpy(pixels, &imageData[2], ((size_t)dataSize - 2) * sizeof(Uint32));
+
+	SDL_UpdateTexture(texture, NULL, pixels, width * sizeof(Uint32));
+
+	delete[] imageData;
+	delete[] pixels;
+
+	env->PopLocalFrame(NULL);
+
+	return texture;
+}
+#pragma warning(pop)

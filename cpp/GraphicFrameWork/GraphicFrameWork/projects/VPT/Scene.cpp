@@ -206,6 +206,8 @@ void LoginScreen::doLogin() {
 
 	delete loginResult;
 
+	getProfilePic();
+
 	instance->RequestSDLFunct([this, message, wasSuccessful]() {
 		Overlay* resultOverlay = new Overlay(fontPath, message, wasSuccessful ? SDL_Color{ 0, 255, 0, 255 } : SDL_Color{ 255, 0, 0, 255 }, SDL_Color{ 255, 255, 255, 255 }, 40, 10, 10, 3000, &instance->Overlays);
 		resultOverlay->Init(instance->windowSize.width, instance->renderer, 20);
@@ -229,4 +231,73 @@ void StandardQuestion::LoadComponents()
 
 	Objects.push_back(prompt);
 	Objects.push_back(answer_box);
+}
+
+void LoginScreen::Draw() {
+	Scene::Draw();
+	if(userIcon != nullptr)
+		SDL_RenderCopy(instance->renderer, userIcon, NULL, new SDL_Rect{ 256, 256, 256, 256 });
+}
+
+void LoginScreen::getProfilePic() {
+	JNIEnv* env = Env::GetJNIEnv();
+	env->PushLocalFrame(4);
+	env->PushLocalFrame(1);
+	jclass packetClass = env->FindClass("common/networking/packet/Packet");
+	jmethodID constructorId = env->GetMethodID(packetClass, "<init>", "(I)V");
+	jobject requestPacket = env->NewObject(packetClass, constructorId, PacketId_CURRENT_USER_REQUEST);
+
+	Packet* resultPacket = client::client::Request(env->PopLocalFrame(requestPacket));
+	if (Utils::ValidatePacketType(resultPacket->resultType_m, ResultId_USER_RESULT)) {
+		jclass resultPacketClass = env->FindClass("common/networking/packet/packets/result/ResultPacket");
+		jfieldID successFieldId = env->GetFieldID(resultPacketClass, "wasActionSuccessful", "Z");
+		if (env->GetBooleanField(resultPacket->packetObj_m, successFieldId) == JNI_TRUE) {
+			jclass singleResultPacketClass = env->FindClass("common/networking/packet/packets/result/SingleResultPacket");
+			jfieldID dataFieldId = env->GetFieldID(singleResultPacketClass, "result", "Ljava/lang/Object;");
+			jobject user = env->GetObjectField(resultPacket->packetObj_m, dataFieldId);
+			if (user == NULL) {
+				cerr << "Null User" << endl;
+			}
+			else {
+				jclass netUserClass = env->FindClass("common/user/NetPublicUser");
+				jmethodID attributesMethod = env->GetMethodID(netUserClass, "getAttributes", "()Ljava/util/ArrayList;");
+				jobject attributes = env->CallObjectMethod(user, attributesMethod);
+				jclass attributeTypeClass = env->FindClass("common/user/UserAttributeType");
+				jfieldID requestedAttributeTypeFieldId = env->GetStaticFieldID(attributeTypeClass, "USERICON", "Lcommon/user/UserAttributeType;");
+				jobject requestedAttributeType = env->GetStaticObjectField(attributeTypeClass, requestedAttributeTypeFieldId);
+				jclass attributeClass = env->FindClass("common/user/NetUserAttribute");
+				jfieldID typeFieldId = env->GetFieldID(attributeClass, "type", "Lcommon/user/UserAttributeType;");
+
+				jclass arrayListClass = env->FindClass("java/util/ArrayList");
+				jmethodID arrayListSizeMethodId = env->GetMethodID(arrayListClass, "size", "()I");
+				jint arrayListSize = env->CallIntMethod(attributes, arrayListSizeMethodId);
+				jmethodID arrayListGetMethodId = env->GetMethodID(arrayListClass, "get", "(I)Ljava/lang/Object;");
+
+				for (jint i = 0; i < arrayListSize; i++) {
+					jobject attr = env->CallObjectMethod(attributes, arrayListGetMethodId, i);
+					if (env->IsSameObject(requestedAttributeType, env->GetObjectField(attr, typeFieldId))) {
+						jclass netSingleDataAttributeClass = env->FindClass("common/user/NetSingleDataAttribute");
+						jmethodID getMethodId = env->GetMethodID(netSingleDataAttributeClass, "getData", "()Ljava/lang/Object;");
+						jobject image = env->CallObjectMethod(attr, getMethodId);
+						jobject globalImageRef = env->NewGlobalRef(image);
+						instance->RequestSDLFunct([this, globalImageRef]() {
+							userIcon = Utils::CreateTextureFromImage(globalImageRef, instance->renderer, Env::GetJNIEnv());
+							Env::GetJNIEnv()->DeleteGlobalRef(globalImageRef);
+						});
+						break;
+					}
+					env->DeleteLocalRef(attr);
+				}
+			}
+		}
+		else {
+			jfieldID messageFieldId = env->GetFieldID(resultPacketClass, "msg", "Ljava/lang/String;");
+			cerr << string(env->GetStringUTFChars((jstring)env->GetObjectField(resultPacket->packetObj_m, messageFieldId), NULL)) << endl;
+		}
+	}
+	else {
+		cerr << "Invalid Responce From Server Please Try Again" << endl;
+	}
+
+	env->PopLocalFrame(NULL);
 }
