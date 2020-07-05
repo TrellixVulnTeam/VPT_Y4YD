@@ -1,3 +1,12 @@
-import webbrowser
-filename = 'C:\\Users\\richa\\source\\repos\\VPT\\python\\monca-editor\\index.html'
-webbrowser.open_new(filename)
+from flask import Flask, render_template
+from flaskwebgui import FlaskUI
+
+app = Flask(__name__)
+
+ui = FlaskUI(app)
+
+@app.route("/")
+def index():
+	 return render_template('index.html')
+
+ui.run()

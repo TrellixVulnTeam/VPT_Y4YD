@@ -107,12 +107,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-14.0.1\include\win32;C:\Program Files\Java\jdk-14.0.1\include;$(ProjectDir)SDL2_ttf-2.0.15\include;$(ProjectDir)SDL2_image-2.0.5\include;$(ProjectDir)SDL2-2.0.10\include;C:\Program Files %28x86%29\Microsoft Visual Studio\Shared\Python37_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-14.0.1\include\win32;C:\Program Files\Java\jdk-14.0.1\include;$(ProjectDir)SDL2_ttf-2.0.15\include;$(ProjectDir)SDL2_image-2.0.5\include;$(ProjectDir)SDL2-2.0.10\include;$(ProjectDir)..\..\..\python\Python\Python36\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\Java\jdk-14.0.1\lib;$(ProjectDir)SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)SDL2_image-2.0.5\lib\x64;$(ProjectDir)SDL2-2.0.10\lib\x64;C:\Program Files %28x86%29\Microsoft Visual Studio\Shared\Python37_64\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Java\jdk-14.0.1\lib;$(ProjectDir)SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)SDL2_image-2.0.5\lib\x64;$(ProjectDir)SDL2-2.0.10\lib\x64;$(ProjectDir)..\..\..\python\Python\Python36\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;_tkinter.lib;python3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
