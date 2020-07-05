@@ -116,5 +116,8 @@
     <ClInclude Include="Scene.h">
       <Filter>Header Files\ObjectApi</Filter>
     </ClInclude>
+    <ClInclude Include="IPython.h">
+      <Filter>Header Files\cfg/auto-gen</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

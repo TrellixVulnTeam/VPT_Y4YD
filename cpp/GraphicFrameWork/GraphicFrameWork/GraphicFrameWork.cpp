@@ -16,6 +16,7 @@
 #endif
 #include "projects/VPT/PacketId.h"
 #include "projects/VPT/ResultId.h"
+#include "IPython.h"
 using namespace std;
 vector <AppInstance*> instances;
 #ifndef USE_DEBUG_CLIENT

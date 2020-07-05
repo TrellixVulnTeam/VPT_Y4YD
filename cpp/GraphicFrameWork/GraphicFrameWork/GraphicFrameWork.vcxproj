@@ -107,13 +107,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-14.0.1\include\win32;C:\Program Files\Java\jdk-14.0.1\include;$(ProjectDir)SDL2_ttf-2.0.15\include;$(ProjectDir)SDL2_image-2.0.5\include;$(ProjectDir)SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Java\jdk-14.0.1\include\win32;C:\Program Files\Java\jdk-14.0.1\include;$(ProjectDir)SDL2_ttf-2.0.15\include;$(ProjectDir)SDL2_image-2.0.5\include;$(ProjectDir)SDL2-2.0.10\include;C:\Program Files %28x86%29\Microsoft Visual Studio\Shared\Python37_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\Java\jdk-14.0.1\lib;$(ProjectDir)SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)SDL2_image-2.0.5\lib\x64;$(ProjectDir)SDL2-2.0.10\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\Java\jdk-14.0.1\lib;$(ProjectDir)SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)SDL2_image-2.0.5\lib\x64;$(ProjectDir)SDL2-2.0.10\lib\x64;C:\Program Files %28x86%29\Microsoft Visual Studio\Shared\Python37_64\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;_tkinter.lib;python3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd $(ProjectDir)
@@ -188,6 +188,7 @@ call UpdateDll.bat</Command>
     <ClInclude Include="projects\VPT\RelativePaths.h" />
     <ClInclude Include="projects\VPT\TestV.h" />
     <ClInclude Include="projects\VPT\Utils.h" />
+    <ClInclude Include="IPython.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

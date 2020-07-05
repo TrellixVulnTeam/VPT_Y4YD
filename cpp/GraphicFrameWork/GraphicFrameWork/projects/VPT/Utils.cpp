@@ -96,20 +96,6 @@ void Utils::writeClipboard(string data) {
 	CloseClipboard();
 }
 
-template<typename kt, typename vt>
-bool Utils::contains(map<kt, vt> m, kt key) {
-	return m.count(key) == 1;
-}
-
-template<typename kt, typename vt>
-vt Utils::get(map<kt, vt> m, kt key) {
-	auto ittr = m.find(key);
-	if (ittr == m.end()) {
-		return NULL;
-	}
-	return ittr->second;
-}
-
 bool Utils::ValidatePacketType(int packetType, int expectedType) {
 	if (packetType == expectedType) {
 		return true;
