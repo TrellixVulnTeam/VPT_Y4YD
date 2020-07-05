@@ -26,9 +26,17 @@ public:
 	static string readClipboard();
 	static void writeClipboard(string data);
 	template<typename kt, typename vt>
-	static bool contains(map<kt, vt> m, kt key);
+	static bool contains(map<kt, vt> m, kt key) {
+		return m.count(key) == 1;
+	}
 	template<typename kt, typename vt>
-	static vt get(map<kt, vt> m, kt key);
+	static vt get(map<kt, vt> m, kt key) {
+		auto ittr = m.find(key);
+		if (ittr == m.end()) {
+			return NULL;
+		}
+		return ittr->second;
+	}
 	static bool ValidatePacketType(int packetType, int expectedType);
 	static SDL_Texture* CreateTextureFromImage(jobject image, SDL_Renderer* renderer, JNIEnv* env);
 };
