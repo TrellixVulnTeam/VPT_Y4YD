@@ -84,3 +84,14 @@ public:
 	string question_m;
 };
 
+class escMenu : public Scene {
+public:
+	virtual void LoadStaticComponents();
+	virtual void LoadComponents();
+	virtual Scene& Create() { return *new escMenu(); }
+	//these will be replaced with better buttons later
+	Button* ResumeTest;
+	Button* options;
+	Button* Exit;
+};
+
