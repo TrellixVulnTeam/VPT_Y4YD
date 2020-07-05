@@ -17,6 +17,7 @@
 #include "projects/VPT/PacketId.h"
 #include "projects/VPT/ResultId.h"
 #include "IPython.h"
+#include <conio.h>
 using namespace std;
 vector <AppInstance*> instances;
 #ifndef USE_DEBUG_CLIENT
@@ -44,6 +45,15 @@ int main(int argc, char* argv[])
     else {
         cout << "TTf init worked" << endl;
     }
+    
+    PyObject* pInt;
+
+    Py_Initialize();
+
+    PyRun_SimpleString("print('Hello World from Embedded Python!!!')");
+
+    Py_Finalize();
+
 #ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
