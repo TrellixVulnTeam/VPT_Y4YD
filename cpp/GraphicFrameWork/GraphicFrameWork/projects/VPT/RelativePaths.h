@@ -10,3 +10,4 @@ const string dir = "..\\";
 #endif
 
 const string fontPath = dir + "PrinceValiant.ttf";
+const string pythonDir = dir + "..\\..\\..\\..\\..\\python\\";

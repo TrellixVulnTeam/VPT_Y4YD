@@ -45,12 +45,16 @@ int main(int argc, char* argv[])
     else {
         cout << "TTf init worked" << endl;
     }
-    
-    PyObject* pInt;
+
+    string strFilename = pythonDir + "pythonTest.py";
+    const char* filename = strFilename.c_str();
+
+    FILE* fp;
 
     Py_Initialize();
 
-    PyRun_SimpleString("print('Hello World from Embedded Python!!!')");
+    fp = _Py_fopen(filename, "r");
+    PyRun_SimpleFile(fp, filename);
 
     Py_Finalize();
 
