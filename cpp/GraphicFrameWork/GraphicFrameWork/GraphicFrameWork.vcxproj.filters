@@ -63,6 +63,9 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\ObjectApi</Filter>
     </ClCompile>
+    <ClCompile Include="PythonImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include.h">
@@ -118,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="IPython.h">
       <Filter>Header Files\cfg/auto-gen</Filter>
+    </ClInclude>
+    <ClInclude Include="PythonImpl.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
