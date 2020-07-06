@@ -6,6 +6,7 @@
 #include <cstdlib> 
 #include <ctime> 
 #include "RelativePaths.h"
+#include "Utils.h"
 namespace editor {
 	struct AppObjSelected;
 	struct AppData
@@ -25,6 +26,8 @@ namespace editor {
 		PlaceableBounding() { };
 		virtual string PrintReleventData();
 		int collideid;
+		int selectW;
+		int selectH;
 	};
 
 	class PlaceableButton : public PlaceableBounding {

@@ -68,8 +68,8 @@ void editor::editor::Input()
 			for (AppObject* object : AppObjects) {
 				if (PlaceableBounding* obj = dynamic_cast<PlaceableBounding*>(object)) {
 					if (object->id == 1) {
-						object->x_m = AppObjects[0]->x_m;
-						object->y_m = AppObjects[0]->y_m;
+						object->x_m = AppObjects[0]->x_m - obj->selectW;
+						object->y_m = AppObjects[0]->y_m - obj->selectH;
 					}
 				}
 			}
@@ -79,13 +79,28 @@ void editor::editor::Input()
 			if (selectedval.selected == true) {
 				AppObjects[selectedval.index]->id = 0;
 			}
+			else {
+				for (unsigned int i = 0; i < AppObjects.size(); i++) {
+					if (PlaceableBounding* placeableObj = dynamic_cast<PlaceableBounding*>(AppObjects[i])) {
+						if (Utils::contains(AppObjects[i]->getBounds(), SDL_Point{ AppObjects[0]->x_m, AppObjects[0]->y_m })) {
+							placeableObj->id = 1;
+							placeableObj->selectW = AppObjects[0]->x_m - placeableObj->x_m;
+							placeableObj->selectH = AppObjects[0]->y_m - placeableObj->y_m;
+							break;
+						}
+					}
+				}
+			}
 			if (message_m == "Button") {
-				AppObjects.push_back(new PlaceableButton());
+				PlaceableButton* newObj = new PlaceableButton();
+				AppObjects.push_back(newObj);
 				AppObjects[AppObjects.size() - 1]->PreInit((dir + "bounding.png").c_str());
 				AppObjects[AppObjects.size() - 1]->Init(renderer, 100, 100, 400, 400);
 				AppObjects[AppObjects.size() - 1]->id = 1;
-				AppObjects[AppObjects.size() - 1]->x_m = AppObjects[0]->x_m;
-				AppObjects[AppObjects.size() - 1]->y_m = AppObjects[0]->y_m;
+				AppObjects[AppObjects.size() - 1]->x_m = AppObjects[0]->x_m - (AppObjects[AppObjects.size() - 1]->width / 2);
+				AppObjects[AppObjects.size() - 1]->y_m = AppObjects[0]->y_m - (AppObjects[AppObjects.size() - 1]->height / 2);
+				newObj->selectW = (AppObjects[AppObjects.size() - 1]->width / 2);
+				newObj->selectH = (AppObjects[AppObjects.size() - 1]->height / 2);
 			}
 		}
 		for (AppObject* object : AppObjects) {

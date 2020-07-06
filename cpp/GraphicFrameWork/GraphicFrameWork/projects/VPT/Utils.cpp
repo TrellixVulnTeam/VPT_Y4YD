@@ -144,3 +144,7 @@ SDL_Texture* Utils::CreateTextureFromImage(jobject image, SDL_Renderer* renderer
 	return texture;
 }
 #pragma warning(pop)
+
+bool Utils::contains(SDL_Rect* rect, SDL_Point point) {
+	return rect->x <= point.x && rect->x + rect->w >= point.x && rect->y <= point.y && rect->y + rect->h >= point.y;
+}
