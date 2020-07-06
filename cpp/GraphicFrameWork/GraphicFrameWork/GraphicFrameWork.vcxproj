@@ -159,6 +159,7 @@ call UpdateDll.bat</Command>
   <ItemGroup>
     <ClCompile Include="AppObject.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="CppPython.cpp" />
     <ClCompile Include="GraphicFrameWork.cpp" />
     <ClCompile Include="Instance.cpp" />
     <ClCompile Include="projects\VPT\Background.cpp" />
@@ -169,12 +170,12 @@ call UpdateDll.bat</Command>
     <ClCompile Include="projects\VPT\Packet.cpp" />
     <ClCompile Include="projects\VPT\TestV.cpp" />
     <ClCompile Include="projects\VPT\Utils.cpp" />
-    <ClCompile Include="PythonImpl.cpp" />
     <ClCompile Include="Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppObject.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="CppPython.h" />
     <ClInclude Include="Include.h" />
     <ClInclude Include="Instance.h" />
     <ClInclude Include="projects\VPT\Background.h" />
@@ -190,7 +191,6 @@ call UpdateDll.bat</Command>
     <ClInclude Include="projects\VPT\TestV.h" />
     <ClInclude Include="projects\VPT\Utils.h" />
     <ClInclude Include="IPython.h" />
-    <ClInclude Include="PythonImpl.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
