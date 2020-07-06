@@ -16,8 +16,6 @@
 #endif
 #include "projects/VPT/PacketId.h"
 #include "projects/VPT/ResultId.h"
-#include "IPython.h"
-#include <conio.h>
 using namespace std;
 vector <AppInstance*> instances;
 #ifndef USE_DEBUG_CLIENT
@@ -46,24 +44,12 @@ int main(int argc, char* argv[])
         cout << "TTf init worked" << endl;
     }
 
-    string strFilename = pythonDir + "pythonTest.py";
-    const char* filename = strFilename.c_str();
-
-    FILE* fp;
-
-    Py_Initialize();
-
-    fp = _Py_fopen(filename, "r");
-    PyRun_SimpleFile(fp, filename);
-
-    Py_Finalize();
-
 #ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
 #else
-    instances.push_back(new TestV::TestV());
-    TestV::AppData appdata;
+    instances.push_back(new editor::editor());
+    editor::AppData appdata;
 #endif
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
