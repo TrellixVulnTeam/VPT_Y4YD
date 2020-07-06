@@ -2,7 +2,7 @@
 
 static mutex execLock;
 
-void CppPython::ExecPython(string filename, vector<PyMethodDef> callbacks, function<void(PyObject*)> resultHandler) {
+void CppPython::ExecPython(string filename, function<PyObject*()> getArgs, vector<PyMethodDef> callbacks, function<void(PyObject*)> resultHandler) {
 	lock_guard<mutex> execLG(execLock);
 	string relativeFilename = pythonDir + filename + ".py";
 	const char* filenameAsString = relativeFilename.c_str();
@@ -12,7 +12,7 @@ void CppPython::ExecPython(string filename, vector<PyMethodDef> callbacks, funct
 	PyObject* pythonModule = PyImport_Import(moduleName);
 	Py_DECREF(moduleName);
 	PyObject* mainMethod = PyObject_GetAttrString(pythonModule, "main");
-	PyObject* result = PyObject_CallObject(mainMethod, NULL);
+	PyObject* result = PyObject_CallObject(mainMethod, getArgs());
 	Py_DECREF(mainMethod);
 	resultHandler(result);
 	if (result != NULL) {
