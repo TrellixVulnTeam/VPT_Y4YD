@@ -63,7 +63,7 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\ObjectApi</Filter>
     </ClCompile>
-    <ClCompile Include="PythonImpl.cpp">
+    <ClCompile Include="CppPython.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -122,7 +122,7 @@
     <ClInclude Include="IPython.h">
       <Filter>Header Files\cfg/auto-gen</Filter>
     </ClInclude>
-    <ClInclude Include="PythonImpl.h">
+    <ClInclude Include="CppPython.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
