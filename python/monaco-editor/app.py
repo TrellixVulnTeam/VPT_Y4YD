@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, abort
 from flask import jsonify
 from flaskwebgui import FlaskUI
 from flask import redirect
@@ -20,10 +20,9 @@ def index():
 		conn_count += 1
 
 	if ip != localhost or conn_count > 1:
-		return redirect(url_for("fail"))
+		abort(403)
 		
 	if ip == localhost:
-		print(conn_count) 
 		return render_template('index.html')
 
 @app.route("/fail")
