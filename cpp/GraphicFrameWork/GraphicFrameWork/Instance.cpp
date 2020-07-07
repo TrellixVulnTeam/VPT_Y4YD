@@ -10,6 +10,8 @@ AppInstance::AppInstance()
 void AppInstance::BasicInit(const char* window_title, int w, int h)
 {
 	Win = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
+	string iconPath = dir + "WindowIcon.png";
+	SDL_SetWindowIcon(Win, IMG_Load(iconPath.c_str()));
 	renderer = SDL_CreateRenderer(Win, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_ShowCursor(1);
