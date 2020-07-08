@@ -11,7 +11,7 @@ ui = FlaskUI(app)
 
 conn_count = 0
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["POST","GET"])
 def index():
 	global conn_count
 	ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)	
@@ -19,12 +19,18 @@ def index():
 	if ip == localhost:
 		conn_count += 1
 
+	if request.method == "POST":
+		conn_count -= 1
+		code = request.form["code"]
+		return code
+	
 	if ip != localhost or conn_count > 1:
 		return redirect(url_for("fail"))
 		
 	if ip == localhost:
 		print(conn_count) 
 		return render_template('index.html')
+
 
 @app.route("/fail")
 def fail():

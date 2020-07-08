@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
     instances.push_back(new client::client());
     client::AppData appdata;
 #else
-    instances.push_back(new editor::editor());
-    editor::AppData appdata;
+    instances.push_back(new TestV::TestV());
+    TestV::AppData appdata;
 #endif
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();

@@ -7,7 +7,7 @@ TestV::TestV::TestV()
 void TestV::TestV::Init(const char* window_title, int w, int h)
 {
 	BasicInit(window_title, w, h);
-	BeginLoadingScene(StandardQuestion("WashingtonRendskin").Create());
+	BeginLoadingScene(StandardQuestion("SHIT").Create());
 	GetActiveScene().Init(this);
 }
 
