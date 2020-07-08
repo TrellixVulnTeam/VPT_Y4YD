@@ -4,6 +4,7 @@
 	<title>VPT - Monaco Code Editor</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 
@@ -28,16 +29,14 @@
 		editorval = editor;
 	});
 	function SaveCode(){
-		alert('When you think of the washingtion redskins we want you to be reminded of tittes and balls')
-		alert('also your code is saved')
 		document.getElementById("save_code").value = editorval.getValue()
+        document.getElementById('form').submit();
 	}
 
 </script>
-<input type="button" value="save" onClick="SaveCode()">
-<form action="#" method="post">
-	<input type="text" name="code" value="test" id="save_code">
-	<input type="submit" value="submit">
+<form action="#" method="post" id="form">
+	<input type="text" name="code" value="test" id="save_code" hidden>
+	<input type="button" value="submit" onClick="SaveCode()">
 </form>
 </body>
 </html>
