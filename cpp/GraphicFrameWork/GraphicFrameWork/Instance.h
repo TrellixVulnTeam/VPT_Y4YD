@@ -8,6 +8,7 @@
 #include "Component.h"
 #include "projects/VPT/Flags.h"
 #include "projects/VPT/Utils.h"
+#include "projects/VPT/RelativePaths.h"
 using namespace std;
 class Scene;
 class AppInstance
