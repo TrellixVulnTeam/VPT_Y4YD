@@ -7,6 +7,8 @@
 #include <ctime> 
 #include "RelativePaths.h"
 #include "Utils.h"
+#include "PlaceableObjects.h"
+
 namespace editor {
 	struct AppObjSelected;
 	struct AppData
@@ -19,31 +21,6 @@ namespace editor {
 	struct AppObjSelected {
 		bool selected;
 		unsigned int index;
-	};
-
-	class PlaceableBounding : public AppObject{
-	public:
-		PlaceableBounding() { };
-		virtual string PrintReleventData();
-		int collideid;
-		int selectW;
-		int selectH;
-	};
-
-	class PlaceableButton : public PlaceableBounding {
-	public:
-		PlaceableButton() { };
-		string PrintReleventData() {
-			return "Button," + to_string(x_m) + "," + to_string(y_m) + "," + to_string(width) + "," + to_string(height);
-		};
-	};
-
-	class PlaceableTextBox : public PlaceableBounding {
-	public:
-		PlaceableTextBox() {};
-		string PrintReleventData() {
-			return "TextBox," + to_string(x_m) + "," + to_string(y_m) + "," + to_string(width) + "," + to_string(height);
-		}
 	};
 
 	struct TextBoxData {
@@ -59,12 +36,11 @@ namespace editor {
 		void Init(const char* window_title, int w, int h);
 		void Draw();
 		void Update();
-		void Input();
+		void Input(bool wasEvent, SDL_Event e);
 		AppObjSelected Selected();
+		string message_m;
 	private:
 		int UpdateVal;
-		string message_m;
-		TextBox* tb;
 	};
 	
 }

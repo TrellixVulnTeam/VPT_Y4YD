@@ -23,9 +23,6 @@ void client::client::Init(const char* window_title, int w, int h)
 	//addOverlay(overlay);
 
 	//AppObjects vector because is need for collision component
-	AppObjects.push_back(new AppObject());
-	AppObjects[0]->PreInit("");
-	AppObjects[0]->Init(renderer, 1, 1, 0, 0);
 	//AppObjects vector because is need for collision component
 
 	//text init
@@ -129,25 +126,32 @@ void client::client::Update()
 	}
 }
 
-void client::client::Input()
+void client::client::Input(bool wasEvent, SDL_Event e)
 {
 	for (Component* c: cm.InputSectorComponents) {
 		c->run(AppObjects);
 	}
-	if (SDL_PollEvent(&e)) {
-		if (e.type == SDL_QUIT) { running = false; }
-		if (e.type == SDL_MOUSEMOTION) {
-			AppObjects[0]->x_m = e.motion.x;
-			AppObjects[0]->y_m = e.motion.y;
-		}
-		for (AppObject* object : AppObjects) {
-			object->input(e);
-		}
-		GetActiveScene().Input(e);
-	}
-	for (AppObject* overlay : Overlays) {
-		if (overlay != nullptr) {
-			overlay->input(e);
+	if (wasEvent) {
+		if (e.window.windowID == windowId) {
+			if (e.type == SDL_QUIT || (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)) { running = false; }
+			if (e.type == SDL_MOUSEMOTION) {
+				AppObjects[0]->x_m = e.motion.x;
+				AppObjects[0]->y_m = e.motion.y;
+			}
+			for (AppObject* object : AppObjects) {
+				object->input(e);
+			}
+			GetActiveScene().Input(e);
+			for (AppObject* overlay : Overlays) {
+				if (overlay != nullptr) {
+					overlay->input(e);
+				}
+			}
+			for (AppObject* overlay : Overlays) {
+				if (overlay != nullptr) {
+					overlay->input(e);
+				}
+			}
 		}
 	}
 }
@@ -177,10 +181,12 @@ void client::client::Loop()
 #ifndef USE_DEBUGGER
 		try {
 #endif
+			SDL_Event e;
+			bool wasEvent = SDL_PollEvent(&e);
 			PacketProcess();
 			RunRequestedSDLFuncts();
 			Update();
-			Input();
+			Input(wasEvent, e);
 			if (frametime > FrameDelay) {
 				framestart = SDL_GetTicks();
 				Draw();

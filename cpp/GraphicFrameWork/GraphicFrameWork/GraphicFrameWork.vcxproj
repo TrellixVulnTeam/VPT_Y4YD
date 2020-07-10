@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -166,8 +166,10 @@ call UpdateDll.bat</Command>
     <ClCompile Include="projects\VPT\Border.cpp" />
     <ClCompile Include="projects\VPT\client.cpp" />
     <ClCompile Include="projects\VPT\editor.cpp" />
+    <ClCompile Include="projects\VPT\editorHelper.cpp" />
     <ClCompile Include="projects\VPT\Env.cpp" />
     <ClCompile Include="projects\VPT\Packet.cpp" />
+    <ClCompile Include="projects\VPT\PlaceableObjects.cpp" />
     <ClCompile Include="projects\VPT\TestV.cpp" />
     <ClCompile Include="projects\VPT\Utils.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -182,10 +184,12 @@ call UpdateDll.bat</Command>
     <ClInclude Include="projects\VPT\Border.h" />
     <ClInclude Include="projects\VPT\client.h" />
     <ClInclude Include="projects\VPT\editor.h" />
+    <ClInclude Include="projects\VPT\editorHelper.h" />
     <ClInclude Include="projects\VPT\Env.h" />
     <ClInclude Include="projects\VPT\Flags.h" />
     <ClInclude Include="projects\VPT\Packet.h" />
     <ClInclude Include="projects\VPT\PacketId.h" />
+    <ClInclude Include="projects\VPT\PlaceableObjects.h" />
     <ClInclude Include="projects\VPT\ResultId.h" />
     <ClInclude Include="projects\VPT\RelativePaths.h" />
     <ClInclude Include="projects\VPT\TestV.h" />

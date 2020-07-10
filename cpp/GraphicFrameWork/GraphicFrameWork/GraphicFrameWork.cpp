@@ -16,6 +16,7 @@
 #endif
 #include "projects/VPT/PacketId.h"
 #include "projects/VPT/ResultId.h"
+#include "projects/VPT/editorHelper.h"
 using namespace std;
 vector <AppInstance*> instances;
 #ifndef USE_DEBUG_CLIENT
@@ -47,12 +48,17 @@ int main(int argc, char* argv[])
 #ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
-#else
-    instances.push_back(new TestV::TestV());
-    TestV::AppData appdata;
-#endif
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
+#else
+    instances.push_back(new editor::editor());
+    editor::AppData appdata;
+    instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
+    instances.push_back(new EditorHelper((editor::editor*)instances[0]));
+    EditorHelper::AppData helperappdata;
+    instances[1]->Init(helperappdata.win_name, helperappdata.w, helperappdata.h);
+    AppInstance::RunMultiLoop(instances);
+#endif
     return 0;
 }
 

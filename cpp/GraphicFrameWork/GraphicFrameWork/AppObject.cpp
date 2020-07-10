@@ -664,7 +664,7 @@ void TextBox::update()
 	text_m->update();
 }
 
-SimpleButton::SimpleButton(Text* text, int x_offset, int y_offset, function<void()> onclick, Background* background, Border* border, SDL_Color hoverTint, SDL_Color clickTint)
+SimpleButton::SimpleButton(Text* text, int x_offset, int y_offset, function<void(SimpleButton*)> onclick, Background* background, Border* border, SDL_Color hoverTint, SDL_Color clickTint)
 {
 	background_m = background;
 	border_m = border;
@@ -758,7 +758,7 @@ void SimpleButton::input(SDL_Event e)
 	if (e.type == SDL_MOUSEBUTTONUP) {
 		isMouseDown = false;
 		if (isCollided) {
-			onclick_m();
+			onclick_m(this);
 		}
 	}
 }

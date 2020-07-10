@@ -35,7 +35,7 @@ public:
 	SDL_Color tint;
 };
 
-class Text : public AppObject{
+class Text : public AppObject {
 public:
 	Text(string font, string text, SDL_Color textcolor, int textsize);
 	void BasicInit(SDL_Renderer* renderer, int w, int h, int x, int y);
@@ -164,7 +164,7 @@ public:
 
 class SimpleButton : public AppObject {
 public:
-	SimpleButton(Text* text, int x_offset, int y_offset, function<void()> onclick, 
+	SimpleButton(Text* text, int x_offset, int y_offset, function<void(SimpleButton*)> onclick, 
 		Background* background = new SolidBackground(SDL_Color{ 210, 255, 255, 255 }), Border* border = new SolidBorder(SDL_Color{0, 0, 0, 255}, 5),
 		SDL_Color hoverTint = SDL_Color{255, 255, 255, 50}, SDL_Color clickTint = SDL_Color{ 255, 255, 255, 100 });
 	void collide(int CollisionVal);
@@ -182,7 +182,7 @@ public:
 	int x_offset_m;
 	int y_offset_m;
 	bool isCollided, isMouseDown;
-	function<void()> onclick_m;
+	function<void(SimpleButton*)> onclick_m;
 };
 
 class LoadingSymbol : public AppObject {

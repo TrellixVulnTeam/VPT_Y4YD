@@ -22,18 +22,18 @@
     <Filter Include="Source Files\ObjectApi">
       <UniqueIdentifier>{35b04aaa-a83e-49ad-822b-e69a3938f1aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Windows">
+      <UniqueIdentifier>{ddf8f673-a9f9-4d1a-8bf9-786dd5c3676f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{0e0f9bb9-c9a4-48e4-bbb3-f13a622a59e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicFrameWork.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="projects\VPT\client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="projects\VPT\Packet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="projects\VPT\editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="projects\VPT\Utils.cpp">
@@ -57,24 +57,30 @@
     <ClCompile Include="projects\VPT\Env.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="projects\VPT\TestV.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\ObjectApi</Filter>
     </ClCompile>
     <ClCompile Include="CppPython.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="projects\VPT\client.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\editor.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\PlaceableObjects.cpp">
+      <Filter>Source Files\ObjectApi</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\editorHelper.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\TestV.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="projects\VPT\client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="projects\VPT\editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="projects\VPT\Utils.h">
@@ -113,9 +119,6 @@
     <ClInclude Include="projects\VPT\Env.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="projects\VPT\TestV.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Header Files\ObjectApi</Filter>
     </ClInclude>
@@ -124,6 +127,21 @@
     </ClInclude>
     <ClInclude Include="CppPython.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\editor.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\client.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\editorHelper.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\PlaceableObjects.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\TestV.h">
+      <Filter>Header Files\Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

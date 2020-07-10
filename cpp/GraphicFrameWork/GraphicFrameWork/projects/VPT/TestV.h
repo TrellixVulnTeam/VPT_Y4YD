@@ -29,6 +29,6 @@ namespace TestV {
 		void Init(const char* window_title, int w, int h);
 		void Draw();
 		void Update();
-		void Input();
+		void Input(bool wasEvent, SDL_Event e);
 	};
 }
