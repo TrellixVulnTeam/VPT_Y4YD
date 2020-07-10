@@ -7,8 +7,13 @@
 	<div>
 		<h1>Settings</h1>
 		<form action="/change_settings" method="post" id="form">
-			<input type="text" name="language" value="python" id="get_langauge">
-			<input type="text" name="theme" value="vs-light" id="get_theme">
+            <select name="language">
+                <option value="python">Python</option>
+            </select>
+            <select name="theme">
+                <option value="vs-light">Light</option>">
+                <option value="vs-dark">Dark</option>
+            </select>
 			<input type="submit" value="change_settings">
 		</form>
 	</div>
