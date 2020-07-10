@@ -6,7 +6,11 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
-<body>
+<body> 
+
+<form action = "/settings" method="post" id="form" class="settings">
+	<input type="submit" value="settings" name = "sub">
+</form>
 
 <h2>{{ header }}</h2>
 <div id="container" style="width:80vw;height:80vh;border:1px solid grey"></div>
@@ -27,14 +31,46 @@
 			language: 'cpp'
 		});
 		editorval = editor;
-	});
-	function SaveCode(){
-		document.getElementById("save_code").value = editorval.getValue()
-        document.getElementById('form').submit();
-	}
 
+		var settings_req_packet = {
+			request: "settings"
+		}
+
+		fetch(`${window.origin}/req_settings_packet`, {
+			method: "POST",
+			body: JSON.stringify(settings_req_packet),
+			cache: "no-cache",
+			headers: new Headers({
+				"content-type": "application/json"
+			})
+		})
+		.then(function (response) {
+			if(response.status !== 200){
+				console.log(`Response status wasnt sucsess: ${response.status}`)
+				return ;
+			}
+
+			response.json().then(function (data) {
+				console.log(data[0].lang)
+				monaco.editor.setModelLanguage(editor.getModel(), data[0].lang)
+				monaco.editor.setTheme(data[1].theme)
+			})
+
+		})
+
+	});
+
+	function SaveCode(){
+		var code = editorval.getValue()
+		var stringifed_code = JSON.stringify(code)
+		document.getElementById("save_code").value = code
+        var elements = document.getElementsByClassName('submit');
+        elements[elements.length - 1].submit()
+
+	}
 </script>
-<form action="#" method="post" id="form">
+
+<form action="#" method="post" id="form" class="submit">
 	<input type="text" name="code" value="test" id="save_code" hidden>
 	<input type="button" value="submit" onClick="SaveCode()">
 </form>

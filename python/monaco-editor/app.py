@@ -4,13 +4,16 @@ from flaskwebgui import FlaskUI
 from flask import redirect
 from flask import url_for
 from flask import request
+from flask import jsonify
+from flask import make_response
+
 
 app = Flask(__name__)
 
 ui = FlaskUI(app)
 
 conn_count = 0
-
+settings = ["python", "vs-light"]
 @app.route("/", methods=["POST","GET"])
 def index():
 	global conn_count
@@ -21,8 +24,13 @@ def index():
 
 	if request.method == "POST":
 		conn_count -= 1
+		#if request.form["submit_code"] == "submit":
 		code = request.form["code"]
-		return code
+
+		import os
+		os.system("..\Python\Python36\python.exe ../CodeProcesser/code_parser.py " + code + " " + settings[0])
+		return render_template('index.html')
+
 	
 	if ip != localhost or conn_count > 1:
 		abort(403)
@@ -30,9 +38,30 @@ def index():
 	if ip == localhost:
 		return render_template('index.html')
 
-
 @app.route("/fail")
 def fail():
-	return render_template('fail_index.html')	
+	return render_template('fail_index.html')
+
+@app.route("/settings", methods=["POST","GET"])
+def Settings():
+	return render_template('settings.html')
+
+@app.route("/change_settings", methods=["POST","GET"])
+def Change_Settings():
+	global conn_count
+	lang = request.form["language"]
+	theme = request.form["theme"]
+	print(lang)
+	settings[0] = lang
+	settings[1] = theme
+	conn_count -= 1
+	return redirect(url_for("index"))
+
+@app.route("/req_settings_packet", methods=["POST", "GET"])
+def SendSettings():
+	req = request.get_json()
+	print(req)
+	res = make_response(jsonify({"lang": settings[0]}, {"theme": settings[1]}), 200)
+	return res
 
 ui.run()
