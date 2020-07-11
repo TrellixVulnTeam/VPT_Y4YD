@@ -97,9 +97,10 @@ public:
 	virtual void LoadComponents();
 	virtual Scene& Create() { return *new escMenu(); }
 	//these will be replaced with better buttons later
-	Button* ResumeTest;
-	Button* options;
-	Button* Exit;
+	Text* Title;
+	SimpleButton* ResumeTest;
+	SimpleButton* options;
+	SimpleButton* Exit;
 	
 };
 

@@ -356,4 +356,21 @@ void escMenu::LoadStaticComponents()
 
 void escMenu::LoadComponents()
 {
+	int ptx = 370;
+	Title = new Text(fontPath, "Test Menu", SDL_Color{0,0,0,255}, 70);
+	Title->Init(instance->renderer, 0, 0, ptx, 0);
+
+	ResumeTest = new SimpleButton(new Text(fontPath, "Resume", SDL_Color{ 0,0,0,255 }, 50), 10, 10, [this](SimpleButton* button) { });
+	ResumeTest->Init(instance->renderer, ptx + 60, 130);
+
+	options = new SimpleButton(new Text(fontPath, "Options", SDL_Color{ 0,0,0,255 }, 50), 10, 10, [this](SimpleButton* button) {});
+	options->Init(instance->renderer, ptx + 60, 270);
+
+	Exit = new SimpleButton(new Text(fontPath, "Save and Quit", SDL_Color{ 0,0,0,255 }, 50), 10, 10, [this](SimpleButton* button) {});
+	Exit->Init(instance->renderer, ptx, 410);
+
+	Objects.push_back(Title);
+	Objects.push_back(ResumeTest);
+	Objects.push_back(options);
+	Objects.push_back(Exit);
 }
