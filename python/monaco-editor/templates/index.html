@@ -12,6 +12,12 @@
 	<input type="submit" value="settings" name = "sub">
 </form>
 
+<form action = "/lode_code" method="post" id="form" class="load_code">
+	<select name="file_to_load">
+		<option value="new">NewFile</option>
+	</select>
+</form>
+
 <h2>{{ header }}</h2>
 <div id="container" style="width:80vw;height:80vh;border:1px solid grey"></div>
 
@@ -32,6 +38,7 @@
 		});
 		editorval = editor;
 
+		//settings
 		var settings_req_packet = {
 			request: "settings"
 		}
@@ -57,6 +64,7 @@
 			})
 
 		})
+		//settings
 
 	});
 

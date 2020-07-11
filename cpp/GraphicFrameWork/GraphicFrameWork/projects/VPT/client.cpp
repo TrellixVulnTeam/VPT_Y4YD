@@ -9,7 +9,7 @@ static Packet* recievedPacket;
 client::client::client()
 {
 }
-void onclick1() {
+void onclick1(Button* button) {
 	cout << "test" << endl;
 }
 void client::client::Init(const char* window_title, int w, int h)
@@ -32,7 +32,7 @@ void client::client::Init(const char* window_title, int w, int h)
 	//text init
 
 	//button init
-	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0, onclick1);
+	button = new Button(dir + "CButtonUP.png", dir + "CButtonP.png", nullptr, 0, 0, 0,0, [this](Button* button) {onclick1(button); } );
 	button->Init(renderer, 100, 100, 270, 400);
 	//AppObjects.push_back(button);
 	//button init

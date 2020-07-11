@@ -231,8 +231,19 @@ void StandardQuestion::LoadComponents()
 	answer_box = new TextField("Answer", fontPath, tfd.textsize, tfd.x_offset, tfd.y_offset);
 	answer_box->Init(dir, instance->renderer, tfd.w, tfd.h, txbx, 100);
 
+
+	Monoca_Editor_open = new SimpleButton(new Text(fontPath, "Open Editor", SDL_Color{ 0, 0,0, 255 }, 50), 10, 10, [this](SimpleButton* button) {onClick(button); });
+	Monoca_Editor_open->Init(instance->renderer, ptx + 20, 300);
+
+
 	Objects.push_back(prompt);
 	Objects.push_back(answer_box);
+	Objects.push_back(Monoca_Editor_open);
+}
+
+void StandardQuestion::onClick(SimpleButton* sb)
+{
+	cout << "test" << endl;
 }
 
 void LoginScreen::Draw() {

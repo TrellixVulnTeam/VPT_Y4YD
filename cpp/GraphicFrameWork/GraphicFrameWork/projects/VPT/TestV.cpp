@@ -7,7 +7,7 @@ TestV::TestV::TestV()
 void TestV::TestV::Init(const char* window_title, int w, int h)
 {
 	BasicInit(window_title, w, h);
-	BeginLoadingScene(StandardQuestion("SHIT").Create());
+	BeginLoadingScene(StandardQuestion("WahingtionRedskins").Create());
 	GetActiveScene().Init(this);
 }
 
@@ -25,7 +25,7 @@ void TestV::TestV::Update()
 
 void TestV::TestV::Input(bool wasEvent, SDL_Event e)
 {
-	if (wasEvent) {
+	if (wasEvent && e.window.windowID == windowId) {
 		if (e.type == SDL_QUIT || (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE && e.window.windowID == windowId)) { running = false; }
 		GetActiveScene().Input(e);
 	}

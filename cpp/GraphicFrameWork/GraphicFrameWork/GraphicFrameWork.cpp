@@ -51,13 +51,16 @@ int main(int argc, char* argv[])
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
 #else
-    instances.push_back(new editor::editor());
-    editor::AppData appdata;
+    instances.push_back(new TestV::TestV());
+   // editor::AppData appdata;
+    //instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
+   // instances.push_back(new EditorHelper((editor::editor*)instances[0]));
+    //EditorHelper::AppData helperappdata;
+    //instances[1]->Init(helperappdata.win_name, helperappdata.w, helperappdata.h);
+    //AppInstance::RunMultiLoop(instances);
+    TestV::AppData appdata;
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
-    instances.push_back(new EditorHelper((editor::editor*)instances[0]));
-    EditorHelper::AppData helperappdata;
-    instances[1]->Init(helperappdata.win_name, helperappdata.w, helperappdata.h);
-    AppInstance::RunMultiLoop(instances);
+    instances[0]->Loop();
 #endif
     return 0;
 }

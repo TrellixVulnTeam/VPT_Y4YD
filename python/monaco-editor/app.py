@@ -6,14 +6,22 @@ from flask import url_for
 from flask import request
 from flask import jsonify
 from flask import make_response
-
+import glob
 
 app = Flask(__name__)
 
 ui = FlaskUI(app)
 
+class RFA:
+	def __init__(self, filetype):
+		self.filetype = filetype
+
+	def GetFiles(self):
+		return glob.glob("../CodeProcesser/code/" + self.filetype)
+
 conn_count = 0
 settings = ["python", "vs-light"]
+registered_files = ["*.py", "*.cpp", "*.js"]
 @app.route("/", methods=["POST","GET"])
 def index():
 	global conn_count
@@ -62,6 +70,15 @@ def SendSettings():
 	req = request.get_json()
 	print(req)
 	res = make_response(jsonify({"lang": settings[0]}, {"theme": settings[1]}), 200)
+	return res
+
+@app.route("/req_getcodefile_paths",  methods=["POST", "GET"])
+def SendCodeFiles():
+	req = request.get_json()
+	print(req)
+	py_files = RFA(registered_files[0])
+	print(py_files.GetFiles())
+	res = make_response(jsonify({"file": "test"}))
 	return res
 
 ui.run()

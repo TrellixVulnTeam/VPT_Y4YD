@@ -82,6 +82,8 @@ public:
 	TextField* answer_box;
 	Text* prompt;
 	string question_m;
+	SimpleButton* Monoca_Editor_open;
+	void onClick(SimpleButton* sb);
 };
 
 class escMenu : public Scene {
@@ -93,5 +95,6 @@ public:
 	Button* ResumeTest;
 	Button* options;
 	Button* Exit;
+	
 };
 
