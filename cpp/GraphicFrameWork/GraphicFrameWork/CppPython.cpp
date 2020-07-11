@@ -1,6 +1,7 @@
 #include "CppPython.h"
 
 static mutex execLock;
+PyModuleDef CppPython::currentCallbackModule = PyModuleDef{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 void CppPython::ExecPython(string filename, function<PyObject*()> getArgs, vector<PyMethodDef> callbacks, function<void(PyObject*)> resultHandler) {
 	lock_guard<mutex> execLG(execLock);

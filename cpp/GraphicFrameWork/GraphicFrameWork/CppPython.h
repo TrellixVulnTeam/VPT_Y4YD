@@ -20,6 +20,4 @@ extern "C" {
 		static PyModuleDef currentCallbackModule;
 		__declspec(dllexport) static PyObject* InitCurrentCallbackModule(void) { return PyModule_Create(&currentCallbackModule); }
 	};
-
-	PyModuleDef CppPython::currentCallbackModule = PyModuleDef{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 }
