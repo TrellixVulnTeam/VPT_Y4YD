@@ -4,6 +4,9 @@ static mutex execLock;
 
 void CppPython::ExecPython(string filename, function<PyObject*()> getArgs, vector<PyMethodDef> callbacks, function<void(PyObject*)> resultHandler) {
 	lock_guard<mutex> execLG(execLock);
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	string pythonExecDir = pythonDir + "Python\\Python36";
+	Py_SetPath(converter.from_bytes(pythonExecDir).c_str());
 	string relativeFilename = pythonDir + filename + ".py";
 	const char* filenameAsString = relativeFilename.c_str();
 	RegisterCallbacks(callbacks);

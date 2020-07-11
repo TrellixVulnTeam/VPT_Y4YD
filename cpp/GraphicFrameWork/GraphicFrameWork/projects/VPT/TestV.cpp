@@ -26,7 +26,7 @@ void TestV::TestV::Update()
 void TestV::TestV::Input(bool wasEvent, SDL_Event e)
 {
 	if (wasEvent && e.window.windowID == windowId) {
-		if (e.type == SDL_QUIT || (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE && e.window.windowID == windowId)) { running = false; }
+		if (e.type == SDL_QUIT || (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)) { running = false; }
 		GetActiveScene().Input(e);
 	}
 }

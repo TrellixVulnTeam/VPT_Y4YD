@@ -5,6 +5,9 @@
 #include "projects/VPT/RelativePaths.h"
 #include <functional>
 #include <mutex>
+#include <locale>
+#include <codecvt>
+#include <string>
 
 using namespace std;
 
