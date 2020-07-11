@@ -12,27 +12,39 @@ void CppPython::ExecPython(string filename, function<PyObject*()> getArgs, vecto
 	//Py_SetPythonHome(pythonExecDirW);
 	//string define = pythonDir + "monaco-editor";
 	//Py_SetPath(converter.from_bytes(define).c_str());
-	//string relativeFilename = pythonDir + filename + ".py";
-	const char* filenameAsString = filename.c_str();
-	Py_Initialize();
-	PyObject* syspath = PySys_GetObject("path");
-	string pythonpath = pythonDir + "Python\\Python36";
-	PyList_Append(syspath, PyBytes_FromString(pythonpath.c_str()));
-	string codepath = pythonDir + "monaco-editor";
-	PyList_Append(syspath, PyBytes_FromString(codepath.c_str()));
-	RegisterCallbacks(callbacks);
-	PyObject* moduleName = PyBytes_FromString(filenameAsString);
-	PyObject* pythonModule = PyImport_Import(moduleName);
-	Py_DECREF(moduleName);
-	PyObject* mainMethod = PyObject_GetAttrString(pythonModule, "main");
-	PyObject* result = PyObject_CallObject(mainMethod, getArgs());
-	Py_DECREF(mainMethod);
-	resultHandler(result);
-	if (result != NULL) {
-		Py_DECREF(result);
-	}
-	Py_DECREF(pythonModule);
-	Py_Finalize();
+	string relativeFilename = pythonDir + filename;
+    // Initialize the Python Interpreter
+
+    PyObject* pName, * pModule, * pDict, * pFunc, * pValue;
+    Py_Initialize();
+
+    // Build the name object
+    pName = PyUnicode_DecodeFSDefault(relativeFilename.c_str());
+
+    // Load the module object
+    pModule = PyImport_Import(pName);
+
+    // pDict is a borrowed reference 
+    pDict = PyModule_GetDict(pModule);
+
+    // pFunc is also a borrowed reference 
+    pFunc = PyDict_GetItemString(pDict, "main");
+
+    if (PyCallable_Check(pFunc))
+    {
+        PyObject_CallObject(pFunc, NULL);
+    }
+    else
+    {
+        PyErr_Print();
+    }
+
+    // Clean up
+    Py_DECREF(pModule);
+    Py_DECREF(pName);
+
+    // Finish the Python Interpreter
+    Py_Finalize();
 }
 
 void CppPython::RegisterCallbacks(vector<PyMethodDef> callbacks) {

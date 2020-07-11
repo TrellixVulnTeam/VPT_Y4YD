@@ -7,16 +7,44 @@
 	<div>
 		<h1>Settings</h1>
 		<form action="/change_settings" method="post" id="form">
-            <select name="language">
-                <option value="python">Python</option>
-                <option value="cpp">c++</option>
+            <select name="language" id="language">
+                <option value="python" id="python" selected="">Python</option>
+                <option value="cpp" id="cpp" selected="">c++</option>
             </select>
-            <select name="theme">
-                <option value="vs-light">Light</option>">
-                <option value="vs-dark">Dark</option>
+            <select name="theme" id="theme">
+                <option value="vs-light" id="vs-light" selected="">Light</option>">
+                <option value="vs-dark" id="vs-dark" selected="">Dark</option>
             </select>
 			<input type="submit" value="change_settings">
 		</form>
 	</div>
 </body>
+<script type="text/javascript">
+		var settings_req_packet = {
+			request: "settings"
+		}
+
+		fetch(`${window.origin}/req_settings_packet`, {
+			method: "POST",
+			body: JSON.stringify(settings_req_packet),
+			cache: "no-cache",
+			headers: new Headers({
+				"content-type": "application/json"
+			})
+		})
+		.then(function (response) {
+			if(response.status !== 200){
+				console.log(`Response status wasnt sucsess: ${response.status}`)
+				return ;
+			}
+
+			response.json().then(function (data) {
+				console.log(data[0].lang)
+				document.getElementById(data[0].lang).selected = "selected"
+				document.getElementById(data[1].theme).selected = "selected"
+			})
+
+		})
+
+</script>
 </html>
