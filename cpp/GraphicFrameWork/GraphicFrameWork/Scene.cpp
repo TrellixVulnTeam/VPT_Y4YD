@@ -224,6 +224,7 @@ void StandardQuestion::LoadComponents()
 {
 	int txbx = 270;
 	int ptx = 360;
+	int Sbutton_offset = 90;
 	prompt = new Text(fontPath, question_m, SDL_Color{ 0,0,0, 255 }, 40);
 	prompt->Init(instance->renderer, 0, 0, ptx, 0);
 
@@ -232,18 +233,52 @@ void StandardQuestion::LoadComponents()
 	answer_box->Init(dir, instance->renderer, tfd.w, tfd.h, txbx, 100);
 
 
-	Monoca_Editor_open = new SimpleButton(new Text(fontPath, "Open Editor", SDL_Color{ 0, 0,0, 255 }, 50), 10, 10, [this](SimpleButton* button) {onClick(button); });
-	Monoca_Editor_open->Init(instance->renderer, ptx + 20, 300);
+	Monoca_Editor_open = new SimpleButton(new Text(fontPath, "Open Editor", SDL_Color{ 0, 0,0, 255 }, 30), 10, 10, [this](SimpleButton* button) {onClickM(button); });
+	Monoca_Editor_open->Init(instance->renderer, ptx - Sbutton_offset, 210);
 
+	Esc_Menu_open = new SimpleButton(new Text(fontPath, "Open Test Menu", SDL_Color{ 0, 0,0, 255 }, 30), 10, 10, [this](SimpleButton* button) {onClickEM(button); });
+	Esc_Menu_open->Init(instance->renderer, ptx - Sbutton_offset, 280);
 
 	Objects.push_back(prompt);
 	Objects.push_back(answer_box);
-	Objects.push_back(Monoca_Editor_open);
+	Objects.push_back(Monoca_Editor_open); 
+	Objects.push_back(Esc_Menu_open);
 }
 
-void StandardQuestion::onClick(SimpleButton* sb)
+void StandardQuestion::Input(SDL_Event e)
 {
-	cout << "test" << endl;
+	for (Component* c : cm.InputSectorComponents) {
+		c->run(Objects);
+	}
+	if (e.type == SDL_MOUSEMOTION) {
+		Objects[0]->x_m = e.motion.x;
+		Objects[0]->y_m = e.motion.y;
+	}
+	if (e.type == SDL_KEYUP) {
+		if (e.key.keysym.sym == SDLK_ESCAPE) {
+			cout << "worked" << endl;
+			GetInput = "esc_menu";
+		}
+	}
+	for (AppObject* object : Objects) {
+		object->input(e);
+	}
+	for (AppObject* overlay : Overlays) {
+		if (overlay != nullptr) {
+			overlay->input(e);
+		}
+	}
+}
+
+void StandardQuestion::onClickM(SimpleButton* sb)
+{
+	CppPython::ExecPython("app");
+}
+
+void StandardQuestion::onClickEM(SimpleButton* sb)
+{
+	cout << "worked" << endl;
+	GetInput = "esc_menu";
 }
 
 void LoginScreen::Draw() {
@@ -321,4 +356,21 @@ void escMenu::LoadStaticComponents()
 
 void escMenu::LoadComponents()
 {
+	int ptx = 370;
+	Title = new Text(fontPath, "Test Menu", SDL_Color{0,0,0,255}, 70);
+	Title->Init(instance->renderer, 0, 0, ptx, 0);
+
+	ResumeTest = new SimpleButton(new Text(fontPath, "Resume", SDL_Color{ 0,0,0,255 }, 50), 10, 10, [this](SimpleButton* button) { });
+	ResumeTest->Init(instance->renderer, ptx + 60, 130);
+
+	options = new SimpleButton(new Text(fontPath, "Options", SDL_Color{ 0,0,0,255 }, 50), 10, 10, [this](SimpleButton* button) {});
+	options->Init(instance->renderer, ptx + 60, 270);
+
+	Exit = new SimpleButton(new Text(fontPath, "Save and Quit", SDL_Color{ 0,0,0,255 }, 50), 10, 10, [this](SimpleButton* button) {});
+	Exit->Init(instance->renderer, ptx, 410);
+
+	Objects.push_back(Title);
+	Objects.push_back(ResumeTest);
+	Objects.push_back(options);
+	Objects.push_back(Exit);
 }
