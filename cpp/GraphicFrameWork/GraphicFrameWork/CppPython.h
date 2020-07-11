@@ -8,6 +8,7 @@
 #include <locale>
 #include <codecvt>
 #include <string>
+#include <iostream>
 
 using namespace std;
 

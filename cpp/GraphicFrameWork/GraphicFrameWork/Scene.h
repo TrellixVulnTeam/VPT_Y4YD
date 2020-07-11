@@ -5,6 +5,7 @@
 #include <map>
 #include "projects/VPT/Utils.h"
 #include "projects/VPT/ResultId.h"
+#include "CppPython.h"
 
 class Scene {
 public:
@@ -78,12 +79,16 @@ public:
 	StandardQuestion(string question) { question_m = question; }
 	virtual void LoadStaticComponents();
 	virtual void LoadComponents();
+	string GetInput;
 	virtual Scene& Create() { return *new StandardQuestion(question_m); }
+	void Input(SDL_Event e);
 	TextField* answer_box;
 	Text* prompt;
 	string question_m;
 	SimpleButton* Monoca_Editor_open;
-	void onClick(SimpleButton* sb);
+	SimpleButton* Esc_Menu_open;
+	void onClickM(SimpleButton* sb);
+	void onClickEM(SimpleButton* sb);
 };
 
 class escMenu : public Scene {

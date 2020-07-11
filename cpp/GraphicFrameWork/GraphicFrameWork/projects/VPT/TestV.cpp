@@ -8,7 +8,6 @@ void TestV::TestV::Init(const char* window_title, int w, int h)
 {
 	BasicInit(window_title, w, h);
 	BeginLoadingScene(StandardQuestion("WahingtionRedskins").Create());
-	GetActiveScene().Init(this);
 }
 
 void TestV::TestV::Draw()
