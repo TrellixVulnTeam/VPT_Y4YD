@@ -5,24 +5,32 @@ PyModuleDef CppPython::currentCallbackModule = PyModuleDef{ NULL, NULL, NULL, NU
 
 void CppPython::ExecPython(string filename, function<PyObject*()> getArgs, vector<PyMethodDef> callbacks, function<void(PyObject*)> resultHandler) {
 	lock_guard<mutex> execLG(execLock);
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	string pythonExecDir = pythonDir + "Python\\Python36";
-	Py_SetPath(converter.from_bytes(pythonExecDir).c_str());
-	string relativeFilename = pythonDir + filename + ".py";
-	const char* filenameAsString = relativeFilename.c_str();
-	RegisterCallbacks(callbacks);
+	string cmd = "\"" + pythonDir + "Python/Python36/python.exe\" \"" + pythonDir + filename + ".py\"";
+	system(cmd.c_str());
+	/*string pythonExecDir = pythonDir + "Python\\Python36\\python-3.6.0-embed-amd64.zip";
+	string relativeFilename = pythonDir + filename;
+	const char* filenameAsString = relativeFilename.c_str();*/
+
+	/*RegisterCallbacks(callbacks);
+	Py_SetProgramName(Utils::UnConstWChar(Utils::FromString(relativeFilename).c_str()));
 	Py_Initialize();
-	PyObject* moduleName = PyUnicode_FromString(filenameAsString);
-	PyObject* pythonModule = PyImport_Import(moduleName);
-	Py_DECREF(moduleName);
-	PyObject* mainMethod = PyObject_GetAttrString(pythonModule, "main");
-	PyObject* result = PyObject_CallObject(mainMethod, getArgs());
-	Py_DECREF(mainMethod);
-	resultHandler(result);
-	if (result != NULL) {
-		Py_DECREF(result);
-	}
-	Py_DECREF(pythonModule);
+	Py_SetPath(Utils::FromString(pythonExecDir).c_str());*/
+	/*PyRun_SimpleString("import sys");
+	string addDirCode = "sys.path.append('" + pythonDir + "')";
+	PyRun_SimpleString(addDirCode.c_str());*/
+
+	//PyObject* moduleName = PyBytes_FromString(filenameAsString);
+	////cout << PyUnicode_AsUTF8(moduleName) << endl;
+	//PyObject* pythonModule = PyImport_AddModule(filenameAsString);
+	//Py_DECREF(moduleName);
+	//PyObject* mainMethod = PyObject_GetAttrString(pythonModule, "main");
+	//PyObject* result = PyObject_CallObject(mainMethod, getArgs());
+	//Py_DECREF(mainMethod);
+	//resultHandler(result);
+	//if (result != NULL) {
+	//	Py_DECREF(result);
+	//}
+	//Py_DECREF(pythonModule);
 	Py_Finalize();
 }
 

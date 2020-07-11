@@ -148,3 +148,14 @@ SDL_Texture* Utils::CreateTextureFromImage(jobject image, SDL_Renderer* renderer
 bool Utils::contains(SDL_Rect* rect, SDL_Point point) {
 	return rect->x <= point.x && rect->x + rect->w >= point.x && rect->y <= point.y && rect->y + rect->h >= point.y;
 }
+
+wstring Utils::FromString(string str) {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.from_bytes(str);
+}
+
+wchar_t* Utils::UnConstWChar(const wchar_t* chars) {
+	wchar_t* out = new wchar_t[sizeof(chars) / sizeof(wchar_t)];
+	memcpy(out, chars, sizeof(chars));
+	return out;
+}

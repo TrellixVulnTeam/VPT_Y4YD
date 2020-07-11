@@ -6,6 +6,8 @@
 #include <string>
 #include "ResultId.h"
 #include <jni.h>
+#include <locale>
+#include <codecvt>
 
 using namespace std;
 class Utils {
@@ -40,4 +42,6 @@ public:
 	static bool ValidatePacketType(int packetType, int expectedType);
 	static SDL_Texture* CreateTextureFromImage(jobject image, SDL_Renderer* renderer, JNIEnv* env);
 	static bool contains(SDL_Rect* rect, SDL_Point point);
+	static wstring FromString(string str);
+	static wchar_t* UnConstWChar(const wchar_t* chars);
 };
