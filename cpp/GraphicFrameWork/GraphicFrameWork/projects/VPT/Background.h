@@ -12,7 +12,6 @@ class SolidBackground : public Background {
 public:
 	SolidBackground(SDL_Color color);
 	void draw(SDL_Renderer* renderer, const SDL_Rect* rect);
-private:
 	SDL_Color color_m;
 };
 
@@ -20,7 +19,6 @@ class ImageBackground : public Background {
 public:
 	ImageBackground(string imagePath);
 	void draw(SDL_Renderer* renderer, const SDL_Rect* rect);
-private:
 	bool textureInit;
 	SDL_Texture* image_m;
 	string imagePath_m;

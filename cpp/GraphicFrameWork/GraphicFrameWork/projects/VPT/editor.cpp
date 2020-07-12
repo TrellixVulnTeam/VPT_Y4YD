@@ -81,11 +81,38 @@ void editor::editor::Input(bool wasEvent, SDL_Event e)
 			}
 		}
 	}
-	if (message_m == "Button") {
-		PlaceableButton* newObj = new PlaceableButton();
+	bool objectAdded = false;
+	if (message_m == "Dynamic Object") {
+		PlaceableBounding* newObj = new PlaceableBounding();
+		newObj->PreInit((dir + "bounding.png").c_str());
+		newObj->Init(renderer, 100, 100, 400, 400);
 		AppObjects.push_back(newObj);
-		AppObjects[AppObjects.size() - 1]->PreInit((dir + "bounding.png").c_str());
-		AppObjects[AppObjects.size() - 1]->Init(renderer, 100, 100, 400, 400);
+	}
+	else if (message_m == "Text") {
+		PlaceableText* newObj = new PlaceableText();
+		newObj->Init(renderer, 400, 400);
+		AppObjects.push_back(newObj);
+	} else if (message_m == "Button") {
+		PlaceableButton* newObj = new PlaceableButton(dir + "CButtonUP.png", dir + "CButtonP.png");
+		newObj->Init(renderer, 100, 100, 400, 400);
+		AppObjects.push_back(newObj);
+	}
+	else if (message_m == "Text Field") {
+		PlaceableTextField* newObj = new PlaceableTextField();
+		newObj->Init(renderer, 400, 400);
+		AppObjects.push_back(newObj);
+	}
+	else if (message_m == "Simple Button") {
+		PlaceableSimpleButton* newObj = new PlaceableSimpleButton();
+		newObj->Init(renderer, 400, 400);
+		AppObjects.push_back(newObj);
+	}
+	else if (message_m == "Loading Symbol") {
+		PlaceableLoadingSymbol* newObj = new PlaceableLoadingSymbol();
+		newObj->Init(renderer, 200, 200, 400, 400);
+		AppObjects.push_back(newObj);
+	}
+	if (objectAdded) {
 		AppObjects[AppObjects.size() - 1]->id = 0;
 		AppObjects[AppObjects.size() - 1]->x_m = AppObjects[0]->x_m - (AppObjects[AppObjects.size() - 1]->width / 2);
 		AppObjects[AppObjects.size() - 1]->y_m = AppObjects[0]->y_m - (AppObjects[AppObjects.size() - 1]->height / 2);

@@ -3,9 +3,12 @@
 void EditorHelper::Init(const char* window_title, int w, int h) {
 	BasicInit(window_title, w, h);
 
-	SimpleButton* buttonButton = new SimpleButton(new Text(fontPath, "Button", SDL_Color{ 0, 0, 0,255 }, 50), 10, 10, [this](SimpleButton* button) { HandleButtonInput(button); });
-	buttonButton->Init(renderer, 0, 0);
-	AppObjects.push_back(buttonButton);
+	AddObjectButton("Dynamic Object");
+	AddObjectButton("Text");
+	AddObjectButton("Button");
+	AddObjectButton("Text Field");
+	AddObjectButton("Simple Button");
+	AddObjectButton("Loading Symbol");
 
 	int buttonGridWidth = 2;
 	int maxWidth = 0;
@@ -46,4 +49,10 @@ void EditorHelper::Init(const char* window_title, int w, int h) {
 
 void EditorHelper::HandleButtonInput(SimpleButton* button) {
 	editor->message_m = button->text_m->message;
+}
+
+void EditorHelper::AddObjectButton(string text) {
+	SimpleButton* button = new SimpleButton(new Text(fontPath, text, SDL_Color{ 0, 0, 0,255 }, 50), 10, 10, [this](SimpleButton* button) { HandleButtonInput(button); });
+	button->Init(renderer, 0, 0);
+	AppObjects.push_back(button);
 }

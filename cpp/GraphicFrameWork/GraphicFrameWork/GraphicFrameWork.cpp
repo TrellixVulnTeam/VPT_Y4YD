@@ -17,7 +17,6 @@
 #include "projects/VPT/PacketId.h"
 #include "projects/VPT/ResultId.h"
 #include "projects/VPT/editorHelper.h"
-#include "CppPython.h"
 using namespace std;
 vector <AppInstance*> instances;
 #ifndef USE_DEBUG_CLIENT
@@ -45,25 +44,26 @@ int main(int argc, char* argv[])
     else {
         cout << "TTf init worked" << endl;
     }
-    string cmd = "echo %CD% & cd " + pythonDir + "monaco-editor & run-editor.bat";
-    system(cmd.c_str());
-    abort();
 #ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
 #else
-   // editor::AppData appdata;
-    //instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
-   // instances.push_back(new EditorHelper((editor::editor*)instances[0]));
-    //EditorHelper::AppData helperappdata;
-    //instances[1]->Init(helperappdata.win_name, helperappdata.w, helperappdata.h);
-    //AppInstance::RunMultiLoop(instances);
+#ifndef RUN_TESTV
+    editor::AppData appdata;
+    instances.push_back(new editor::editor());
+    instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
+    EditorHelper::AppData helperappdata;
+    instances.push_back(new EditorHelper((editor::editor*)instances[0]));
+    instances[1]->Init(helperappdata.win_name, helperappdata.w, helperappdata.h);
+    AppInstance::RunMultiLoop(instances);
+#else
     instances.push_back(new TestV::TestV());
     TestV::AppData appdata;
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
+#endif
 #endif
     return 0;
 }

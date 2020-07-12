@@ -28,6 +28,7 @@ public:
 	void Init(const char* window_title, int w, int h);
 	void HandleButtonInput(SimpleButton* button);
 private:
+	void AddObjectButton(string text);
 	int UpdateVal;
 	editor::editor* editor;
 };

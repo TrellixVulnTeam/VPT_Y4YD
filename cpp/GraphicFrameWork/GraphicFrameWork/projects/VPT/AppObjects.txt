@@ -4,7 +4,7 @@ Button x y (w h image_base image_selected)
 TextField x y (w h image text_offset_x text_offset_y placeholder_text pwChar text_size)
 TextBox ?
 Checkbox ?
-SimpleButton x y text (w h backgroud border hover_tint click_tint)
+SimpleButton x y text (w h text_offset_x text_offset_y backgroud border hover_tint click_tint)
 LoadingSymbol x y w h (speed color image)
 
 Background is_solid ? color : image

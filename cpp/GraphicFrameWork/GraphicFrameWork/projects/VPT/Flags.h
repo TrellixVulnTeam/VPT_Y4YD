@@ -5,3 +5,5 @@
 #define USE_DEBUG_CLIENT
 //Run Editor Rather Than Client
 #define RUN_EDITOR
+//Run TestV
+//#define RUN_TESTV
