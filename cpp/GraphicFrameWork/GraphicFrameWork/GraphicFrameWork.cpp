@@ -5,15 +5,29 @@
 #include <SDL_ttf.h>
 #include <jni.h>
 #include "projects/VPT/client.h"
+#include "projects/VPT/editor.h"
+#include "projects/VPT/TestV.h" //this is meant to test your retarded scences or  somthing like that
 #include <vector>
+#include "projects/VPT/RelativePaths.h"
+#ifndef USE_DEBUG_CLIENT
+#include "projects/VPT/client_ClientJNI.h"
+#else
 #include "projects/VPT/VPT.h"
+#endif
 #include "projects/VPT/PacketId.h"
 #include "projects/VPT/ResultId.h"
+#include "projects/VPT/editorHelper.h"
 using namespace std;
 vector <AppInstance*> instances;
-JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv *env, jclass claz, jobjectArray ja);
+#ifndef USE_DEBUG_CLIENT
+JNIEXPORT void JNICALL Java_client_ClientJNI_cppMain(JNIEnv* env, jclass claz, jobjectArray ja);
+JNIEXPORT void JNICALL Java_client_ClientJNI_recievePacket(JNIEnv* env, jclass claz, jobject packet);
+JNIEXPORT void JNICALL Java_client_ClientJNI_socketClosed(JNIEnv* env, jclass claz);
+#else
+JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray ja);
 JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet);
 JNIEXPORT void JNICALL Java_VPT_socketClosed(JNIEnv* env, jclass claz);
+#endif
 int main(int argc, char* argv[])
 {
 
@@ -30,17 +44,35 @@ int main(int argc, char* argv[])
     else {
         cout << "TTf init worked" << endl;
     }
+#ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
+#else
+#ifndef RUN_TESTV
+    editor::AppData appdata;
+    instances.push_back(new editor::editor());
+    instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
+    EditorHelper::AppData helperappdata;
+    instances.push_back(new EditorHelper((editor::editor*)instances[0]));
+    instances[1]->Init(helperappdata.win_name, helperappdata.w, helperappdata.h);
+    AppInstance::RunMultiLoop(instances);
+#else
+    instances.push_back(new TestV::TestV());
+    TestV::AppData appdata;
+    instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
+    instances[0]->Loop();
+#endif
+#endif
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray ja)
-{
-    jmethodID mid = env->GetStaticMethodID(claz, "CallBack", "()V");
-    env->CallStaticVoidMethod(claz, mid);
+void cppMain(JNIEnv* env, jclass claz, jobjectArray ja) {
+    JavaVM* vm = nullptr;
+    JavaVM** vmPtr = &vm;
+    env->GetJavaVM(vmPtr);
+    Env::SetJVM(vm);
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         cout << "SDL init worked" << endl;
     }
@@ -54,15 +86,20 @@ JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray j
     else {
         cout << "TTf init worked" << endl;
     }
+#ifndef RUN_EDITOR
     instances.push_back(new client::client());
     client::AppData appdata;
+#else
+    instances.push_back(new TestV::TestV());
+    editor::AppData appdata;
+#endif
     instances[0]->Init(appdata.win_name, appdata.w, appdata.h);
     instances[0]->Loop();
     return;
 }
 
-JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packet)
-{
+void recievePacket(JNIEnv* env, jclass claz, jobject packetIn) {
+    jobject packet = env->NewGlobalRef(packetIn);
     jclass packetClass = env->FindClass("common/networking/packet/Packet");
     if (!env->IsInstanceOf(packet, packetClass)) {
         //Not a packet
@@ -75,7 +112,7 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
         return;
     }
     if (packetId == PacketId_FORCE_LOGOUT) {
-        //force logout
+        client::client::QueuePacket(new Packet(packet, packetId, ResultId_NULL));
     }
     if (packetId == PacketId_RESULT) {
         //ResultPacket
@@ -89,13 +126,44 @@ JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject 
             //null result packet
             return;
         }
-        //process packet
+        client::client::QueuePacket(new Packet(packet, packetId, resultId));
     }
     //unsupported packet type
     return;
 }
 
-JNIEXPORT void JNICALL Java_VPT_socketClosed(JNIEnv* env, jclass claz)
-{
+void socketClosed(JNIEnv* env, jclass claz) {
     return;
 }
+
+#ifndef USE_DEBUG_CLIENT
+JNIEXPORT void JNICALL Java_client_ClientJNI_cppMain(JNIEnv* env, jclass claz, jobjectArray ja)
+{
+    cppMain(env, claz, ja);
+}
+
+JNIEXPORT void JNICALL Java_client_ClientJNI_recievePacket(JNIEnv* env, jclass claz, jobject packetIn)
+{
+    recievePacket(env, claz, packetIn);
+}
+
+JNIEXPORT void JNICALL Java_client_ClientJNI_socketClosed(JNIEnv* env, jclass claz)
+{
+    socketClosed(env, claz);
+}
+#else
+JNIEXPORT void JNICALL Java_VPT_cppMain(JNIEnv* env, jclass claz, jobjectArray ja)
+{
+    cppMain(env, claz, ja);
+}
+
+JNIEXPORT void JNICALL Java_VPT_recievePacket(JNIEnv* env, jclass claz, jobject packetIn)
+{
+    recievePacket(env, claz, packetIn);
+}
+
+JNIEXPORT void JNICALL Java_VPT_socketClosed(JNIEnv* env, jclass claz)
+{
+    socketClosed(env, claz);
+}
+#endif

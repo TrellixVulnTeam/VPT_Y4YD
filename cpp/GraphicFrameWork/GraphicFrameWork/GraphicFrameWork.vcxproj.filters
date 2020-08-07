@@ -13,45 +13,135 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\cfg/auto-gen">
+      <UniqueIdentifier>{8424a26f-a0d5-454d-a2c1-9fdd49790600}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ObjectApi">
+      <UniqueIdentifier>{6256dfc9-c45f-4b2f-8b72-cc6012995833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ObjectApi">
+      <UniqueIdentifier>{35b04aaa-a83e-49ad-822b-e69a3938f1aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Windows">
+      <UniqueIdentifier>{ddf8f673-a9f9-4d1a-8bf9-786dd5c3676f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{0e0f9bb9-c9a4-48e4-bbb3-f13a622a59e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicFrameWork.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Instance.cpp">
+    <ClCompile Include="projects\VPT\Packet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AppObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ObjectApi</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\Border.cpp">
+      <Filter>Source Files\ObjectApi</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\Background.cpp">
+      <Filter>Source Files\ObjectApi</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
+      <Filter>Source Files\ObjectApi</Filter>
+    </ClCompile>
+    <ClCompile Include="Instance.cpp">
+      <Filter>Source Files\ObjectApi</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\Env.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\ObjectApi</Filter>
+    </ClCompile>
+    <ClCompile Include="CppPython.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="projects\VPT\client.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\editor.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\PlaceableObjects.cpp">
+      <Filter>Source Files\ObjectApi</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\editorHelper.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="projects\VPT\TestV.cpp">
+      <Filter>Source Files\Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Instance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AppObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="projects\VPT\client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="projects\VPT\PacketId.h">
+    <ClInclude Include="projects\VPT\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="projects\VPT\ResultId.h">
+      <Filter>Header Files\cfg/auto-gen</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\RelativePaths.h">
+      <Filter>Header Files\cfg/auto-gen</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\PacketId.h">
+      <Filter>Header Files\cfg/auto-gen</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\Flags.h">
+      <Filter>Header Files\cfg/auto-gen</Filter>
+    </ClInclude>
+    <ClInclude Include="AppObject.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\Background.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\Border.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="Instance.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\Packet.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\Env.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="IPython.h">
+      <Filter>Header Files\cfg/auto-gen</Filter>
+    </ClInclude>
+    <ClInclude Include="CppPython.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\editor.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\client.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\editorHelper.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\PlaceableObjects.h">
+      <Filter>Header Files\ObjectApi</Filter>
+    </ClInclude>
+    <ClInclude Include="projects\VPT\TestV.h">
+      <Filter>Header Files\Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

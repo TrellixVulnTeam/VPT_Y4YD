@@ -25,7 +25,7 @@ public final class ClientConstants {
     /**
      * The server port
      */
-    public static final int SERVER_PORT = 0;
+    public static final int SERVER_PORT = 25565;
     
     private ClientConstants() {}
     

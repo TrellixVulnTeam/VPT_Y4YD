@@ -433,9 +433,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
 /java/HeaderCompiler/nbproject/private/
 /java/HeaderCompiler/build/
 /java/HeaderCompiler/dist/
-/java/VPTEditorInterpritor/nbproject/private/
 /java/VPTPythonServer/nbproject/private/
 /java/VPTPythonServer/build/
+/java/VPTEditorInterpritor/build/

@@ -40,6 +40,7 @@ public:
 	int id();
 	bool isCollided(AppObject* object);
 	string RunSector();
+	bool colNot0 = false;
 private:
 	vector <AppObject*> AppObjects_m;
 };

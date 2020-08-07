@@ -43,6 +43,24 @@ public class SerializableImage implements Serializable {
         return out;
     }
     
+    public int[] exportToSDL() {
+        int width = Utils.bytesToInt(Arrays.copyOfRange(encodedData, 0, 4)), height = Utils.bytesToInt(Arrays.copyOfRange(encodedData, 4, 8));
+        int[] outArr = new int[(width * height) + 2];
+        outArr[0] = width;
+        outArr[1] = height;
+        int iidx = 8;
+        int idx = 2;
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                int argb = to32BPP(Arrays.copyOfRange(encodedData, iidx, iidx + 3));
+                outArr[idx] = argb;
+                iidx += 3;
+                idx++;
+            }
+        }
+        return outArr;
+    }
+    
     public static byte[] to24BPP(int argb) {
         int a = (argb >> 29) & 7;
         int r = (argb >> 17) & 127;
@@ -58,7 +76,7 @@ public class SerializableImage implements Serializable {
         int r = (argb24 >> 22) & 127;
         int g = (argb24 >> 15) & 127;
         int b = (argb24 >> 8) & 127;
-        int argb32 = (a << 24) | (r << 16) | (g << 8) | b;
+        int argb32 = (a << 29) | (r << 17) | (g << 9) | (b << 1);
         return argb32;
     }
     

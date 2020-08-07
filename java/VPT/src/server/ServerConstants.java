@@ -41,9 +41,13 @@ public final class ServerConstants {
      */
     public static final boolean USE_FAIR_LOCKS = true;
     /**
+     * The system root directory
+     */
+    public static final String ROOT_DIR = System.getProperty("os.name").startsWith("Windows") ? "C:\\" : "/";
+    /**
      * The main server directory
      */
-    public static final String SERVER_DIR = new File("/").getAbsolutePath() + "VPT" + separator + "Server";
+    public static final String SERVER_DIR = ROOT_DIR + "VPT" + separator + "Server";
     /**
      * The server backup directory
      */

@@ -12,7 +12,7 @@ public final class Constants {
     /**
      * The algorithm to use for retrieving {@link javax.crypto.Cipher} instances for secret keys
      */
-    public static String SECRET_ENCRYPTION_MODE = "AES/GCM/NoPadding";
+    public static String SECRET_ENCRYPTION_MODE = "AES/CBC/PKCS5Padding";
     /**
      * The algorithm to use for retrieving {@link javax.crypto.Cipher} instances for asymmetric keys
      */

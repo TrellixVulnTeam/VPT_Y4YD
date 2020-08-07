@@ -85,7 +85,7 @@ public final class ClientMain {
         }
         @SuppressWarnings("UseSpecificCatch")
         Thread recieveThread = new Thread(() -> {
-            while(socket.isClosed()) {
+            while(!socket.isClosed()) {
                 try {
                     Packet packet = pis.readPacket();
                     if(packet == null || packet.id == PacketId.NULL.id) {

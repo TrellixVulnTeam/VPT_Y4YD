@@ -72,7 +72,7 @@ public class Main {
     }
     
     public static boolean process(SSLSocket socket, PacketOutputStream pos, Console console) throws Exception {
-        String classToSend = console.readLine("Enter Name of Class to Send: ");
+        String classToSend = console.readLine​("Enter Name of Class to Send: ");
         if(classToSend.equals("dc")) {
             socket.close();
             return true;
@@ -82,7 +82,7 @@ public class Main {
             System.err.println("Class is Not a Packet");
             return false;
         }
-        String params = console.readLine("Enter Params: ");
+        String params = console.readLine​("Enter Params: ");
         if(params.isEmpty()) {
             pos.writePacket((Packet)packetClass.getConstructor().newInstance());
             return false;

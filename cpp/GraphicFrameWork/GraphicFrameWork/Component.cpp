@@ -43,7 +43,7 @@ int Component::id()
 
 string Component::RunSector()
 {
-	return nullptr;
+	return string();
 }
 
 int TestComponent::run(vector <AppObject*> AppObjects)
@@ -70,10 +70,15 @@ CollisionBox::CollisionBox(vector<AppObject*> AppObjects)
 int CollisionBox::run(vector <AppObject*> AppObjects)
 {
 	AppObjects_m = AppObjects;
-	for (unsigned int i = 0; i < AppObjects_m.size(); i++) {
-		if (isCollided(AppObjects_m[i])) {
-			return i;
+	if (colNot0) {
+		for (unsigned int i = 0; i < AppObjects_m.size(); i++) {
+			if (isCollided(AppObjects_m[i]) && AppObjects_m[i]->id != parent_m->id) {
+				return i;
+			}
 		}
+	}
+	else if(AppObjects_m.size() > 0 && isCollided(AppObjects_m[0])) {
+		return 0;
 	}
 	return -1;
 }
@@ -151,8 +156,8 @@ bool CollisionCircle::isCollided(AppObject* object)
 	int bx = object->x_m;
 	int ay = parent_m->y_m;
 	int by = object->y_m;
-	int aw = parent_m->width;
-	int bw = object->width;
+	double aw = parent_m->width;
+	double bw = object->width;
 	int ah = parent_m->height;
 	int bh = object->height;
 
@@ -160,7 +165,7 @@ bool CollisionCircle::isCollided(AppObject* object)
 	int distx = ax - bx;
 	int disty = ay - by;
 
-	int dist = sqrt(distx * distx + disty * disty);
+	double dist = sqrt(distx * distx + disty * disty);
 
 	if (dist < aw + bw){
 		return true;
