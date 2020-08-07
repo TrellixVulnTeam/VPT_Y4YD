@@ -35,7 +35,7 @@ public final class ServerConstants {
     /**
      * The port that the server will be started on
      */
-    public static final int SERVER_PORT = 0;
+    public static final int SERVER_PORT = 636;
     /**
      * Whether {@link java.util.concurrent.locks.ReentrantReadWriteLock}s will be fair
      */

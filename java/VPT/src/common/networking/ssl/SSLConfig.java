@@ -63,6 +63,11 @@ public final class SSLConfig {
         init();
     }
     
+    public static void initBoth(KeyStore keyStore, char[] password, String keyAlias, KeyStore trustStore) throws KeyManagementException, KeyStoreException {
+        context.init(new KeyManager[] {new SSLKeyManager(keyStore, password, keyAlias)}, new TrustManager[] {new SSLTrustManager(trustStore)}, null);
+        init();
+    }
+    
     /**
      * Initializes the socket factories
      */

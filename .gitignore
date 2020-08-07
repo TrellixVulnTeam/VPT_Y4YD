@@ -437,3 +437,5 @@ FodyWeavers.xsd
 /java/HeaderCompiler/build/
 /java/HeaderCompiler/dist/
 /java/VPTEditorInterpritor/nbproject/private/
+/java/VPTPythonServer/nbproject/private/
+/java/VPTPythonServer/build/
