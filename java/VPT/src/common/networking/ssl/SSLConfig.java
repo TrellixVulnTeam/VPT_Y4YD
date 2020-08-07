@@ -4,9 +4,12 @@ import common.Constants;
 import common.Utils;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.util.stream.Stream;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -38,6 +41,7 @@ public final class SSLConfig {
      * Whether the {@link SSLContext} has been initialized
      */
     private static boolean init = false;
+    private static boolean isDocker = isRunningInsideDocker();
     
     /**
      * Initializes the {@link SSLContext} for client use
@@ -102,7 +106,22 @@ public final class SSLConfig {
      */
     public static SSLServerSocket createServerSocket(int port) throws IllegalStateException, IOException {
         checkInit();
-        return (SSLServerSocket)serverSocketFactory.createServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
+        if(isDocker) {
+            return (SSLServerSocket)serverSocketFactory.createServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
+        } else {
+            return (SSLServerSocket)serverSocketFactory.createServerSocket(port);
+        }
+    }
+    
+    //Credit: https://stackoverflow.com/questions/52580008/how-does-java-application-know-it-is-running-within-a-docker-container
+    public static Boolean isRunningInsideDocker() {
+
+        try (Stream< String> stream
+                = Files.lines(Paths.get("/proc/1/cgroup"))) {
+            return stream.anyMatch(line -> line.contains("/docker"));
+        } catch (IOException e) {
+            return false;
+        }
     }
     
     /**

@@ -44,7 +44,6 @@ public class Main {
             while(true) {
                 try {
                     SSLSocket clientSocket = (SSLSocket)sc.accept();
-                    System.out.println("Recieved Connection");
                     if(clientSocket.isConnected() && !clientSocket.isClosed()) {
                         BufferedReader clientInputStream;
                         BufferedWriter clientOutputStream;
