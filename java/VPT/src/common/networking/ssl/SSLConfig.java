@@ -102,7 +102,7 @@ public final class SSLConfig {
      */
     public static SSLServerSocket createServerSocket(int port) throws IllegalStateException, IOException {
         checkInit();
-        return (SSLServerSocket)serverSocketFactory.createServerSocket(port, 0, InetAddress.getByName("0.0.0.0"));
+        return (SSLServerSocket)serverSocketFactory.createServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
     }
     
     /**
