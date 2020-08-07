@@ -3,6 +3,7 @@ package common.networking.ssl;
 import common.Constants;
 import common.Utils;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -101,7 +102,7 @@ public final class SSLConfig {
      */
     public static SSLServerSocket createServerSocket(int port) throws IllegalStateException, IOException {
         checkInit();
-        return (SSLServerSocket)serverSocketFactory.createServerSocket(port);
+        return (SSLServerSocket)serverSocketFactory.createServerSocket(port, 0, InetAddress.getByName("0.0.0.0"));
     }
     
     /**
