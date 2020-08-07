@@ -38,6 +38,8 @@ public class ConnectionHandler {
      * Whether {@link #handleConnection()} has been called
      */
     private volatile boolean isRunning;
+    
+    private static int numConnections = 0;
 
     /**
      * Creates a new ConnectionHandler and initializes the streams
@@ -65,6 +67,7 @@ public class ConnectionHandler {
         if(isRunning) {
             throw new IllegalStateException("Connection is already being handled");
         }
+        numConnections++;
         new Thread(this::doHandleConnection).start();
         isRunning = true;
     }
@@ -102,6 +105,7 @@ public class ConnectionHandler {
                 }
             }
         }
+        numConnections--;
     }
     
     /**
