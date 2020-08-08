@@ -47,7 +47,7 @@ public final class ServerConstants {
     /**
      * The main server directory
      */
-    public static final String SERVER_DIR = ROOT_DIR + "VPT" + separator + "Server";
+    public static final String SERVER_DIR = ROOT_DIR + "home" + separator + "VPT" + separator + "Server";
     /**
      * The server backup directory
      */
