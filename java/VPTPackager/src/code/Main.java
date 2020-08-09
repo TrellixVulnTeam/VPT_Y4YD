@@ -16,6 +16,8 @@ public class Main {
         File sourceJar = new File(args[0]);
         File clientJar = new File(sourceJar.getParent() + File.separator + "VPTClient.jar");
         File serverJar = new File(sourceJar.getParent() + File.separator + "VPTServer.jar");
+        clientJar.createNewFile();
+        serverJar.createNewFile();
         try(ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceJar));
             ZipOutputStream cos = new ZipOutputStream(new FileOutputStream(clientJar));
             ZipOutputStream sos = new ZipOutputStream(new FileOutputStream(serverJar));) {
@@ -26,11 +28,9 @@ public class Main {
                 boolean isServerFile = !entry.getName().startsWith("client");
                 if(isClientFile) {
                     cos.putNextEntry(new ZipEntry(entry.getName()));
-                    continue;
                 }
                 if(isServerFile) {
                     sos.putNextEntry(new ZipEntry(entry.getName()));
-                    continue;
                 }
                 if(entry.getName().equals("META-INF/MANIFEST.MF")) {
                     StringBuilder sb = new StringBuilder();
