@@ -1,0 +1,7 @@
+python/Python/* linguist-vendored
+python/monaco-editor/static/* linguist-vendored
+monaco-editor/* linguist-vendored
+cpp/GraphicFrameWork/GraphicFrameWork/SDL2-2.0.10/* linguist-vendored
+cpp/GraphicFrameWork/GraphicFrameWork/SDL2_image-2.0.5/* linguist-vendored
+cpp/GraphicFrameWork/GraphicFrameWork/SDL2_ttf-2.0.15/* linguist-vendored
+java/VPT/javadoc/* linguist-documentation
