@@ -272,13 +272,13 @@ void StandardQuestion::Input(SDL_Event e)
 
 void StandardQuestion::onClickM(SimpleButton* sb)
 {
-	CppPython::ExecPython("app");
+	cout << "worked1" << endl;
 }
 
 void StandardQuestion::onClickEM(SimpleButton* sb)
 {
 	cout << "worked" << endl;
-	GetInput = "esc_menu";
+	//GetInput = "esc_menu";
 }
 
 void LoginScreen::Draw() {

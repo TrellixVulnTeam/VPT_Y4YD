@@ -1,5 +1,6 @@
 package server;
 
+import com.mysql.jdbc.Connection;
 import common.Constants;
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
