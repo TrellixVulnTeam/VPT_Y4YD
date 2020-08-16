@@ -445,3 +445,4 @@ FodyWeavers.xsd
 /java/VPTServerPackager/build/
 /java/VPTPackager/nbproject/private/
 /java/VPTPackager/build/
+/java/VPT/dist/

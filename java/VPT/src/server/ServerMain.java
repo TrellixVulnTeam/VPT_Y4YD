@@ -1,5 +1,6 @@
 package server;
 
+import server.services.RequestService;
 import common.Console;
 import common.Constants;
 import common.networking.packet.PacketId;
@@ -19,7 +20,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
-import server.user.LoginService;
+import server.services.LoginService;
 import server.user.UserStore;
 
 /**

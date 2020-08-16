@@ -1,5 +1,6 @@
 package server.user;
 
+import server.services.LoginService;
 import common.user.NetPublicUser;
 import java.io.Serializable;
 import java.util.ArrayList;
