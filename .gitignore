@@ -440,3 +440,8 @@ FodyWeavers.xsd
 /java/VPTPythonServer/nbproject/private/
 /java/VPTPythonServer/build/
 /java/VPTEditorInterpritor/build/
+/java/VPTServerPackager/nbproject/private/
+/java/VPTServerPackager/dist/
+/java/VPTServerPackager/build/
+/java/VPTPackager/nbproject/private/
+/java/VPTPackager/build/
