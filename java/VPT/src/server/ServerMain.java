@@ -38,6 +38,12 @@ public final class ServerMain {
      */
     @SuppressWarnings("UseSpecificCatch")
     public static void main(String[] args) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch(ClassNotFoundException e) {
+            System.err.println("MySQL Driver Not Found");
+            System.exit(1);
+        }
         @SuppressWarnings("UnusedAssignment")
         Console console = null;
         if(ServerConstants.BRANCH == Constants.Branch.DEV) {
