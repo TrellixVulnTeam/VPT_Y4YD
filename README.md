@@ -1,2 +1,7 @@
 # VPT
-	The Veteran Programming Test (hereafter referred to as VPT) was born out of the desire to create a more comprehensive test of programming knowledge. We do not dispute the validity of more traditional assessments such as the AP test. However, we find these to be too focused on theory and too abstract in their problems. (We think that they abstract away the important complexity behind them). However, first and foremost, we consider it to be a way to improve our skills by developing a real-world application. In the future, we also hope to move on to developing other interesting projects. For example, as part of this project, we are developing an object based graphics API/engine based on the SDL library.
+	The Veteran Programming Test (hereafter referred to as VPT) was
+born out of the desire to create a more comprehensive test of programming
+knowledge. We do not dispute the validity of more traditional assessments
+such as the AP test. However, we find these to be too focused on theory
+and too abstract in their problems. (We think that they abstract away
+the important complexity behind them).
