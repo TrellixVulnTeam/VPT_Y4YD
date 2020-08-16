@@ -7,7 +7,7 @@ class ModuleMS:
 		self.func_list = {}
 
 	def run(self, module_id, req, module_request, sdata_protocol):
-		self.modules[module_id].RUN(req, module_request, sdata_protocol)
+		return self.modules[module_id].RUN(req, module_request, sdata_protocol)
 
 
 	def module_instantiate(self, func_list):

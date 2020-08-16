@@ -6,5 +6,5 @@ class VPTModule(module.Module):
 		self.runnable = True
 
 	def run(self, req, module_request, sdata_protocol):
-		return jsonify({"sdata": self.id})
+		return {"sdata": self.id}
 

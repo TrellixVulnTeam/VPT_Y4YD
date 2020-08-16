@@ -17,8 +17,10 @@
 	<script src="../static/send_recv.js"></script>
 	<script>
 		var packet = {
-			request: "test",
-			sdata: "data"
+			request: "get-module",
+			sdata: "data",
+			module_request: "test",
+			module: "VPT"			
 		}
 		SRPacket(packet, function(res_data){ console.log(res_data)})	
 	</script>

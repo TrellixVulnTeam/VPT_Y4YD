@@ -7,12 +7,20 @@ sys.path.append("py_vptclient")
 __import__("vpt_client")
 
 sys.path.append("projBE_modules")
-__import__("module_managment")
+mm = __import__("module_managment", fromlist=[''])
 
 app = Flask(__name__)
 
 ip_table = []
 ip_table.append("127.0.0.1")
+
+def functest(args):
+        return "test"
+
+func_list = {"testfunc": functest}
+module_ms = mm.ModuleMS()
+
+module_ms.module_instantiate(func_list)
 
 
 @app.route("/")
@@ -35,7 +43,7 @@ def recv_packet():
 	sdata_proto = req.get("sdata")
 	#"get-module"
 	#module
-	#module-request
+	#module_request
 	if preq == "test":
 		res = make_response(jsonify({"sdata": "test"}), 200)
 
@@ -50,9 +58,11 @@ def recv_packet():
 	if preq == "ip_table_len":
 		res = make_response(jsonify({"sdata": len(ip_table) - 1}), 200)
 
-	#if preq == "get-module":
-		#module_res = module_ms.run(req.get("module"), req, req.get("module-request"), sdata_proto)
-		#res = make_response(module_res, 200)
+	if preq == "get-module":
+		print("getting_module")
+		module_res = module_ms.run(req.get("module"), req, req.get("module_request"), sdata_proto)
+		print(module_res)
+		res = make_response(jsonify(module_res) , 200)
 
 	return res
 
