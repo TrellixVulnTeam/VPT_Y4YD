@@ -6,4 +6,4 @@
 //Run Editor Rather Than Client
 #define RUN_EDITOR
 //Run TestV
-//#define RUN_TESTV
+#define RUN_TESTV
