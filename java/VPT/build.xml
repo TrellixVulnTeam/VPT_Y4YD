@@ -72,7 +72,7 @@
     -->
     
     <target name="do-headercompile" if="headercompilefilesexist">
-        <exec dir="${header-compiler-dir}" executable="${platform.home}/bin/java">
+        <exec dir="${header-compiler-dir}" executable="${java.home}/bin/java">
             <arg value="-jar" />
             <arg value="${header-compiler-dir}/dist/VPTHeaderCompiler.jar" />
             <arg value="${src.dir.absolute}" />
@@ -96,7 +96,7 @@
     </target>
     
     <target name="do-package" if="packagefilesexist">
-        <exec dir="${server-packager-dir}" executable="${platform.home}/bin/java">
+        <exec dir="${server-packager-dir}" executable="${java.home}/bin/java">
             <arg value="-jar" />
             <arg value="${server-packager-dir}/VPTPackager.jar" />
             <arg value="${jarFile}" />
