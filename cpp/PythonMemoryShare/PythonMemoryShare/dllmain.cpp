@@ -178,7 +178,7 @@ static PyObject* PySharedMemory_UnmapView(PyObject* self, PyObject* args) {
     }
     viewHandles.erase(string(handleHandle));
     UnmapViewOfFile(viewHandles.find(string(handleHandle))->second);
-    Py_IncRef(Py_None);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -193,7 +193,7 @@ static PyObject* PySharedMemory_Close(PyObject* self, PyObject* args) {
     }
     CloseHandle(fileHandles.find(string(handleHandle))->second);
     fileHandles.erase(string(handleHandle));
-    Py_IncRef(Py_None);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
