@@ -12,12 +12,46 @@
 #include <string>
 #include <map>
 #include <comdef.h>
+#include <tchar.h>
+#include <iostream>
+#define _CRT_SECURE_NO_WARNINGS
 
 using namespace std;
 
 map<string, HANDLE> fileHandles;
+map<string, LPTSTR> viewHandles;
 
 PyObject* sharedMemoryError;
+
+static TCHAR* ANSItoUnicode(const char* text) {
+    wchar_t* out = new wchar_t[strlen(text) + 1];
+    size_t ncc = 0;
+    mbstowcs_s(&ncc, out, strlen(text) + 1, text, _TRUNCATE);
+    return reinterpret_cast<TCHAR*>(out);
+}
+
+static char* UnicodetoANSI(wchar_t* text) {
+    char* out = new char[2 * (wcslen(text) + 1)];
+    size_t ncc = 0;
+    wcstombs_s(&ncc, out, 2 * (wcslen(text) + 1), text, _TRUNCATE);
+    return out;
+}
+
+static CHAR* ANSItoANSI(const char* text) {
+    return const_cast<CHAR*>(text);
+}
+
+#ifdef UNICODE
+#define CP(text) ANSItoUnicode(text)
+#else
+#define CP(text) ANSItoANSI(text)
+#endif
+
+#ifdef UNICODE
+#define CPI(text) UnicodetoANSI(text)
+#else
+#define CPI(text) ANSItoANSI(text)
+#endif
 
 //Credit: https://stackoverflow.com/questions/440133/how-do-i-create-a-random-alpha-numeric-string-in-c
 static void gen_random(char* s, const int len) {
@@ -42,15 +76,16 @@ static string randomString() {
 static PyObject* PySharedMemory_Create(PyObject* self, PyObject* args) {
     const char* name;
     size_t bufSize;
-    if (!PyArg_ParseTuple(args, "s", &name, &bufSize)) {
+    if (!PyArg_ParseTuple(args, "sI", &name, &bufSize)) {
         return NULL;
     }
-    WCHAR* nameW = new WCHAR[sizeof(name) / sizeof(char)];
-    mbstowcs(nameW, name, sizeof(name) / sizeof(char));
-HANDLE memoryHandle = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, bufSize, nameW);
-string key = randomString();
-fileHandles.insert(make_pair(key, memoryHandle));
-return PyUnicode_FromString(key.c_str());
+    HANDLE memoryHandle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, bufSize, name);
+    string key;
+    do {
+        key = randomString();
+    } while (fileHandles.count(key) != 0);
+    fileHandles.insert(make_pair(key, memoryHandle));
+    return PyUnicode_FromString(key.c_str());
 }
 
 static PyObject* PySharedMemory_Open(PyObject* self, PyObject* args) {
@@ -59,50 +94,68 @@ static PyObject* PySharedMemory_Open(PyObject* self, PyObject* args) {
         return NULL;
     }
     HANDLE memoryHandle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, name);
-    string key = randomString();
+    string key;
+    do {
+        key = randomString();
+    } while (fileHandles.count(key) != 0);
     fileHandles.insert(make_pair(key, memoryHandle));
     return PyUnicode_FromString(key.c_str());
 }
 
 static PyObject* PySharedMemory_Read(PyObject* self, PyObject* args) {
     const char* handleHandle;
-    size_t bytesToRead;
-    if (!PyArg_ParseTuple(args, "sI", &handleHandle, &bytesToRead)) {
+    if (!PyArg_ParseTuple(args, "s", &handleHandle)) {
         return NULL;
     }
     if (fileHandles.count(string(handleHandle)) != 1) {
         PyErr_SetString(sharedMemoryError, "Handle Does Not Exist");
         return NULL;
     }
-    LPTSTR data = (LPTSTR)MapViewOfFile(fileHandles.find(string(handleHandle))->second, FILE_MAP_ALL_ACCESS, 0, 0, bytesToRead);
+    LPTSTR data = (LPTSTR)MapViewOfFile(fileHandles.find(string(handleHandle))->second, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (data == NULL) {
         PyErr_SetString(sharedMemoryError, "Error Occured: " + GetLastError());
         return NULL;
     }
+    PyObject* out = PyUnicode_FromString(CPI(data));
     UnmapViewOfFile(data);
-    return PyUnicode_FromString(_bstr_t(data));
+    return out;
 }
 
 static PyObject* PySharedMemory_Write(PyObject* self, PyObject* args) {
     const char* handleHandle;
-    size_t bytesToRead;
     const char* text;
-    if (!PyArg_ParseTuple(args, "sIs", &handleHandle, &bytesToRead, &text)) {
+    if (!PyArg_ParseTuple(args, "ss", &handleHandle, &text)) {
         return NULL;
     }
     if (fileHandles.count(string(handleHandle)) != 1) {
         PyErr_SetString(sharedMemoryError, "Handle Does Not Exist");
         return NULL;
     }
-    LPTSTR data = (LPTSTR)MapViewOfFile(fileHandles.find(string(handleHandle))->second, FILE_MAP_ALL_ACCESS, 0, 0, bytesToRead);
+    LPTSTR data = (LPTSTR)MapViewOfFile(fileHandles.find(string(handleHandle))->second, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (data == NULL) {
         PyErr_SetString(sharedMemoryError, "Error Occured: " + GetLastError());
         return NULL;
     }
-    TCHAR* msg = new TCHAR[sizeof(text) / sizeof(char)];
-    mbstowcs(msg, text, sizeof(text) / sizeof(char));
-    CopyMemory((PVOID)data, text, sizeof(text));
-    UnmapViewOfFile(data);
+    TCHAR* msg = CP(text);
+    CopyMemory((PVOID)data, msg, (_tcslen(msg) * sizeof(TCHAR)));
+    string key;
+    do {
+        key = randomString();
+    } while (viewHandles.count(key) != 0);
+    viewHandles.insert(make_pair(key, data));
+    return PyUnicode_FromString(key.c_str());
+}
+
+static PyObject* PySharedMemory_UnmapView(PyObject* self, PyObject* args) {
+    const char* handleHandle;
+    if (!PyArg_ParseTuple(args, "s", &handleHandle)) {
+        return NULL;
+    }
+    if (viewHandles.count(string(handleHandle)) != 1) {
+        PyErr_SetString(sharedMemoryError, "Handle Does Not Exist");
+        return NULL;
+    }
+    UnmapViewOfFile(viewHandles.find(string(handleHandle))->second);
     Py_IncRef(Py_None);
     return Py_None;
 }
@@ -127,6 +180,7 @@ static PyMethodDef SharedMemoryMethods[] = {
     {"OpenSharedMemory", PySharedMemory_Open, METH_VARARGS, "Opens Shared Memory"},
     {"ReadSharedMemory", PySharedMemory_Read, METH_VARARGS, "Reads Shared Memory"},
     {"WriteSharedMemory", PySharedMemory_Write, METH_VARARGS, "Writes Shared Memory"},
+    {"UnmapSharedView", PySharedMemory_UnmapView, METH_VARARGS, "Unmaps A Shared View"},
     {"CloseSharedMemory", PySharedMemory_Close, METH_VARARGS, "Close Shared Memory"},
     {NULL, NULL, 0, NULL},
 };
