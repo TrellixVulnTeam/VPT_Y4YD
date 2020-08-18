@@ -67,6 +67,19 @@ static void gen_random(char* s, const int len) {
     s[len] = 0;
 }
 
+//Credit: https://stackoverflow.com/questions/2709713/how-to-convert-unsigned-long-to-string
+static string sul(unsigned long num) {
+    const int n = snprintf(NULL, 0, "%lu", num);
+    char* buf = new char[n + 1];
+    int c = snprintf(buf, n + 1, "%lu", num);
+    return string(buf);
+}
+
+static const char* GetLastErrorExport() {
+    string out = "Error Occured: " + sul(GetLastError());
+    return out.c_str();
+}
+
 static string randomString() {
     char* randChars = new char[32];
     gen_random(randChars, 32);
@@ -80,6 +93,10 @@ static PyObject* PySharedMemory_Create(PyObject* self, PyObject* args) {
         return NULL;
     }
     HANDLE memoryHandle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, bufSize, name);
+    if (memoryHandle == NULL) {
+        PyErr_SetString(sharedMemoryError, GetLastErrorExport());
+        return NULL;
+    }
     string key;
     do {
         key = randomString();
@@ -94,6 +111,10 @@ static PyObject* PySharedMemory_Open(PyObject* self, PyObject* args) {
         return NULL;
     }
     HANDLE memoryHandle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, name);
+    if (memoryHandle == NULL) {
+        PyErr_SetString(sharedMemoryError, GetLastErrorExport());
+        return NULL;
+    }
     string key;
     do {
         key = randomString();
@@ -113,7 +134,7 @@ static PyObject* PySharedMemory_Read(PyObject* self, PyObject* args) {
     }
     LPTSTR data = (LPTSTR)MapViewOfFile(fileHandles.find(string(handleHandle))->second, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (data == NULL) {
-        PyErr_SetString(sharedMemoryError, "Error Occured: " + GetLastError());
+        PyErr_SetString(sharedMemoryError, GetLastErrorExport());
         return NULL;
     }
     PyObject* out = PyUnicode_FromString(CPI(data));
@@ -133,7 +154,7 @@ static PyObject* PySharedMemory_Write(PyObject* self, PyObject* args) {
     }
     LPTSTR data = (LPTSTR)MapViewOfFile(fileHandles.find(string(handleHandle))->second, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (data == NULL) {
-        PyErr_SetString(sharedMemoryError, "Error Occured: " + GetLastError());
+        PyErr_SetString(sharedMemoryError, GetLastErrorExport());
         return NULL;
     }
     TCHAR* msg = CP(text);
@@ -152,9 +173,10 @@ static PyObject* PySharedMemory_UnmapView(PyObject* self, PyObject* args) {
         return NULL;
     }
     if (viewHandles.count(string(handleHandle)) != 1) {
-        PyErr_SetString(sharedMemoryError, "Handle Does Not Exist");
+        PyErr_SetString(sharedMemoryError, GetLastErrorExport());
         return NULL;
     }
+    viewHandles.erase(string(handleHandle));
     UnmapViewOfFile(viewHandles.find(string(handleHandle))->second);
     Py_IncRef(Py_None);
     return Py_None;

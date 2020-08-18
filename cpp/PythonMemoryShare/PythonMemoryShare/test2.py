@@ -1,6 +1,6 @@
 from sharedmemory import *
 
-handle = OpenSharedMemory("LOCAL\test")
+handle2 = OpenSharedMemory("LOCAL\test")
 input('')
-print(ReadSharedMemory(handle))
-CloseSharedMemory(handle)
+print(ReadSharedMemory(handle2))
+CloseSharedMemory(handle2)
