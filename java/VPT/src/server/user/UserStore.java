@@ -14,6 +14,9 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +27,7 @@ import server.ServerConstants;
 import server.serialization.BackupSerialization;
 import server.serialization.EncryptionSerialization;
 import server.serialization.MacSerialization;
+import server.services.SQLService;
 
 /**
  * Stores users and their related attributes
@@ -55,14 +59,6 @@ public final class UserStore {
      * Protects access to {@link #publicAttributes}
      */
     private static final ReentrantReadWriteLock attributeLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
-    /**
-     * Contains methods to be run on the deletion of users
-     */
-    private static final ConcurrentHashMap<String, ArrayList<Runnable>> deletionSubscribers = new ConcurrentHashMap<>();
-    /**
-     * Protects access to {@link #deletionSubscribers}
-     */
-    private static final ReentrantReadWriteLock deletionSubscribersLock = new ReentrantReadWriteLock(ServerConstants.USE_FAIR_LOCKS);
     /**
      * Contains the public keys of users
      */
@@ -239,57 +235,6 @@ public final class UserStore {
     }
     
     /**
-     * Registers the given method to be run if the specified user is deleted
-     * @param userId the userId of the user to check
-     * @param onUserDeletion the method to be run
-     * @throws IllegalArgumentException if the specified user does not exist
-     */
-    public static void subscribeToDeletionEvents(String userId, Runnable onUserDeletion) throws IllegalArgumentException {
-        deletionSubscribersLock.readLock().lock();
-        try {
-            userLock.readLock().lock();
-            try {
-                if(!checkUserIdExistance(userId)) {
-                    throw new IllegalArgumentException("User: " + userId + " does not exist");
-                }
-                synchronized(deletionSubscribers) {
-                    if(!deletionSubscribers.containsKey(userId)) {
-                        deletionSubscribers.put(userId, new ArrayList<>());
-                    }
-                }
-                synchronized(deletionSubscribers.get(userId)) {
-                    deletionSubscribers.get(userId).add(onUserDeletion);
-                }
-            } finally {
-                userLock.readLock().unlock();
-            }
-        } finally {
-            deletionSubscribersLock.readLock().unlock();
-        }
-    }
-    
-    /**
-     * Unregisters the given method from being run when the specified user is deleted
-     * @param userId the userId of the user being checked
-     * @param callback the method which would be run
-     */
-    public static void unsubscribeFromDeletionEvents(String userId, Runnable callback) {
-        deletionSubscribersLock.readLock().lock();
-        try {
-            synchronized(deletionSubscribers) {
-                if(!deletionSubscribers.containsKey(userId)) {
-                    return;
-                }
-            }
-            synchronized(deletionSubscribers.get(userId)) {
-                deletionSubscribers.get(userId).remove(callback);
-            }
-        } finally {
-            deletionSubscribersLock.readLock().unlock();
-        }
-    }
-    
-    /**
      * Checks if the given userId corresponds to an existing user
      * @param userId the userId to check
      * @return whether the given userId corresponds to an existing user
@@ -322,48 +267,25 @@ public final class UserStore {
      * @throws IOException if there is an error creating any of the required files
      * @throws SecurityException if the current user does not have the permissions to create the specified user
      */
-    public static void createUser(User user) throws IllegalArgumentException, IOException, SecurityException {
+    @SuppressWarnings("UseSpecificCatch")
+    public static void createUser(User user) throws IllegalArgumentException, SQLException {
         if(isInvalidUserId(user.userId)) {
             throw new IllegalArgumentException("User Id Cannot Contain Any of the Following Characters: " + ServerConstants.USERID_FORBIDDEN_CHARACTERS);
         }
-        LoginService.checkAccess();
-        if(checkUserIdExistance(user.userId)) {
-            throw new IllegalArgumentException("User Already Exists");
-        }
-        userLock.writeLock().lock();
+        SQLService.setTransactionParams(Connection.TRANSACTION_SERIALIZABLE, false);
+        Connection conn = SQLService.getConnection();
         try {
+            conn.setAutoCommit(false);
             if(checkUserIdExistance(user.userId)) {
                 throw new IllegalArgumentException("User Already Exists");
             }
-            KeyPair publicFileKeys = Utils.createPseudoRandomAsymetricKey();
-            user.setKey("USER_FILE_PRIVATE_KEY", publicFileKeys.getPrivate());
-            user.setKey("USER_FILE_PUBLIC_KEY", publicFileKeys.getPublic());
-            publicKeyLock.writeLock().lock();
-            try {
-                userPublicKeys.put(user.userId, publicFileKeys.getPublic());
-                publicKeysChanged = true;
-            } finally {
-                publicKeyLock.writeLock().unlock();
-            }
-            saveUser(user, true);
-            try {
-                EncryptionSerialization.serialize(user.getKey("USER_FILE_SECRET_KEY"), "Users/" + Utils.hash(user.userId) + ".usr.key", ADMIN_PUBLIC_KEY);
-            } catch(InvalidKeyException e) {
-                throw new IOException(e);
-            }
-            users.put(user.userId, new WeakReference<>(user));
-            if(user.isVisible()) {
-                attributeLock.writeLock().lock();
-                attributesChanged = true;
-                try {
-                    publicAttributes.put(user.userId, user.getAttributes());
-                } finally {
-                    attributeLock.writeLock().unlock();
-                }
-            }
-        } finally {
-            userLock.writeLock().unlock();
+            PreparedStatement createUserStatememt = conn.prepareStatement("INSERT INTO users (?, ?, ?)");
+            conn.commit();
+        } catch(Throwable t) {
+            conn.rollback();
+            throw t;
         }
+        conn.setAutoCommit(true);
     }
     
     /**

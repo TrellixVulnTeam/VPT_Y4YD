@@ -15,6 +15,7 @@ import common.networking.ssl.SSLConnection;
 import common.user.NetPublicUser;
 import java.io.IOException;
 import java.time.Duration;
+import server.services.DeletionService;
 import server.services.LoginService;
 import server.user.PublicUser;
 import server.user.User;
@@ -40,15 +41,15 @@ public final class PacketHandler {
             }
             if(p.id == PacketId.LOGIN.id) {
                 RequestService.request(connection, "Login", ServerConstants.USER_SPEC_REQUESTS_TE);
-                User currentUser = LoginService.getCurrentUser();
-                if(currentUser != null) {
+                int currentUser = LoginService.getCurrentUserId();
+                if(currentUser != -1) {
                     LoginService.logout();
-                    UserStore.unsubscribeFromDeletionEvents(currentUser.userId, onUserDeletion);
+                    DeletionService.unsubscribeFromDeletionEvents(currentUser, onUserDeletion);
                 }
                 LoginPacket loginPacket = (LoginPacket)p;
                 boolean result = LoginService.login(loginPacket.userId, loginPacket.password);
                 if(result) {
-                    UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
+                    DeletionService.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
                 }
                 return new StandardResultPacket(result, result ? null : "Invalid Login");
             } else if(p.id == PacketId.CREATE_USER.id) {
@@ -78,7 +79,7 @@ public final class PacketHandler {
                 return new StandardResultPacket(true);
             } else if(p.id == PacketId.CURRENT_USER_REQUEST.id) {
                 RequestService.request(connection, "Current User Info", ServerConstants.USER_NORM_REQUESTS_TE);
-                User currentUser = LoginService.getCurrentUser();
+                int currentUser = LoginService.getCurrentUserId();
                 if(currentUser == null) {
                     return new SingleResultPacket<NetPublicUser>(ResultType.USER_RESULT, false, "Not Logged In", null);
                 }

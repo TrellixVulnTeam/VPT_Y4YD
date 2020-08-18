@@ -7,7 +7,7 @@ import server.ServerConstants;
 
 public final class SQLService {
     
-    private static final ThreadLocal<Connection> connectionTL = ThreadLocal.withInitial(SQLService::createConnection);
+    private static final ThreadLocal<Connection> connectionTL = ThreadLocal.withInitial(() -> null);
     private static String sqlServerPassword = null;
     
     public static void setSQLServerPassword(String password) throws IllegalStateException {
@@ -17,6 +17,23 @@ public final class SQLService {
         sqlServerPassword = password;
     }
    
+    public static void initConnection() throws IllegalStateException {
+        if(connectionTL.get() != null) {
+            return;
+        }
+        connectionTL.set(createConnection());
+    }
+    
+    public static Connection getConnection() {
+        return connectionTL.get();
+    }
+    
+    public static void setTransactionParams(int isolationLevel, boolean isReadOnly) throws SQLException {
+        Connection conn = getConnection();
+        conn.setTransactionIsolation(isolationLevel);
+        conn.setReadOnly(isReadOnly);
+    }
+    
     private static Connection createConnection() throws IllegalStateException {
         if(sqlServerPassword == null) {
             throw new IllegalStateException("SQL Server Password Unknown");

@@ -14,6 +14,7 @@ import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
@@ -297,7 +298,7 @@ public final class Utils {
      * @return the conditionally transformed input
      */
     public static <T> T conditionalTransform(T o, boolean condition, TransformFunction<T> function) {
-        return condition ? function.transform(o) : o;
+        return condition ? function.apply(o) : o;
     }
     
     /**
@@ -356,16 +357,7 @@ public final class Utils {
      * An interface representing a function which transforms its input
      * @param <T> the return type of the function
      */
-    public static interface TransformFunction<T> {
-        
-        /**
-         * Transforms the input
-         * @param o the input
-         * @return the transformed input
-         */
-        public T transform(T o);
-        
-    }
+    public static interface TransformFunction<T> extends Function<T, T> {}
     
     /**
      * A class binding a {@link Cipher} to its iv
