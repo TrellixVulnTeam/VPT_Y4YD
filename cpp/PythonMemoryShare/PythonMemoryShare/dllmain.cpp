@@ -13,8 +13,6 @@
 #include <map>
 #include <comdef.h>
 #include <tchar.h>
-#include <iostream>
-#define _CRT_SECURE_NO_WARNINGS
 
 using namespace std;
 
@@ -69,10 +67,7 @@ static void gen_random(char* s, const int len) {
 
 //Credit: https://stackoverflow.com/questions/2709713/how-to-convert-unsigned-long-to-string
 static string sul(unsigned long num) {
-    const int n = snprintf(NULL, 0, "%lu", num);
-    char* buf = new char[n + 1];
-    int c = snprintf(buf, n + 1, "%lu", num);
-    return string(buf);
+    return to_string(num);
 }
 
 static const char* GetLastErrorExport() {
