@@ -16,9 +16,9 @@
 <div id="container" style="width:80vw;height:80vh;border:1px solid grey"></div>
 
 <!-- OR ANY OTHER AMD LOADER HERE INSTEAD OF loader.js -->
-<script src="../static/packets.js"></script>
-<script src="../static/send_recv.js"></script>
-<script src="../static/min/vs/loader.js"></script>
+<script src="{{ url_for('static', filename='Packets.js') }}"></script>
+<script src="{{ url_for('static', filename='send_recv.js') }}"></script>
+<script src="{{ url_for('static', filename='min/vs/loader.js') }}"></script>
 <script>
 	var editorval;
 	require.config({ paths: { 'vs': '../static/min/vs' }});
@@ -46,7 +46,8 @@
 			sdata: "data"
 		}
 		SRPacket(packet, function(res_data){console.log(res_data)})
-		SRPacket(get_settings_packets, function(res_data){console.log(res_data)})
+		var settings_packet = compose_settings_packet("get", "null")
+		SRPacket(settings_packet, function(res_data){alert(res_data)})
 	}
 </script>
 
