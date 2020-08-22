@@ -12,16 +12,12 @@
 	<input type="submit" value="settings" name = "sub">
 </form>
 
-<form action = "/lode_code" method="post" id="form" class="load_code">
-	<select name="file_to_load">
-		<option value="new">NewFile</option>
-	</select>
-</form>
-
 <h2>{{ header }}</h2>
 <div id="container" style="width:80vw;height:80vh;border:1px solid grey"></div>
 
 <!-- OR ANY OTHER AMD LOADER HERE INSTEAD OF loader.js -->
+<script src="../static/packets.js"></script>
+<script src="../static/send_recv.js"></script>
 <script src="../static/min/vs/loader.js"></script>
 <script>
 	var editorval;
@@ -38,43 +34,19 @@
 		});
 		editorval = editor;
 
-		//settings
-		var settings_req_packet = {
-			request: "settings"
-		}
-
-		fetch(`${window.origin}/req_settings_packet`, {
-			method: "POST",
-			body: JSON.stringify(settings_req_packet),
-			cache: "no-cache",
-			headers: new Headers({
-				"content-type": "application/json"
-			})
-		})
-		.then(function (response) {
-			if(response.status !== 200){
-				console.log(`Response status wasnt sucsess: ${response.status}`)
-				return ;
-			}
-
-			response.json().then(function (data) {
-				console.log(data[0].lang)
-				monaco.editor.setModelLanguage(editor.getModel(), data[0].lang)
-				monaco.editor.setTheme(data[1].theme)
-			})
-
-		})
-		//settings
-
 	});
+
+	
 
 	function SaveCode(){
 		var code = editorval.getValue()
 		var stringifed_code = JSON.stringify(code)
-		document.getElementById("save_code").value = code
-        var elements = document.getElementsByClassName('submit');
-        elements[elements.length - 1].submit()
-
+		var packet = {
+			request: "test",
+			sdata: "data"
+		}
+		SRPacket(packet, function(res_data){console.log(res_data)})
+		SRPacket(get_settings_packets, function(res_data){console.log(res_data)})
 	}
 </script>
 

@@ -20,31 +20,6 @@
 	</div>
 </body>
 <script type="text/javascript">
-		var settings_req_packet = {
-			request: "settings"
-		}
-
-		fetch(`${window.origin}/req_settings_packet`, {
-			method: "POST",
-			body: JSON.stringify(settings_req_packet),
-			cache: "no-cache",
-			headers: new Headers({
-				"content-type": "application/json"
-			})
-		})
-		.then(function (response) {
-			if(response.status !== 200){
-				console.log(`Response status wasnt sucsess: ${response.status}`)
-				return ;
-			}
-
-			response.json().then(function (data) {
-				console.log(data[0].lang)
-				document.getElementById(data[0].lang).selected = "selected"
-				document.getElementById(data[1].theme).selected = "selected"
-			})
-
-		})
 
 </script>
 </html>
