@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -255,6 +256,23 @@ public final class Utils {
         buffer.put(bytes, 0, bytes.length);
         buffer.flip(); 
         return buffer.getInt();
+    }
+    
+    public static String randomString(int length) {
+        char[] out = new char[length];
+        for(int i = 0; i < length; i++) {
+            byte next = (byte)(new Random().nextInt(61));
+            char nextChar;
+            if(next < 9) {
+                nextChar = (char)(next + 48);
+            } else if(next < 35) {
+                nextChar = (char)(next + 56);
+            } else {
+                nextChar = (char)(next + 62);
+            }
+            out[i] = nextChar;
+        }
+        return new String(out);
     }
     
     /**

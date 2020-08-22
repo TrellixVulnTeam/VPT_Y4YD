@@ -96,15 +96,16 @@ public final class ServerConstants {
     public static final int USER_ONET_REQUESTS_TE = 1;
     
     //USER
+    public static final int USERNAME_MAX_LENGTH = 20;
     /**
      * A user readable string of characters forbidden in userIds
      */
-    public static final String USERID_FORBIDDEN_CHARACTERS = "<>:'/\\|?*[]^$.+-(){}";
+    public static final String USERNAME_FORBIDDEN_CHARACTERS = "<>:'/\\|?*[]^$.+-(){}";
     /**
      * A pattern string of characters forbidden in userIds
      * @see java.util.regex.Pattern
      */
-    public static final String USERID_FORBIDDEN_CHARACTERS_REGEX = "[\\Q<>:'/\\|?*[]^$.+-(){}\\E]+";
+    public static final String USERNAME_FORBIDDEN_CHARACTERS_REGEX = "[\\Q<>:'/\\|?*[]^$.+-(){}\\E]+";
     
     private ServerConstants() {}
     

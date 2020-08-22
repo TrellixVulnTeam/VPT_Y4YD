@@ -13,21 +13,21 @@ public class LoginPacket extends Packet {
     /**
      * The userId of the account being requested
      */
-    public final String userId;
+    public final String username;
     
     /**
      * The password of the account being requested
      */
-    public final byte[] password;
+    public final String password;
 
     /**
      * Creates a new LoginPacket
      * @param userId the userId of the account being requested
      * @param password the password of the account being requested
      */
-    public LoginPacket(String userId, byte[] password) {
+    public LoginPacket(String username, String password) {
         super(PacketId.LOGIN);
-        this.userId = userId;
+        this.username = username;
         this.password = password;
     }
     
