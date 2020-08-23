@@ -98,8 +98,6 @@ def CreateOrOpenComm(name, size, isServer):
     return True
 
 def doReadComm(comm, func, isServer):
-    if comm not in commDict:
-        raise ValueError('Comm Does Not Exist')
     commT = commDict[comm]
     memory = commT[(0,1)[isServer]]
     sendEvent = commT[(3,2)[isServer]]
