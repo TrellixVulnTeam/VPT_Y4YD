@@ -107,8 +107,7 @@ static PyObject* PySyncEvents_OpenEvent(PyObject* self, PyObject* args) {
 
 static PyObject* PySyncEvents_OpenMutex(PyObject* self, PyObject* args) {
     const char* name;
-    BOOL isOwned = FALSE;
-    if (!PyArg_ParseTuple(args, "s|p", &name, &isOwned)) {
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
     HANDLE mutexHandle = OpenMutexA(MUTEX_ALL_ACCESS, FALSE, name);
@@ -262,21 +261,21 @@ static PyMethodDef SyncEventsMethods[] = {
 
 static struct PyModuleDef SyncEventsModule = {
     PyModuleDef_HEAD_INIT,
-    "syncevents",
+    "SyncEvents",
     NULL,
     -1,
     SyncEventsMethods
 };
 
-PyMODINIT_FUNC PyInit_syncevents(void) {
+PyMODINIT_FUNC PyInit_SyncEvents(void) {
     PyObject* pyModule = PyModule_Create(&SyncEventsModule);
     if (pyModule == NULL) {
         return NULL;
     }
 
-    synchronizationError = PyErr_NewException("syncevents.syncerror", NULL, NULL);
+    synchronizationError = PyErr_NewException("SyncEvents.SyncError", NULL, NULL);
     Py_XINCREF(synchronizationError);
-    if (PyModule_AddObject(pyModule, "syncerror", synchronizationError) < 0) {
+    if (PyModule_AddObject(pyModule, "SyncError", synchronizationError) < 0) {
         Py_XDECREF(synchronizationError);
         Py_CLEAR(synchronizationError);
         Py_DECREF(pyModule);

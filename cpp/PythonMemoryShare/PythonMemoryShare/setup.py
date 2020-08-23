@@ -1,5 +1,5 @@
 from distutils.core import setup, Extension
 
-pymodule = Extension('sharedmemory', sources=['dllmain.cpp'])
+pymodule = Extension('SharedMemory', sources=['dllmain.cpp'])
 
-setup(name = 'sharedmemory', version = '1.0', description = 'Adds the ability to access shared memory on windows', ext_modules = [pymodule])
+setup(name = 'SharedMemory', version = '1.0', description = 'Adds the ability to access shared memory on windows', ext_modules = [pymodule])

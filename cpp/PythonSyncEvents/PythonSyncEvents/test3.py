@@ -1,6 +1,6 @@
-from syncevents import *
+from SyncEvents import *
 
-mutex = CreateMutex('LOCAL\test')
+mutex = CreateMutex('Local\\test')
 WaitForMutex(mutex)
 input('')
 ReleaseMutex(mutex)

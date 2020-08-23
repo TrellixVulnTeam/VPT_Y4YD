@@ -204,21 +204,21 @@ static PyMethodDef SharedMemoryMethods[] = {
 
 static struct PyModuleDef SharedMemoryModule = {
     PyModuleDef_HEAD_INIT,
-    "sharedmemory",
+    "SharedMemory",
     NULL,
     -1,
     SharedMemoryMethods
 };
 
-PyMODINIT_FUNC PyInit_sharedmemory(void) {
+PyMODINIT_FUNC PyInit_SharedMemory(void) {
     PyObject* pyModule = PyModule_Create(&SharedMemoryModule);
     if (pyModule == NULL) {
         return NULL;
     }
 
-    sharedMemoryError = PyErr_NewException("sharedmemory.error", NULL, NULL);
+    sharedMemoryError = PyErr_NewException("SharedMemory.SharedMemoryError", NULL, NULL);
     Py_XINCREF(sharedMemoryError);
-    if (PyModule_AddObject(pyModule, "error", sharedMemoryError) < 0) {
+    if (PyModule_AddObject(pyModule, "SharedMemoryError", sharedMemoryError) < 0) {
         Py_XDECREF(sharedMemoryError);
         Py_CLEAR(sharedMemoryError);
         Py_DECREF(pyModule);

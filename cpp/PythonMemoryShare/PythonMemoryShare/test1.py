@@ -1,6 +1,6 @@
-from sharedmemory import *
+from SharedMemory import *
 
-handle = CreateSharedMemory("LOCAL\test", 1024)
+handle = CreateSharedMemory("Local\\test", 1024)
 view = WriteSharedMemory(handle, "this is a test")
 
 filename = 'test2.py'

@@ -1,6 +1,6 @@
-from syncevents import *
+from SyncEvents import *
 
-event = OpenEvent('LOCAL\test')
+event = OpenEvent('Local\\test')
 WaitForEvent(event)
 print('test')
 CloseEvent(event)
