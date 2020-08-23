@@ -30,4 +30,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="setup.py">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="test1.py">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="test2.py">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="test3.py">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="test4.py">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
