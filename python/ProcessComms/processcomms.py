@@ -3,6 +3,7 @@ from SyncEvents import *
 import threading
 import random
 import string
+import asyncio
 
 commDict = {}
 commTermDict = {}
@@ -12,30 +13,27 @@ def get_random_string(length):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(length))
 
-def RunIfDefined(arg, func):
+def RunIfDefined(func, *args):
     if arg is not None:
-        func(arg)
+        func(*args)
         pass
     pass
 
-def Catch(arg, func):
+def Catch(func, *args):
     try:
-        func(arg)
+        func(*args)
         pass
     except:
         pass
     pass
 
-def Catch2(arg1, arg2, func):
-    try:
-        func(arg1, arg2)
-        pass
-    except:
-        pass
+def RunIfDefinedAndCatch(func, *args):
+    Catch(RunIfDefined, func, *args)
     pass
 
-def RunIfDefinedAndCatch(arg, func):
-    Catch2(arg, func, RunIfDefined)
+async def AsAsync(func, *args):
+    await asyncio.get_event_loop().run_in_executor(None, func, *args)
+    pass
 
 def CreateOrOpenSharedMemory(name, size, shouldCreate):
     if shouldCreate:
@@ -53,8 +51,6 @@ def CreateOrOpenMutex(name, shouldCreate, isOwned=False):
     return OpenMutex(name)
 
 def CreateOrOpenComm(name, size, isServer):
-    if comm not in commDict:
-        raise ValueError('Comm Does Not Exist')
     serverMemoryHandle = None
     clientMemoryHandle = None
     serverSendEvent = None
@@ -77,16 +73,16 @@ def CreateOrOpenComm(name, size, isServer):
         terminateEvent = CreateEvent('Local\\' + name + '_' + ('client', 'server')[isServer] + 'terminationevent')
         pass
     except (SharedMemoryError, SyncError):
-        RunIfDefinedAndCatch(serverMemoryHandle, CloseSharedMemory)
-        RunIfDefinedAndCatch(clientMemoryHandle, CloseSharedMemory)
-        RunIfDefinedAndCatch(serverSendEvent, CloseEvent)
-        RunIfDefinedAndCatch(clientSendEvent, CloseEvent)
-        RunIfDefinedAndCatch(serverRecieveEvent, CloseEvent)
-        RunIfDefinedAndCatch(clientRecieveEvent, CloseEvent)
-        RunIfDefinedAndCatch(serverMemoryLock, CloseMutex)
-        RunIfDefinedAndCatch(clientMemoryLock, CloseMutex)
-        RunIfDefinedAndCatch(terminateEvent, CloseEvent)
-        return False
+        RunIfDefinedAndCatch(CloseSharedMemory, serverMemoryHandle)
+        RunIfDefinedAndCatch(CloseSharedMemory, clientMemoryHandle)
+        RunIfDefinedAndCatch(CloseEvent, serverSendEvent)
+        RunIfDefinedAndCatch(CloseEvent, clientSendEvent)
+        RunIfDefinedAndCatch(CloseEvent, serverRecieveEvent)
+        RunIfDefinedAndCatch(CloseEvent, clientRecieveEvent)
+        RunIfDefinedAndCatch(CloseMutex, serverMemoryLock)
+        RunIfDefinedAndCatch(CloseMutex, clientMemoryLock)
+        RunIfDefinedAndCatch(CloseEvent, terminateEvent)
+        return None
     key = None
     while True:
         key = get_random_string(32)
@@ -95,9 +91,11 @@ def CreateOrOpenComm(name, size, isServer):
         pass
     commDict[key]=(serverMemoryHandle, clientMemoryHandle, serverSendEvent, clientSendEvent, serverRecieveEvent, clientRecieveEvent, serverMemoryLock, clientMemoryLock, terminateEvent)
     commTermDict[key]=False
-    return True
+    return key
 
-def doReadComm(comm, func, isServer):
+async def doReadComm(comm, func, isServer):
+    if comm not in commDict:
+        raise ValueError('Comm Does Not Exist')
     commT = commDict[comm]
     memory = commT[(0,1)[isServer]]
     sendEvent = commT[(3,2)[isServer]]
@@ -106,25 +104,28 @@ def doReadComm(comm, func, isServer):
     terminateEvent = commT[8]
     while True:
         try:
-            WaitForEvent(sendEvent)
+            await AsAsync(WaitForEvent, sendEvent)
             if(commTermDict[comm]):
                 break
-            WaitForMutex(lock)
+            await AsAsync(WaitForMutex, lock)
             msg = None
             try:
                 msg = ReadSharedMemory(memory)
                 pass
             finally:
-                Catch(lock, ReleaseMutex)
-                Catch(recieveEvent, SetEvent)
+                Catch(ReleaseMutex, lock)
+                Catch(SetEvent, recieveEvent)
                 pass
             func(msg)
             pass
         except:
             pass
         pass
-    Catch(terminateEvent, SetEvent)
+    Catch(SetEvent, terminateEvent)
     pass
+
+def doDoReadComm(comm, func, isServer):
+    asyncio.new_event_loop().run_until_complete(doReadComm(comm, func, isServer))
 
 def StartReadComm(comm, func, isServer, recieveInNewThread=False):
     if comm not in commDict:
@@ -132,17 +133,17 @@ def StartReadComm(comm, func, isServer, recieveInNewThread=False):
     funcP = (func, None)[recieveInNewThread]
     if(recieveInNewThread):
         def threadWrappedFunc(msg):
-            t = threading.Thread(target=func, args=(msg,))
+            t = threading.Thread(target=func, args=(msg))
             t.start()
             pass
         funcP = threadWrappedFunc
         pass
-    t = threading.Thread(target=doReadComm, args=(comm, funcP, isServer,))
+    t = threading.Thread(target=doDoReadComm, args=(comm, funcP, isServer))
     t.start()
     pass
 
 
-def WriteToComm(comm, msg, isServer):
+async def WriteToCommAsync(comm, msg, isServer):
     if comm not in commDict:
         raise ValueError('Comm Does Not Exist')
     commT = commDict[comm]
@@ -150,23 +151,28 @@ def WriteToComm(comm, msg, isServer):
     sendEvent = commT[(2,3)[isServer]]
     recieveEvent = commT[(5,4)[isServer]]
     lock = commT[(6,7)[isServer]]
-    WaitForMutex(lock)
+    await AsAsync(WaitForMutex, lock)
     try:
-        view = WriteWriteSharedMemory(memory, msg)
+        view = WriteSharedMemory(memory, msg)
         pass
     finally:
-        Catch(lock, ReleaseMutex)
+        Catch(ReleaseMutex, lock)
         pass
     try:
         SetEvent(sendEvent)
-        WaitForEvent(recieveEvent)
+        await AsAsync(WaitForEvent, recieveEvent)
         pass
     finally:
-        Catch(view, UnmapSharedView)
+        Catch(UnmapSharedView, view)
         pass
     pass
 
-def CloseComm(comm, isServer):
+
+def WriteToComm(comm, msg, isServer):
+    asyncio.new_event_loop().run_until_complete(WriteToCommAsync(comm, msg, isServer))
+    pass
+
+async def CloseCommAsync(comm):
     if comm not in commDict:
         raise ValueError('Comm Does Not Exist')
     commT = commDict[comm]
@@ -180,16 +186,20 @@ def CloseComm(comm, isServer):
     clientMemoryLock = commT[7]
     terminateEvent = commT[8]
     commTermDict[comm] = True
-    Catch(terminateEvent, WaitForEvent)
-    Catch(serverMemoryHandle, CloseSharedMemory)
-    Catch(clientMemoryHandle, CloseSharedMemory)
-    Catch(serverSendEvent, CloseEvent)
-    Catch(clientSendEvent, CloseEvent)
-    Catch(serverRecieveEvent, CloseEvent)
-    Catch(clientRecieveEvent, CloseEvent)
-    Catch(serverMemoryLock, CloseMutex)
-    Catch(clientMemoryLock, CloseMutex)
-    Catch(terminateEvent, CloseEvent)
+    await AsAsync(Catch, terminateEvent, WaitForEvent)
+    Catch(CloseSharedMemory, serverMemoryHandle)
+    Catch(CloseSharedMemory, clientMemoryHandle)
+    Catch(CloseEvent, serverSendEvent)
+    Catch(CloseEvent, clientSendEvent)
+    Catch(CloseEvent, serverRecieveEvent)
+    Catch(CloseEvent, clientRecieveEvent)
+    Catch(CloseMutex, serverMemoryLock)
+    Catch(CloseMutex, clientMemoryLock)
+    Catch(CloseEvent, terminateEvent)
     commDict.pop(comm)
     commTermDict.pop(comm)
+    pass
+
+def CloseComm(comm):
+    asyncio.new_event_loop().run_until_complete(CloseCommAsync(comm))
     pass
