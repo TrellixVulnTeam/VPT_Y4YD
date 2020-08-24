@@ -9,7 +9,8 @@ def run(selfobject, conn, addr):
 	if fex == ".py":
 		os.system("python3 " + f)
 
-tcpServerTest = ServerEngine.NewServer("172.18.0.2", 4562, run, "CompileServerKeys/")
-tcpServerTest.start_server()
+tcpServerCCE = ServerEngine.NewServer("172.18.0.2", 4562, run, "CompileServerKeys/")
+tcpServerCCE.Get().HMaxthread = False
+tcpServerCCE.start_server()
 
 

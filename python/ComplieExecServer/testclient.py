@@ -12,7 +12,7 @@ wrappedSocket.connect((HOST, PORT))
 
 wrappedSocket.send(".py".encode())
 wrappedSocket.send("test".encode())
-wrappedSocket.send("print('go fuck your self')".encode())
+wrappedSocket.send("print('test123')".encode())
 
 
 # CLOSE SOCKET CONNECTION
