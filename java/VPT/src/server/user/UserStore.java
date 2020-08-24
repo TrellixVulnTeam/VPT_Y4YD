@@ -1,5 +1,6 @@
 package server.user;
 
+import server.services.LoginService;
 import common.Utils;
 import common.user.AttributeSearch;
 import common.user.AttributeSearchCriteria;

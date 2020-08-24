@@ -1,5 +1,6 @@
 package server;
 
+import server.services.RequestService;
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
 import common.networking.packet.packets.CreateUserPacket;
@@ -14,7 +15,7 @@ import common.networking.ssl.SSLConnection;
 import common.user.NetPublicUser;
 import java.io.IOException;
 import java.time.Duration;
-import server.user.LoginService;
+import server.services.LoginService;
 import server.user.PublicUser;
 import server.user.User;
 import server.user.UserStore;

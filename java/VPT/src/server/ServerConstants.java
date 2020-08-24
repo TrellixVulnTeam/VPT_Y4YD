@@ -58,6 +58,11 @@ public final class ServerConstants {
      */
     public static final long PERIODIC_INTERVAL = Utils.toNanos(10, TimeUnit.MINUTES);
     
+    //SQL
+    public static final String SQL_DB = "VPTDB";
+    public static final String SQL_URL = "jdbc:mysql://169.254.82.12:3306/" + SQL_DB;
+    public static final String SQL_USER = "VPTAPI";
+    
     //REQUEST
     /**
      * The exponent base to be used when calculating timeouts. New timeouts will be <code>TIMEOUT_BASE<sup>numberOfPreviousTimeouts+1</sup></code> seconds

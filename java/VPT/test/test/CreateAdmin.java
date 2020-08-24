@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
 import server.serialization.BackupSerialization;
 import server.serialization.EncryptionSerialization;
 import server.serialization.MacSerialization;
-import server.user.LoginService;
+import server.services.LoginService;
 import server.user.SingleDataAttribute;
 import server.user.User;
 import server.user.UserAttribute;
