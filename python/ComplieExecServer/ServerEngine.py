@@ -21,7 +21,7 @@ class NewServer:
 		print("thread settings have been registerd")
 
 		self.HPrethread_bootup = False
-		self.Prethread_bottupfunc = None
+		self.Prethread_bootupfunc = None
 		print("Pre-thread bootup settings have been registerd")
 
 		self.multi_threaded = multi_threaded
@@ -148,7 +148,7 @@ class NewServer:
 			if self.multi_threaded == True:
 				try:
 					if self.HPrethread_bootup == True:
-						self.Prethread_bottupfunc(self)
+						self.Prethread_bootupfunc(self)
 
 					else:
 						print("")
