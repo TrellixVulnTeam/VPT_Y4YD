@@ -15,5 +15,5 @@ def prethread_bootup(selfobject):
 tcpServerCCE = ServerEngine.NewServer("172.18.0.2", 4562, run, "CompileServerKeys/", True)
 tcpServerCCE.Get().HMaxthread = False
 tcpServerCCE.Get().HPrethread_bootup = True
-tcpServerCCE.Get().Prethread_bottupfunc = prethread_bootup
+tcpServerCCE.Get().Prethread_bootupfunc = prethread_bootup
 tcpServerCCE.start_server()
