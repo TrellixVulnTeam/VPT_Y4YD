@@ -5,7 +5,7 @@ import threading
 import os
 
 class NewServer:
-	def __init__(self, host, port, runfunc, keypath):
+	def __init__(self, host, port, runfunc, keypath, multi_threaded):
 		os.system("clear")
 
 		print("<init sequence begining>")
@@ -19,6 +19,13 @@ class NewServer:
 		self.HMaxthread = False
 		self.Maxthreadc = 0
 		print("thread settings have been registerd")
+
+		self.HPrethread_bootup = False
+		self.Prethread_bottupfunc = None
+		print("Pre-thread bootup settings have been registerd")
+
+		self.multi_threaded = multi_threaded
+		print("multi threading setting has been registerd")
 
 		#packet registration
 		self.close_packet = -111
@@ -56,15 +63,19 @@ class NewServer:
 		print("")
 
 	def show_settings(self):
+		print("Do you want to be shown optional settings[y/n]")
+		sops = str(input("-> "))
+
+		print("")
 		print("<----------------------- Settings ----------------------->")
 		print("host registerd as: ", self.host)
 		print("port registerd as: ", self.port)
+		print("multi_threading registerd as: ", self.multi_threaded)
 		print("")
-		print("Do you want to be shown optional settings[y/n]")
-		sops = str(input("-> "))
 		if sops != "n":
 			print("Has max threads: ", self.HMaxthread)
 			print("Max thread count: ", self.Maxthreadc)
+			print("Has Pre-thread bootup: ", self.HPrethread_bootup)
 
 		print("<-------------------------------------------------------->")
 		print("")
@@ -87,7 +98,6 @@ class NewServer:
 	def client_thread(self, conn, addr, runfunc):
 		runfunc(self.Get(), conn, addr)
 		self.thread_count -= 1
-		print(self.thread_count)
 		conn.close()
 
 	def end_thread(self, conn, addr):
@@ -135,16 +145,27 @@ class NewServer:
 			conn, addr = self.wrapedsocket.accept()
 			print("connected with " + addr[0] + ":" + str(addr[1]))
 
-			try:
-				if self.HMaxthread == True and self.Maxthreadc == self.thread_count:
-					tthread = threading.Thread(target=self.end_thread, args=(conn, addr,))
-					tthread.start()
-				else:
-					tthread = threading.Thread(target=self.client_thread, args=(conn, addr, self.runfunc,))
-					tthread.start()
-					self.thread_count += 1
-					print(self.thread_count)
-			except:
-				print("unable to start thread")
+			if self.multi_threaded == True:
+				try:
+					if self.HPrethread_bootup == True:
+						self.Prethread_bottupfunc(self)
+
+					else:
+						print("")
+
+					if self.HMaxthread == True and self.Maxthreadc == self.thread_count:
+						tthread = threading.Thread(target=self.end_thread, args=(conn, addr,))
+						tthread.start()
+					else:
+						tthread = threading.Thread(target=self.client_thread, args=(conn, addr, self.runfunc,))
+						tthread.start()
+						self.thread_count += 1
+				except:
+					print("unable to start thread")
+			else:
+				self.runfunc(self.Get(), conn, addr)
+				conn.close()
+				break
 
 
+		self.wrapedsocket.close()
