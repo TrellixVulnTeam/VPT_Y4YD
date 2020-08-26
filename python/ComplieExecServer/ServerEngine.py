@@ -3,6 +3,41 @@ import sys
 import ssl
 import threading
 import os
+import time
+
+print("Using ServerEngine system for linux systems")
+time.sleep(3)
+
+class KeyPairContainer:
+	def __init__(self):
+		os.system("clear")
+		print("checking if keystore dirs exist")
+
+		if os.path.isdir("/keystore/") == False:
+			print("dir dosent exist generating keystore dir press enter to continue")
+			tmp = input("")
+			os.system("mkdir /keystore")
+			print("dir's made")
+		else:
+			print("dir exists")
+
+	def RunKeyPair(self, keypair_name):
+		print("")
+		if os.path.isdir("/keystore/" + keypair_name) == False:
+			print("This keypair dosen't exist do you want to generate this as a new keypair[y/n]")
+			genkey = str(input("-> "))
+			if genkey == "y":
+				os.system("mkdir /keystore/" + keypair_name)
+				os.system("./gen_keys.sh")
+				os.system("cp cert.pem /keystore/" + keypair_name + "/" + "cert.pem")
+				os.system("rm cert.pem")
+				os.system("cp key.pem /keystore/" + keypair_name + "/" + "key.pem")
+				os.system("rm key.pem")
+				return "/keystore/" + keypair_name + "/"
+			else:
+				quit()
+		else:
+			return "/keystore/" + keypair_name + "/"
 
 class NewServer:
 	def __init__(self, host, port, runfunc, keypath, multi_threaded):
@@ -21,7 +56,7 @@ class NewServer:
 		print("thread settings have been registerd")
 
 		self.HPrethread_bootup = False
-		self.Prethread_bottupfunc = None
+		self.Prethread_bootupfunc = None
 		print("Pre-thread bootup settings have been registerd")
 
 		self.multi_threaded = multi_threaded
@@ -34,25 +69,7 @@ class NewServer:
 
 		self.thread_count = 0
 
-		print("")
-		print("")
-		print("Have you generated keys[y/n]")
-		haskeys = str(input("-> "))
-		print("")
-		print("")
-
 		self.keypath = keypath
-		if haskeys != "y":
-			print("generating cert.pem and key.pem")
-			print("---------------")
-
-			os.system("./gen_keys.sh")
-
-			print("--------------")
-			print("Move these key's to a dir and make last var equal that path")
-			self.keypath = ""
-			print("")
-
 
 		self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 		self.context.load_cert_chain(self.keypath + "cert.pem",self.keypath + "key.pem")
@@ -148,7 +165,7 @@ class NewServer:
 			if self.multi_threaded == True:
 				try:
 					if self.HPrethread_bootup == True:
-						self.Prethread_bottupfunc(self)
+						self.Prethread_bootupfunc(self)
 
 					else:
 						print("")
