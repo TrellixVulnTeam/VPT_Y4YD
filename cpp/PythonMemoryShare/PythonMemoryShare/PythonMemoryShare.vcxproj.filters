@@ -34,5 +34,11 @@
     <None Include="setup.py">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="test1.py">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="test2.py">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

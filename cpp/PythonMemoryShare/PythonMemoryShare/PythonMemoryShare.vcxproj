@@ -168,6 +168,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="setup.py" />
+    <None Include="test1.py" />
+    <None Include="test2.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
