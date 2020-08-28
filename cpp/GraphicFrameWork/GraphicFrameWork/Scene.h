@@ -20,6 +20,8 @@ public:
 	virtual void Draw();
 	virtual void ProcessPacket(Packet p) {}
 	virtual Scene& Create() = 0;
+	void RevertLoadingScene();
+	void FinishLoadingScene();
 	const int id;
 	AppInstance* instance;
 	ComponentManager cm;
@@ -27,6 +29,8 @@ public:
 	vector <AppObject*> Overlays;
 	bool needsCollisions = true;
 	bool doneInitOnInit = true;
+private:
+	bool hasRevertedOrFinishedLoading = true;
 };
 
 class StaticScene : public Scene {

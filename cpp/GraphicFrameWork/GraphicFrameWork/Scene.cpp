@@ -6,6 +6,7 @@ Scene::Scene() : id(nextId) { nextId++;  }
 
 void Scene::Init(AppInstance* instance) {
 	Scene::instance = instance;
+	hasRevertedOrFinishedLoading = false;
 	Objects.push_back(new AppObject());
 	Objects[0]->PreInit("");
 	Objects[0]->Init(instance->renderer, 1, 1, 0, 0);
@@ -75,6 +76,18 @@ void Scene::Draw() {
 		if (overlay != nullptr) {
 			overlay->draw();
 		}
+	}
+}
+
+void Scene::RevertLoadingScene() {
+	if (!hasRevertedOrFinishedLoading) {
+		instance->RevertSceneLoading(*this);
+	}
+}
+
+void Scene::FinishLoadingScene() {
+	if (!hasRevertedOrFinishedLoading) {
+		instance->FinishSceneLoading(*this);
 	}
 }
 
