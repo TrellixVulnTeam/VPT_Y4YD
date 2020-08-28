@@ -15,7 +15,7 @@ void Scene::Init(AppInstance* instance) {
 	AttachListeners();
 	PostInit();
 	if (doneInitOnInit) {
-		instance->FinishSceneLoading(*this);
+		FinishLoadingScene();
 	}
 }
 
