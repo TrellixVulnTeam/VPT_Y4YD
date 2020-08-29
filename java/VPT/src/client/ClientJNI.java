@@ -13,7 +13,7 @@ public final class ClientJNI {
         String libDir = new File(".").getAbsolutePath() + File.separator;
         //List of required libraries in the ORDER that they should be loaded
         String[] libraries = {"zlib1", "libfreetype-6", "libjpeg-9", "libpng16-16",
-            "libtiff-5", "libwebp-7", "SDL2", "SDL2_image", "SDL2_ttf", "Client"};
+            "libtiff-5", "libwebp-7", "SDL2", "SDL2_image", "SDL2_ttf", "python36", "python3", "Client"};
         //Library file extension
         String extension = ".dll";
         for(String library: libraries) {

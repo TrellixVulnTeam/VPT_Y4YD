@@ -58,13 +58,13 @@ public final class RequestService {
             if(remainingTimeout > 0) {
                 throw new TooManyRequestsException(remainingTimeout);
             }
+            lastRequest.request();
             if(lastRequest.getNumRequests() % requestsToEscalate == 0) {
                 long timeout = Utils.toNanos((long)Math.pow(ServerConstants.TIMEOUT_BASE, lastRequest.getNumRequests() / requestsToEscalate), TimeUnit.SECONDS);
                 lastRequest.setLastTimeout(timeout);
-                lastRequest.setRequestTime();
                 throw new TooManyRequestsException(timeout);
             }
-            lastRequest.request();
+            lastRequest.setLastTimeout(0);
         } finally {
             requestLock.readLock().unlock();
         }
