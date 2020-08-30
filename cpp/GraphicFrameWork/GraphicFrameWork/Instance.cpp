@@ -3,6 +3,8 @@
 //Note: Don't exceed 16 windows
 vector<AppInstance*> AppInstance::multiInstances(16);
 mutex requestLock;
+int numErrors = 0;
+Uint32 lastError = 0;
 
 AppInstance::AppInstance()
 {

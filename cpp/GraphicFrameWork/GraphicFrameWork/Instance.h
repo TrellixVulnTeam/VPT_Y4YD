@@ -26,7 +26,7 @@ public:
 	void BasicLoop();
 	virtual void Loop() { BasicLoop(); }
 	virtual void Cleanup() { SDL_DestroyWindow(Win); }
-	void reportError();
+	static void reportError();
 	void addOverlay(AppObject* overlay);
 	void BeginLoadingScene(Scene& scene);
 	void FinishSceneLoading(Scene& scene);
@@ -47,8 +47,6 @@ public:
 	Uint32 framestart;
 	int frametime = INT_MAX;
 	int cnt;
-	int numErrors = 0;
-	Uint32 lastError = 0;
 	Scene* currentScene;
 	bool isDisplayingScene;
 	bool isDynamicScene;
