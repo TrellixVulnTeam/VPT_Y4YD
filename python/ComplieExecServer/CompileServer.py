@@ -1,6 +1,8 @@
 import ServerEngine
 import os
 
+user_sys = ServerEngine.UserSys("CCE")
+
 def compileR(f, lang):
 	os.system("cp " + f + " rcode/" + lang + "/" + f)
 	os.system("rm " + f)
@@ -19,8 +21,9 @@ def run(selfobject, conn, addr):
 	print("")
 
 
-def prethread_bootup(selfobject):
-	print("<prethread_bootup init sequence>")
+def prethread_bootup(selfobject, conn, addr):
+	global user_sys
+	user_sys.PreThread(selfobject, conn, addr)
 
 keycontainer = ServerEngine.KeyPairContainer()
 tcpServerCCE = ServerEngine.NewServer("172.18.0.2", 4562, run, keycontainer.RunKeyPair("CCE"), True)

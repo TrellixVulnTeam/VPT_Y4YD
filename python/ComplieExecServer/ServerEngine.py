@@ -4,9 +4,12 @@ import ssl
 import threading
 import os
 import time
+import json
 
+os.system("clear")
 print("Using ServerEngine system for linux systems")
 time.sleep(3)
+
 
 class KeyPairContainer:
 	def __init__(self):
@@ -38,6 +41,70 @@ class KeyPairContainer:
 				quit()
 		else:
 			return "/keystore/" + keypair_name + "/"
+
+
+class User:
+	def __init__(self):
+		pass
+
+class UserSys:
+	def __init__(self, proj_name):
+		os.system("clear")
+		print("<User system init>")
+		print("checking if usersys folder exists")
+
+		self.USERS_PATH = "/server_users/" + proj_name + "/" + "users.json"
+		self.user_list = []
+
+		if os.path.isdir("/server_users/") == False:
+			print("The necessary files don't exist do pess enter to generate them")
+			tmp = input("")
+			os.system("mkdir /server_users/")
+
+		if os.path.isdir("/server_users/" + proj_name + "/") == False:
+			print("This project dosen't exist")
+			print("Press enter to generate this project")
+			tmp = input("")
+			os.system("mkdir /server_users/" + proj_name)
+			print("creating users file")
+
+			try:
+				file = open(self.USERS_PATH, "w")
+				tdict = {}
+				tjobject = json.dumps(tdict, indent = 4)
+				file.write(tjobject)
+				file.close()
+
+			except:
+				print("error couldn't create file")
+				time.sleep(4)
+
+	def PreThread(self, selfobject, conn, addr):
+		try:
+			users = open(self.USERS_PATH, "r")
+			ujdata = json.load(users)
+			users.close()
+
+			try:
+				print("blacklisted: ", ujdata[addr[0]]["blacklisted"])
+
+			except:
+				#write data
+				print("Registering new User")
+				os.system("rm " + self.USERS_PATH)
+				try:
+					wtusers = open(self.USERS_PATH, "w")
+					ujdata[addr[0]] = {}
+					ujdata[addr[0]]["ip"] = addr[0]
+					ujdata[addr[0]]["blacklisted"] = False
+					tjobject = json.dumps(ujdata, indent = 4)
+					wtusers.write(tjobject)
+					wtusers.close()
+				except:
+					print("couldn't write data to file")
+
+		except:
+			print("failed opening json data")
 
 class NewServer:
 	def __init__(self, host, port, runfunc, keypath, multi_threaded):
@@ -120,7 +187,7 @@ class NewServer:
 	def end_thread(self, conn, addr):
 		conn.close()
 
-	def base_thread(self, conn, addr):
+	def errored(self, recv_data):
 		recv_data = self.recv(conn, False)
 		if recv_data == self.close_packet:
 			pass
@@ -165,7 +232,7 @@ class NewServer:
 			if self.multi_threaded == True:
 				try:
 					if self.HPrethread_bootup == True:
-						self.Prethread_bootupfunc(self)
+						self.Prethread_bootupfunc(self, conn, addr)
 
 					else:
 						print("")
@@ -186,3 +253,4 @@ class NewServer:
 
 
 		self.wrapedsocket.close()
+
