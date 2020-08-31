@@ -79,32 +79,61 @@ class UserSys:
 				print("error couldn't create file")
 				time.sleep(4)
 
-	def PreThread(self, selfobject, conn, addr):
+	#returns user data if user is registerd properly
+	def RegisterUser(self, selfobject, conn, addr, opjdata):
+		username = selfobject.recv(conn, False)
+		password = selfobject.recv(conn, False)
 		try:
 			users = open(self.USERS_PATH, "r")
 			ujdata = json.load(users)
 			users.close()
 
 			try:
-				print("blacklisted: ", ujdata[addr[0]]["blacklisted"])
-
+				print(username + " blacklisted: ", ujdata[username]["blacklisted"])
+				print("username: " + username + ", " + "password: " + ujdata[username]["password"])
+				if password != ujdata[username]["password"]:
+					selfobject.send("incorrect password", conn)
+					return None
+				else:
+					selfobject.send("correct password", conn)
+					return ujdata[username]
 			except:
 				#write data
 				print("Registering new User")
+				selfobject.send("RU", conn)
+				regop = selfobject.recv(conn, False)
+
+				if regop == "n":
+					return None
+
 				os.system("rm " + self.USERS_PATH)
 				try:
 					wtusers = open(self.USERS_PATH, "w")
-					ujdata[addr[0]] = {}
-					ujdata[addr[0]]["ip"] = addr[0]
-					ujdata[addr[0]]["blacklisted"] = False
-					tjobject = json.dumps(ujdata, indent = 4)
-					wtusers.write(tjobject)
+					ujdata[username] = {}
+					ujdata[username]["ip"] = addr[0]
+					ujdata[username]["blacklisted"] = False
+					ujdata[username]["password"] = password
+					try:
+						tjobject = json.dumps(opjdata(ujdata), indent = 4)
+						wtusers.write(tjobject)
+						print("using optional user data")
+					except:
+						tjobject = json.dumps(ujdata, indent = 4)
+						wtusers.write(tjobject)
+						print("not using optional data")
+
 					wtusers.close()
 				except:
 					print("couldn't write data to file")
 
 		except:
 			print("failed opening json data")
+
+	def WriteTU(self, userdata):
+		pass
+
+	def Get(self):
+		return self
 
 class NewServer:
 	def __init__(self, host, port, runfunc, keypath, multi_threaded):

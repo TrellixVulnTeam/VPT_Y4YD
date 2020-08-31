@@ -10,20 +10,14 @@ def compileR(f, lang):
 	os.system("rm rcode/" + lang + "/" + f)
 
 def run(selfobject, conn, addr):
-	fex = selfobject.recv(conn, False)
-	fname = selfobject.recv(conn, False)
-	selfobject.recv_file(fname + fex, conn)
-	f = fname + fex
-	if fex == ".py":
-		compileR(f, "python")
-	if fex == ".cpp":
-		compileR(f, "c++")
-	print("")
+	user = user_sys.RegisterUser(selfobject, conn, addr, None)
+	if user != None:
+		print(user["password"])
 
+	conn.close()
 
 def prethread_bootup(selfobject, conn, addr):
-	global user_sys
-	user_sys.PreThread(selfobject, conn, addr)
+	pass
 
 keycontainer = ServerEngine.KeyPairContainer()
 tcpServerCCE = ServerEngine.NewServer("172.18.0.2", 4562, run, keycontainer.RunKeyPair("CCE"), True)
