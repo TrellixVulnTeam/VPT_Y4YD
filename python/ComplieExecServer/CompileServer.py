@@ -10,11 +10,17 @@ def compileR(f, lang):
 	os.system("rm rcode/" + lang + "/" + f)
 
 def run(selfobject, conn, addr):
-	user = user_sys.RegisterUser(selfobject, conn, addr, None)
-	if user != None:
-		print(user["password"])
+	print("")
+	global user_sys
+	userd = user_sys.RegisterUser(selfobject, conn, addr, None)
+	if userd != None:
+		print(userd["username"] + " has succsefuly logged in")
+
+	if userd == None:
+		print(addr[0] + " hasn't logged in correctly")
 
 	conn.close()
+	print("")
 
 def prethread_bootup(selfobject, conn, addr):
 	pass

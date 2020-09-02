@@ -42,11 +42,6 @@ class KeyPairContainer:
 		else:
 			return "/keystore/" + keypair_name + "/"
 
-
-class User:
-	def __init__(self):
-		pass
-
 class UserSys:
 	def __init__(self, proj_name):
 		os.system("clear")
@@ -55,6 +50,7 @@ class UserSys:
 
 		self.USERS_PATH = "/server_users/" + proj_name + "/" + "users.json"
 		self.user_list = []
+		self.proj_name = proj_name
 
 		if os.path.isdir("/server_users/") == False:
 			print("The necessary files don't exist do pess enter to generate them")
@@ -111,6 +107,7 @@ class UserSys:
 					wtusers = open(self.USERS_PATH, "w")
 					ujdata[username] = {}
 					ujdata[username]["ip"] = addr[0]
+					ujdata[username]["username"] = username
 					ujdata[username]["blacklisted"] = False
 					ujdata[username]["password"] = password
 					try:
@@ -123,17 +120,44 @@ class UserSys:
 						print("not using optional data")
 
 					wtusers.close()
+					os.system("mkdir /server_users/" + self.proj_name + "/" + username)
 				except:
 					print("couldn't write data to file")
 
 		except:
 			print("failed opening json data")
 
-	def WriteTU(self, userdata):
-		pass
+	def WriteTU(self, NUdata):
+		try:
+			users = open(self.USERS_PATH, "r")
+			ujdata = json.load(users)
+			users.close()
+
+			try:
+				os.system("rm " + self.USERS_PATH)
+				wtusers = open(self.USERS_PATH, "w")
+				ujdata[NUdata["username"]] = NUdata
+				tjobject = json.dumps(ujdata, indent = 4)
+				wtusers.write(tjobject)
+				wtusers.close()
+			except:
+				print("couldn't write data to file")
+
+		except:
+			print("failed opening json data")
 
 	def Get(self):
 		return self
+
+	def GetAllU(self):
+		try:
+			users = open(self.USERS_PATH)
+			ujdata = json.load(users)
+			users.close()
+			return ujdata
+		except:
+			print("failed opening json data returning null")
+			return None
 
 class NewServer:
 	def __init__(self, host, port, runfunc, keypath, multi_threaded):
