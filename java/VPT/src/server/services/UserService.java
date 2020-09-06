@@ -1,5 +1,6 @@
 package server.services;
 
+import common.SerializableImage;
 import common.Utils;
 import java.io.IOException;
 import java.sql.Connection;
@@ -156,7 +157,7 @@ public final class UserService {
         }
     }
     
-    public static int getUserId(String username) throws IllegalArgumentException, SQLException {
+    public static int getUserId(String username) throws IllegalArgumentException, SecurityException, SQLException {
         try(Transaction transaction = SQLService.startTransaction(Connection.TRANSACTION_READ_COMMITTED, false)) {
             if(!checkUserExistance(username)) {
                 throw new IllegalArgumentException("User Does Not Exist");
@@ -165,10 +166,33 @@ public final class UserService {
             try(PreparedStatement stmt = conn.prepareStatement("SELECT id FROM users WHERE username=?")) {
                 stmt.setString(1, username);
                 try(ResultSet result = stmt.executeQuery()) {
-                    return result.getInt(1);
+                    int id = result.getInt(1);
+                    LoginService.checkAccess(id);
+                    return id;
                 }
             }
         }
+    }
+    
+    public static String getUsername(int userId) throws IllegalArgumentException, SecurityException, SQLException {
+        LoginService.checkAccess(userId);
+        try(Transaction transaction = SQLService.startTransaction(Connection.TRANSACTION_READ_COMMITTED, false)) {
+            if(!checkUserIdExistance(userId)) {
+                throw new IllegalArgumentException("User Does Not Exist");
+            }
+            Connection conn = SQLService.getConnection();
+            try(PreparedStatement stmt = conn.prepareStatement("SELECT username FROM users WHERE id=?")) {
+                stmt.setInt(1, userId);
+                try(ResultSet result = stmt.executeQuery()) {
+                    return result.getString(1);
+                }
+            }
+        }
+    }
+    
+    public static SerializableImage getUserIcon(int userId) throws IllegalArgumentException, SecurityException, SQLException {
+        LoginService.checkAccess(userId);
+        throw new UnsupportedOperationException("Not Implemented Yet.");
     }
     
     /**

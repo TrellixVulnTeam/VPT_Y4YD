@@ -1,13 +1,17 @@
 package server;
 
+import common.UserDataField;
 import server.services.RequestService;
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
 import common.networking.packet.packets.CreateUserPacket;
+import common.networking.packet.packets.CurrentUserDataRequestPacket;
 import common.networking.packet.packets.DeleteUserPacket;
 import common.networking.packet.packets.LoginPacket;
+import common.networking.packet.packets.result.DoubleResultPacket;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.packet.packets.result.ResultPacket;
+import common.networking.packet.packets.result.ResultType;
 import common.networking.packet.packets.result.StandardResultPacket;
 import common.networking.ssl.SSLConnection;
 import java.sql.SQLException;
@@ -71,6 +75,21 @@ public final class PacketHandler {
                 RequestService.request(connection, "Logout", ServerConstants.USER_ONET_REQUESTS_TE);
                 LoginService.logout();
                 return new StandardResultPacket(true);
+            } else if(p.id == PacketId.CURRENT_USER_REQUEST.id) {
+                RequestService.request(connection, "CurrentUserRequest", ServerConstants.AUTO_REQUESTS_TE);
+                if(LoginService.getCurrentUserId() == -1) {
+                    throw new SecurityException("You Are Not Logged In");
+                }
+                UserDataField requestField = ((CurrentUserDataRequestPacket)p).data;
+                switch(requestField) {
+                    case USERNAME:
+                        return UserService.getUsername(LoginService.getCurrentUserId());
+                    case USERICON:
+                        return UserService.getUserIcon(LoginService.getCurrentUserId());
+                    case NULL:
+                    default:
+                        return new DoubleResultPacket<>(ResultType.CURRENT_USER_RESULT, true, null, requestField.id, null);
+                }
             }
             return ErrorResultPacket.INVALID_REQUEST;
         } catch(RequestService.TooManyRequestsException e) {
