@@ -132,6 +132,7 @@ public final class UserService {
                 stmt.setString(3, salt);
                 stmt.executeUpdate();
             }
+            transaction.commit();
         }
     }
     

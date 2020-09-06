@@ -81,15 +81,19 @@ public final class PacketHandler {
                     throw new SecurityException("You Are Not Logged In");
                 }
                 UserDataField requestField = ((CurrentUserDataRequestPacket)p).data;
+                Object result;
                 switch(requestField) {
                     case USERNAME:
-                        return UserService.getUsername(LoginService.getCurrentUserId());
+                        result = UserService.getUsername(LoginService.getCurrentUserId());
+                        break;
                     case USERICON:
-                        return UserService.getUserIcon(LoginService.getCurrentUserId());
+                        result = UserService.getUserIcon(LoginService.getCurrentUserId());
+                        break;
                     case NULL:
                     default:
-                        return new DoubleResultPacket<>(ResultType.CURRENT_USER_RESULT, true, null, requestField.id, null);
+                        result = null;
                 }
+                return new DoubleResultPacket<>(ResultType.CURRENT_USER_RESULT, true, null, requestField.id, result);
             }
             return ErrorResultPacket.INVALID_REQUEST;
         } catch(RequestService.TooManyRequestsException e) {
