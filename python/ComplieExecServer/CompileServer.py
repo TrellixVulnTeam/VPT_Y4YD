@@ -15,6 +15,14 @@ def run(selfobject, conn, addr):
 	userd = user_sys.RegisterUser(selfobject, conn, addr, None)
 	if userd != None:
 		print(userd["username"] + " has succsefuly logged in")
+		filename = selfobject.recv(conn, False)
+		print(filename)
+		ftype = ""
+		for x in range(len(filename) - 1):
+			if filename[x] == '.':
+				ftype = filename[x:]
+
+		print(ftype)
 
 	if userd == None:
 		print(addr[0] + " hasn't logged in correctly")

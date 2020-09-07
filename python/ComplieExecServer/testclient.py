@@ -19,7 +19,6 @@ if ures == "RU":
 	op = str(input("Do you want to register this as a new user[y/n] -> "))
 	wrappedSocket.send(op.encode())
 
-
 # CLOSE SOCKET CONNECTION
 wrappedSocket.close()
 

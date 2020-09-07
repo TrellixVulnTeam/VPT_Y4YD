@@ -2,6 +2,7 @@ import socket
 import sys
 import ssl
 import threading
+import hashlib
 import os
 import time
 import json
@@ -86,8 +87,20 @@ class UserSys:
 
 			try:
 				print(username + " blacklisted: ", ujdata[username]["blacklisted"])
-				print("username: " + username + ", " + "password: " + ujdata[username]["password"])
-				if password != ujdata[username]["password"]:
+
+				hashsaltfr = open("/server_users/" + self.proj_name + "/" + username + "/ShashPass", "rb")
+				data = hashsaltfr.read()
+				print(data)
+				hashsaltfr.close()
+
+				saltfs = data[:32]
+				keyfs = data[32:]
+
+				res = self.VerifyUDWHS(password, saltfs, keyfs)
+
+				print(res)
+
+				if res != 0:
 					selfobject.send("incorrect password", conn)
 					return None
 				else:
@@ -103,13 +116,20 @@ class UserSys:
 					return None
 
 				os.system("rm " + self.USERS_PATH)
+				os.system("mkdir /server_users/" + self.proj_name + "/" + username)
 				try:
 					wtusers = open(self.USERS_PATH, "w")
 					ujdata[username] = {}
 					ujdata[username]["ip"] = addr[0]
 					ujdata[username]["username"] = username
 					ujdata[username]["blacklisted"] = False
-					ujdata[username]["password"] = password
+					try:
+						hashsaltf = open("/server_users/" + self.proj_name + "/" + username + "/ShashPass", "wb")
+						hashsaltf.write(self.ShashUData(password))
+						hashsaltf.close()
+					except:
+						print("couldn't make user password hashS file and couldn't write data to it")
+
 					try:
 						tjobject = json.dumps(opjdata(ujdata), indent = 4)
 						wtusers.write(tjobject)
@@ -120,7 +140,6 @@ class UserSys:
 						print("not using optional data")
 
 					wtusers.close()
-					os.system("mkdir /server_users/" + self.proj_name + "/" + username)
 				except:
 					print("couldn't write data to file")
 
@@ -158,6 +177,20 @@ class UserSys:
 		except:
 			print("failed opening json data returning null")
 			return None
+
+	def ShashUData(self, data):
+		salt = os.urandom(32)
+		endata = data.encode('utf-8')
+		key = hashlib.pbkdf2_hmac('sha256', endata, salt, 100000)
+		return salt + key
+
+	def VerifyUDWHS(self, data, salt, key):
+		endata = data.encode('utf-8')
+		nkey = hashlib.pbkdf2_hmac('sha256', endata, salt, 100000)
+		if nkey == key:
+			return 0
+		else:
+			return -1
 
 class NewServer:
 	def __init__(self, host, port, runfunc, keypath, multi_threaded):
