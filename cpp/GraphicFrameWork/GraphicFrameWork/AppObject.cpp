@@ -339,7 +339,7 @@ void TextField::input(SDL_Event e)
 		if (e.type == SDL_KEYDOWN) {
 			//message = message + SDL_GetKeyName(e.key.keysym.sym);
 			SDL_Keycode kc = e.key.keysym.sym;
-			if (kc == SDLK_BACKSPACE && cursorPos != 0) {
+			if (kc == SDLK_BACKSPACE && (cursorPos != 0 || selectionStart != selectionEnd)) {
 				if (selectionStart != selectionEnd) {
 					cursorPos = max(selectionStart, selectionEnd);
 					for (int i = 0; i < abs(selectionStart - selectionEnd); i++) {
@@ -355,10 +355,10 @@ void TextField::input(SDL_Event e)
 			const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
 			bool shift = keyboardState[SDL_SCANCODE_LSHIFT] || keyboardState[SDL_SCANCODE_RSHIFT];
 			bool ctrl = keyboardState[SDL_SCANCODE_LCTRL] || keyboardState[SDL_SCANCODE_RCTRL];
-			if (kc == SDLK_c && selectionStart != selectionEnd) {
+			if (kc == SDLK_c && selectionStart != selectionEnd && ctrl) {
 				Utils::writeClipboard(message.substr(min(selectionStart, selectionEnd), abs(selectionStart - selectionEnd)));
 			}
-			if (kc == SDLK_v) {
+			if (kc == SDLK_v && ctrl) {
 				string clipboardData = Utils::readClipboard();
 				if (!clipboardData.empty()) {
 					if (selectionStart != selectionEnd) {
@@ -422,15 +422,19 @@ void TextField::append(char c) {
 }
 
 void TextField::bksp() {
+	cout << "test" << endl;
 	message = message.substr(0, ((size_t)cursorPos) - 1) + message.substr(cursorPos, message.length());
 	if (cursorPos >= text_m->textds - 1 && cursorPos <= text_m->textde) {
-		text_m->textde--;
-		if (cursorPos == text_m->textds || (text_m->textde == message.length() && text_m->textds != 0)) {
+		if(cursorPos == text_m->textds || (text_m->textde == message.length() && text_m->textds != 0)) {
 			text_m->textds--;
+			text_m->textde--;
+		} else if (text_m->textde != message.length()) {
+			text_m->textde++;
 		}
 	}
-	if(cursorPos > 0)
+	if (cursorPos > 0) {
 		cursorPos--;
+	}
 	updateText();
 }
 

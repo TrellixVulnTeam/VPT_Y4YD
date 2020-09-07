@@ -134,7 +134,7 @@ void LoginScreen::LoadStaticComponents() {
 		text = new Text(fontPath, "VPT Login", SDL_Color{ 0, 0, 0, 255 }, 100);
 		int textWidth, textHeight;
 		TTF_SizeText(text->font_m, text->message.c_str(), &textWidth, &textHeight);
-		text->Init(instance->renderer, 0, 0, (instance->windowSize.width - textWidth) / 2, 30);
+		text->Init(instance->renderer, 0, 0, (instance->windowSize.width - textWidth) / 2, 20);
 		
 		loginButton = new SimpleButton(new Text(fontPath, "Login", SDL_Color{ 0, 0, 0, 255 }, 30), 10, 10, [this]( SimpleButton* button ) {login(); });
 		loginButton->Init(instance->renderer, 270, 400);
