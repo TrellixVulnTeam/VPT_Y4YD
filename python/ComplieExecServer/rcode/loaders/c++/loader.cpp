@@ -99,9 +99,6 @@ int main(int argc, char* argv[]){
 					throw "error";
 			}
 		}
-		cout << dints[0][0] << endl;
-		cout << dstrings[0][0] << endl;
-		cout << args[1].c_str() << endl;
 		//init libarays
 		void *handle;
 		char *error;
