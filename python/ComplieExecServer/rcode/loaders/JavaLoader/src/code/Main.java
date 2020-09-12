@@ -245,12 +245,12 @@ public class Main {
         return filename.replace("/", File.separator);
     }
 
-    private static void logError(Exception e) {e.printStackTrace();
+    private static void logError(Exception e) {
         try {
             File errorFile;
             int lognum = 0;
             do {
-                errorFile = new File(formatFilename(DIR + "error_" + lognum + ".log"));
+                errorFile = new File(formatFilename(DIR + "/error_" + lognum + ".log"));
                 lognum++;
             } while(errorFile.exists());
             errorFile.createNewFile();

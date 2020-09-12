@@ -12,7 +12,6 @@
 *.pch
 
 # Compiled Dynamic libraries
-*.so
 *.dylib
 
 # Fortran module files
@@ -25,7 +24,6 @@
 *.a
 
 # Executables
-*.out
 *.app
 
 # Compiled class file
@@ -446,6 +444,6 @@ FodyWeavers.xsd
 /java/VPTPackager/nbproject/private/
 /java/VPTPackager/build/
 /java/VPT/dist/
-/python/ComplieExecServer/loaders/JavaLoader/nbproject/private/
-/python/ComplieExecServer/loaders/JavaLoader/build/
-/python/ComplieExecServer/loaders/JavaLoader/dist/
+/python/ComplieExecServer/rcode/loaders/JavaLoader/nbproject/private/
+/python/ComplieExecServer/rcode/loaders/JavaLoader/build/
+/python/ComplieExecServer/rcode/loaders/JavaLoader/dist/
