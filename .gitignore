@@ -446,3 +446,6 @@ FodyWeavers.xsd
 /java/VPTPackager/nbproject/private/
 /java/VPTPackager/build/
 /java/VPT/dist/
+/python/ComplieExecServer/loaders/JavaLoader/nbproject/private/
+/python/ComplieExecServer/loaders/JavaLoader/build/
+/python/ComplieExecServer/loaders/JavaLoader/dist/
