@@ -1,24 +1,23 @@
 package server;
 
+import common.UserDataField;
 import server.services.RequestService;
 import common.networking.packet.Packet;
 import common.networking.packet.PacketId;
 import common.networking.packet.packets.CreateUserPacket;
+import common.networking.packet.packets.CurrentUserDataRequestPacket;
 import common.networking.packet.packets.DeleteUserPacket;
 import common.networking.packet.packets.LoginPacket;
+import common.networking.packet.packets.result.DoubleResultPacket;
 import common.networking.packet.packets.result.ErrorResultPacket;
 import common.networking.packet.packets.result.ResultPacket;
 import common.networking.packet.packets.result.ResultType;
-import common.networking.packet.packets.result.SingleResultPacket;
 import common.networking.packet.packets.result.StandardResultPacket;
 import common.networking.ssl.SSLConnection;
-import common.user.NetPublicUser;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.time.Duration;
 import server.services.LoginService;
-import server.user.PublicUser;
-import server.user.User;
-import server.user.UserStore;
+import server.services.UserService;
 
 /**
  * Generates {@link ResultPacket}s in response to client requests
@@ -40,22 +39,22 @@ public final class PacketHandler {
             }
             if(p.id == PacketId.LOGIN.id) {
                 RequestService.request(connection, "Login", ServerConstants.USER_SPEC_REQUESTS_TE);
-                User currentUser = LoginService.getCurrentUser();
-                if(currentUser != null) {
+                int currentUser = LoginService.getCurrentUserId();
+                if(currentUser != -1) {
                     LoginService.logout();
-                    UserStore.unsubscribeFromDeletionEvents(currentUser.userId, onUserDeletion);
+                    UserService.unsubscribeFromDeletionEvents(currentUser, onUserDeletion);
                 }
                 LoginPacket loginPacket = (LoginPacket)p;
-                boolean result = LoginService.login(loginPacket.userId, loginPacket.password);
+                boolean result = LoginService.login(loginPacket.username, loginPacket.password);
                 if(result) {
-                    UserStore.subscribeToDeletionEvents(loginPacket.userId, onUserDeletion);
+                    UserService.subscribeToDeletionEvents(LoginService.getCurrentUserId(), onUserDeletion);
                 }
                 return new StandardResultPacket(result, result ? null : "Invalid Login");
             } else if(p.id == PacketId.CREATE_USER.id) {
                 RequestService.request(connection, "Create User", ServerConstants.USER_SPEC_REQUESTS_TE);
                 try {
                     CreateUserPacket packet = (CreateUserPacket)p;
-                    UserStore.createUser(new User(packet.userId, packet.password, packet.isAdmin));
+                    UserService.createUser(packet.userId, packet.password);
                     return new StandardResultPacket(true);
                 } catch(IllegalArgumentException e) {
                     return new StandardResultPacket(false, e.getMessage());
@@ -64,7 +63,7 @@ public final class PacketHandler {
                 RequestService.request(connection, "Delete User", ServerConstants.USER_ONET_REQUESTS_TE);
                 try {
                     DeleteUserPacket packet = (DeleteUserPacket)p;
-                    UserStore.deleteUser(packet.data);
+                    UserService.deleteUser(packet.data);
                     return new StandardResultPacket(true);
                 } catch(IllegalArgumentException e) {
                     return new StandardResultPacket(false, e.getMessage());
@@ -77,12 +76,24 @@ public final class PacketHandler {
                 LoginService.logout();
                 return new StandardResultPacket(true);
             } else if(p.id == PacketId.CURRENT_USER_REQUEST.id) {
-                RequestService.request(connection, "Current User Info", ServerConstants.USER_NORM_REQUESTS_TE);
-                User currentUser = LoginService.getCurrentUser();
-                if(currentUser == null) {
-                    return new SingleResultPacket<NetPublicUser>(ResultType.USER_RESULT, false, "Not Logged In", null);
+                RequestService.request(connection, "CurrentUserRequest", ServerConstants.AUTO_REQUESTS_TE);
+                if(LoginService.getCurrentUserId() == -1) {
+                    throw new SecurityException("You Are Not Logged In");
                 }
-                return new SingleResultPacket<>(ResultType.USER_RESULT, true, null, currentUser.toNetPublicUser());
+                UserDataField requestField = ((CurrentUserDataRequestPacket)p).data;
+                Object result;
+                switch(requestField) {
+                    case USERNAME:
+                        result = UserService.getUsername(LoginService.getCurrentUserId());
+                        break;
+                    case USERICON:
+                        result = UserService.getUserIcon(LoginService.getCurrentUserId());
+                        break;
+                    case NULL:
+                    default:
+                        result = null;
+                }
+                return new DoubleResultPacket<>(ResultType.CURRENT_USER_RESULT, true, null, requestField.id, result);
             }
             return ErrorResultPacket.INVALID_REQUEST;
         } catch(RequestService.TooManyRequestsException e) {
@@ -91,7 +102,7 @@ public final class PacketHandler {
             return ErrorResultPacket.ILLEGAL_ACCESS(e.getMessage());
         } catch(ClassCastException e) {
             return ErrorResultPacket.INVALID_REQUEST;
-        } catch(IOException e) {
+        } catch(SQLException e) {
             return ErrorResultPacket.SERVER_ERROR;
         }
     }

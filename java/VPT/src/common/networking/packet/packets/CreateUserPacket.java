@@ -15,24 +15,18 @@ public class CreateUserPacket extends Packet {
      */
     public final String userId;
     /**
-     * The requested administrator status of the new user
-     */
-    public final boolean isAdmin;
-    /**
      * The requested password of the new user
      */
-    public final byte[] password;
+    public final String password;
 
     /**
      * Creates a new CreateUserPacket
      * @param userId the requested userId of the new user
-     * @param isAdmin the requested administrator status of the new user
      * @param password the requested password of the new user
      */
-    public CreateUserPacket(String userId, boolean isAdmin, byte[] password) {
+    public CreateUserPacket(String userId, String password) {
         super(PacketId.CREATE_USER);
         this.userId = userId;
-        this.isAdmin = isAdmin;
         this.password = password;
     }
     

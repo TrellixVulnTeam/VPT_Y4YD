@@ -16,6 +16,34 @@ public final class SQLService {
         }
         sqlServerPassword = password;
     }
+    
+    public static void setTransactionProperties(int transactioIsolation, boolean isReadOnly) throws SQLException {
+        Connection conn = getConnection();
+        conn.setTransactionIsolation(transactioIsolation);
+        conn.setReadOnly(isReadOnly);
+    }
+    
+    public static Connection getConnection() {
+        return connectionTL.get();
+    }
+    
+    public static Transaction startTransaction() throws SQLException {
+        return startTransaction(false);
+    }
+    
+    public static Transaction startTransaction(boolean commitOnClose) throws SQLException {
+        return new Transaction(connectionTL.get(), commitOnClose);
+    }
+    
+    public static Transaction startTransaction(int transactioIsolation, boolean isReadOnly) throws SQLException {
+        setTransactionProperties(transactioIsolation, isReadOnly);
+        return startTransaction();
+    }
+    
+    public static Transaction startTransaction(int transactioIsolation, boolean isReadOnly, boolean commitOnClose) throws SQLException {
+        setTransactionProperties(transactioIsolation, isReadOnly);
+        return startTransaction(commitOnClose);
+    }
    
     private static Connection createConnection() throws IllegalStateException {
         if(sqlServerPassword == null) {
@@ -41,5 +69,49 @@ public final class SQLService {
     }
     
     private SQLService() {}
+    
+    public static final class Transaction implements AutoCloseable {
+
+        private final Connection conn;
+        private final boolean commitOnClose;
+        private boolean isOpen;
+        
+        public Transaction(Connection conn, boolean commitOnClose) throws SQLException {
+            this.conn = conn;
+            this.commitOnClose = commitOnClose;
+            conn.setAutoCommit(false);
+            isOpen = true;
+        }
+        
+        public boolean isOpen() {
+            return isOpen;
+        }
+        
+        public void commit() throws SQLException {
+            if(isOpen) {
+                conn.commit();
+                conn.setAutoCommit(true);
+                isOpen = false;
+            }
+        }
+        
+        public void rollback() throws SQLException {
+            if(isOpen) {
+                conn.rollback();
+                conn.setAutoCommit(true);
+                isOpen = false;
+            }
+        }
+        
+        @Override
+        public void close() throws SQLException {
+            if(commitOnClose) {
+                commit();
+            } else {
+                rollback();
+            }
+        }
+        
+    }
     
 }

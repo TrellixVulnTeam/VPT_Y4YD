@@ -1,7 +1,12 @@
 package server.services;
 
-import server.user.User;
-import server.user.UserStore;
+import common.Utils;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import server.services.SQLService.Transaction;
 
 /**
  * Manages logins
@@ -19,32 +24,42 @@ public final class LoginService {
     
     /**
      * Logs in the current thread
-     * @param userId the requested userId to login
+     * @param username the requested userId to login
      * @param password the password of the requested user
      * @return whether the login was successful
      */
-    public static boolean login(String userId, byte[] password) {
-        User user = UserStore.login(userId, password);
-        if(user != null) {
-            session.get().setUser(user);
-            return true;
+    public static boolean login(String username, String password) throws SQLException {
+        try(Transaction transaction = SQLService.startTransaction(Connection.TRANSACTION_READ_COMMITTED, true)) {
+            Connection conn = SQLService.getConnection();
+            try(PreparedStatement prepStmt = conn.prepareStatement("SELECT id, password, salt FROM users WHERE username=?")) {
+                prepStmt.setString(1, username);
+                try(ResultSet result = prepStmt.executeQuery()) {
+                    int id = result.getInt(1);
+                    byte[] realPassword = result.getBytes(2);
+                    String salt = result.getString(3);
+                    if(Arrays.equals(Utils.hash((password + salt).getBytes()), realPassword)) {
+                        session.get().setUser(id);
+                        return false;
+                    }
+                    return false;
+                }
+            }
         }
-        return false;
     }
     
     /**
      * Logs out the current thread
      */
-    public static void logout() {
-        session.get().setUser(null);
+    public static void logout() throws SQLException {
+        session.get().setUser(-1);
     }
     
     /**
      * Retrieves the user logged in to the current thread or <code>null</code> if the current thread is logged out
      * @return The user logged in to the current thread
      */
-    public static User getCurrentUser() {
-        return session.get().getUser();
+    public static int getCurrentUserId() {
+        return session.get().getUserId();
     }
     
     /**
@@ -55,9 +70,10 @@ public final class LoginService {
         if(isSystemThread.get()) {
             return;
         }
-        if(getCurrentUser() != null && getCurrentUser().isAdmin()) {
-            return;
-        }
+        //Add Admin Checking Code
+//        if(getCurrentUser() != null && getCurrentUser().isAdmin()) {
+//            return;
+//        }
         throw new SecurityException("Invalid Permissions");
     }
     
@@ -66,11 +82,11 @@ public final class LoginService {
      * @param user the user to check
      * @throws SecurityException if the currently logged in user cannot modify the properties of the given user
      */
-    public static void checkAccess(User user) throws SecurityException {
-        if(user == null) {
+    public static void checkAccess(int userId) throws SecurityException {
+        if(userId == -1) {
             throw new SecurityException("Invalid Permissions");
         }
-        if(getCurrentUser() == user) {
+        if(getCurrentUserId() == -1) {
             return;
         }
         checkAccess();
@@ -97,7 +113,7 @@ public final class LoginService {
         /**
          * The user logged into a this Session
          */
-        private User user;
+        private int userId;
         /**
          * A reference to {@link #onUserDeletion()}
          */
@@ -107,7 +123,7 @@ public final class LoginService {
          * Creates a new Session and initializes all of its variables to <code>null</code>
          */
         private Session() {
-            user = null;
+            userId = -1;
             onUserDeletion = null;
         }
         
@@ -115,19 +131,19 @@ public final class LoginService {
          * Sets the user associated with this Session
          * @param user the User to associate with this Session
          */
-        private synchronized void setUser(User user) {
+        private synchronized void setUser(int userId) throws SQLException {
             if(onUserDeletion == null) {
                 onUserDeletion = this::onUserDeletion;
             }
-            if(this.user != null) {
-                UserStore.unsubscribeFromDeletionEvents(this.user.userId, onUserDeletion);
+            if(this.userId != -1) {
+                UserService.unsubscribeFromDeletionEvents(this.userId, onUserDeletion);
             }
-            this.user = user;
-            if(user != null) {
+            this.userId = userId;
+            if(userId != -1) {
                 try {
-                    UserStore.subscribeToDeletionEvents(user.userId, onUserDeletion);
+                    UserService.subscribeToDeletionEvents(userId, onUserDeletion);
                 } catch(IllegalArgumentException e) {
-                    this.user = null;
+                    this.userId = -1;
                 }
             }
         }
@@ -136,15 +152,15 @@ public final class LoginService {
          * Retrieves the user currently associated with this Session
          * @return the user currently associated with this Session
          */
-        private synchronized User getUser() {
-            return user;
+        private synchronized int getUserId() {
+            return userId;
         }
         
         /**
          * This method is called by {@link UserStore} when the user currently associated with this Session is deleted
          */
         private synchronized void onUserDeletion() {
-            this.user = null;
+            this.userId = -1;
         }
         
     }

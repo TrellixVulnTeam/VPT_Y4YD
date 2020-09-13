@@ -20,8 +20,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
-import server.services.LoginService;
-import server.user.UserStore;
 
 /**
  * Provides an entry point for the server side of the VPT
@@ -73,7 +71,6 @@ public final class ServerMain {
             e.getCause().printStackTrace(System.err);
             System.exit(1);
         }
-        loadData();
         try {
             startPeriodicMethods();
             try {
@@ -128,7 +125,7 @@ public final class ServerMain {
      */
     private static void startPeriodicMethods() {
         executor.scheduleWithFixedDelay(ServerMain::doPeriodic, ServerConstants.PERIODIC_INTERVAL, ServerConstants.PERIODIC_INTERVAL, TimeUnit.NANOSECONDS);
-        Runtime.getRuntime().addShutdownHook(new Thread(ServerMain::saveData));
+        Runtime.getRuntime().addShutdownHook(new Thread(ServerMain::shutdown));
     }
     
     /**
@@ -136,37 +133,9 @@ public final class ServerMain {
      */
     private static void doPeriodic() {
         RequestService.cleanup();
-        saveData();
     }
     
-    /**
-     * Loads required data from disk into memory. This should only run at the start of the program
-     */
-    private static void loadData() {
-        try {
-            UserStore.loadAdminKey();
-            UserStore.loadAttributes();
-            UserStore.loadPublicKeys();
-        } catch(ClassNotFoundException | IOException e) {
-            System.err.println("Error loading data");
-            e.printStackTrace(System.err);
-        }
-    }
-    
-    /**
-     * Saves any modified data to disk
-     */
-    private static void saveData() {
-        LoginService.markAsSystemThread();
-        try {
-            UserStore.saveUsers();
-            UserStore.saveAttributes();
-            UserStore.savePublicKeys();
-        } catch(IOException e) {
-            System.err.println("Error saving data");
-            e.printStackTrace(System.err);
-        }
-    }
+    private static void shutdown() {}
 
     private ServerMain() {}
     
