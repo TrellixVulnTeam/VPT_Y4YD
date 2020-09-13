@@ -155,10 +155,20 @@ void AppInstance::addOverlay(AppObject* overlay) {
 }
 
 void AppInstance::BeginLoadingScene(Scene& scene) {
+	if (isDisplayingScene) {
+		prevScene = currentScene;
+	}
 	isDisplayingScene = false;
 	isDynamicScene = dynamic_cast<DynamicScene*>(&scene) == nullptr;
 	currentScene = &scene;
 	currentScene->Init(this);
+}
+
+void AppInstance::RevertSceneLoading(Scene& currentScene) {
+	if (&currentScene == this->currentScene) {
+		this->currentScene = prevScene;
+		isDisplayingScene = true;
+	}
 }
 
 void AppInstance::FinishSceneLoading(Scene& scene) {

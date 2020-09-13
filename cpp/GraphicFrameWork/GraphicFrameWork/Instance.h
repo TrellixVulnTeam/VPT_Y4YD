@@ -29,6 +29,7 @@ public:
 	static void reportError();
 	void addOverlay(AppObject* overlay);
 	void BeginLoadingScene(Scene& scene);
+	void RevertSceneLoading(Scene& currentScene);
 	void FinishSceneLoading(Scene& scene);
 	Scene& GetActiveScene();
 	void RequestSDLFunct(function<void()> funct);
@@ -48,6 +49,7 @@ public:
 	int frametime = INT_MAX;
 	int cnt;
 	Scene* currentScene;
+	Scene* prevScene;
 	bool isDisplayingScene;
 	bool isDynamicScene;
 	SDL_Color backgroundColor;
