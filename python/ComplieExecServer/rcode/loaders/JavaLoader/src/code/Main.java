@@ -28,7 +28,7 @@ import java.util.jar.Manifest;
 
 public class Main {
     
-    private static final String DIR = formatFilename("C:\\Users\\ryand\\Desktop\\Folders\\Visual Studio Projects\\Projects\\VPT\\python\\ComplieExecServer\\loaders\\JavaLoader");
+    private static final String DIR = formatFilename(".");
 
     private static boolean hasRun = false;
     public static final Function<String, String> stringParser = s -> s;

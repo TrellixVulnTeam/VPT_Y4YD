@@ -434,16 +434,12 @@ FodyWeavers.xsd
 
 /java/HeaderCompiler/nbproject/private/
 /java/HeaderCompiler/build/
-/java/HeaderCompiler/dist/
 /java/VPTPythonServer/nbproject/private/
 /java/VPTPythonServer/build/
 /java/VPTEditorInterpritor/build/
 /java/VPTServerPackager/nbproject/private/
-/java/VPTServerPackager/dist/
 /java/VPTServerPackager/build/
 /java/VPTPackager/nbproject/private/
 /java/VPTPackager/build/
-/java/VPT/dist/
 /python/ComplieExecServer/rcode/loaders/JavaLoader/nbproject/private/
 /python/ComplieExecServer/rcode/loaders/JavaLoader/build/
-/python/ComplieExecServer/rcode/loaders/JavaLoader/dist/
