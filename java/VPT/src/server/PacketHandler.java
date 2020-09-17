@@ -54,7 +54,7 @@ public final class PacketHandler {
                 RequestService.request(connection, "Create User", ServerConstants.USER_SPEC_REQUESTS_TE);
                 try {
                     CreateUserPacket packet = (CreateUserPacket)p;
-                    UserService.createUser(packet.userId, packet.password);
+                    UserService.createUser(packet.username, packet.password);
                     return new StandardResultPacket(true);
                 } catch(IllegalArgumentException e) {
                     return new StandardResultPacket(false, e.getMessage());
