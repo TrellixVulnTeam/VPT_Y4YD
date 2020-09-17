@@ -13,6 +13,7 @@ sys.path.append("projBE_modules")
 mm = __import__("module_managment", fromlist=[''])
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 ui = FlaskUI(app)
 
