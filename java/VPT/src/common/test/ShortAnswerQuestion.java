@@ -23,6 +23,9 @@ public class ShortAnswerQuestion extends Question {
         this.answer = answer;
     }
     
+    /**
+     * @return A NetShortAnswerQuestion representing the information from this ShortAnswerQuestion
+     */
     public NetShortAnswerQuestion toNetShortAnswerQuestion() {
         return new NetShortAnswerQuestion(question, associatedPoints);
     }

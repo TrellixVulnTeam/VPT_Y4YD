@@ -258,6 +258,11 @@ public final class Utils {
         return buffer.getInt();
     }
     
+    /**
+     * Creates a psudorandom, alphanumeric {@link String}
+     * @param length the length of the String to generate
+     * @return the generated String
+     */
     public static String randomString(int length) {
         char[] out = new char[length];
         for(int i = 0; i < length; i++) {

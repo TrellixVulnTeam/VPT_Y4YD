@@ -13,7 +13,7 @@ public class CreateUserPacket extends Packet {
     /**
      * The requested userId of the new user
      */
-    public final String userId;
+    public final String username;
     /**
      * The requested password of the new user
      */
@@ -21,12 +21,12 @@ public class CreateUserPacket extends Packet {
 
     /**
      * Creates a new CreateUserPacket
-     * @param userId the requested userId of the new user
+     * @param username the requested userId of the new user
      * @param password the requested password of the new user
      */
-    public CreateUserPacket(String userId, String password) {
+    public CreateUserPacket(String username, String password) {
         super(PacketId.CREATE_USER);
-        this.userId = userId;
+        this.username = username;
         this.password = password;
     }
     

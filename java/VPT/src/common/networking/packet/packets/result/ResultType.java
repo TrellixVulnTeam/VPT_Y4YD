@@ -29,6 +29,9 @@ public enum ResultType {
      * Represents a response to a request which consists of a success flag and a possible error message
      */
     STANDARD_RESULT(4),
+    /**
+     * Represents a response containing user data about the currently logged in user
+     */
     CURRENT_USER_RESULT(5);
     
     /**

@@ -33,6 +33,7 @@ public final class UserService {
      * @param userId the userId of the user to check
      * @param onUserDeletion the method to be run
      * @throws IllegalArgumentException if the specified user does not exist
+     * @throws SQLException if there was an error accessing the SQL server
      */
     public static void subscribeToDeletionEvents(int userId, Runnable onUserDeletion) throws IllegalArgumentException, SQLException {
         deletionSubscribersLock.readLock().lock();
@@ -74,6 +75,12 @@ public final class UserService {
         }
     }
     
+    /**
+     * Checks if the given userid corresponds to an existing user
+     * @param userId the userid to check
+     * @return whether the given userid corresponds to an existing user
+     * @throws SQLException if there was an error accessing the SQL server
+     */
     public static boolean checkUserIdExistance(int userId) throws SQLException {
         if(userId == -1) {
             return false;
@@ -90,9 +97,10 @@ public final class UserService {
     }
     
     /**
-     * Checks if the given user is registered
-     * @param user the user to check
+     * Checks if the given username corresponds to an existing user
+     * @param username the username to check
      * @return whether the given user is registered
+     * @throws SQLException if there was an error accessing the SQL server
      */
     public static boolean checkUserExistance(String username) throws SQLException {
         if(username == null) {
@@ -110,11 +118,11 @@ public final class UserService {
     }
     
     /**
-     * Registers the given user and creates all required files
-     * @param user the user to create
-     * @throws IllegalArgumentException if the userId of the given user is invalid
-     * @throws IOException if there is an error creating any of the required files
-     * @throws SecurityException if the current user does not have the permissions to create the specified user
+     * Registers the given user
+     * @param username the username of the user to create
+     * @param password the password of the user to create
+     * @throws IllegalArgumentException if the userId of the given user is invalid or already registered
+     * @throws SQLException if there was an error accessing the SQL server
      */
     public static void createUser(String username, String password) throws IllegalArgumentException, SQLException {
         if(isInvalidUsername(username)) {
@@ -138,9 +146,9 @@ public final class UserService {
     
     /**
      * Deletes the specified user
-     * @param userId the userId of the user to delete
+     * @param username the username of the user to delete
      * @throws IllegalArgumentException if the specified user does not exist
-     * @throws IOException if there is an error deleting the user's files
+     * @throws SQLException if there was an error accessing the SQL server
      * @throws SecurityException if the current user does not have the required permissions to delete the specified user
      */
     public static void deleteUser(String username) throws IllegalArgumentException, SecurityException, SQLException {
@@ -158,6 +166,14 @@ public final class UserService {
         }
     }
     
+    /**
+     * Retrieves the userId corresponding to the specified username
+     * @param username the username to fetch the id for
+     * @return the id of the user corresponding to the specified username
+     * @throws IllegalArgumentException if the specified user does not exist
+     * @throws SecurityException if the current user does not have the permissions to fetch this user's id
+     * @throws SQLException if there was an error accessing the SQL server
+     */ 
     public static int getUserId(String username) throws IllegalArgumentException, SecurityException, SQLException {
         try(Transaction transaction = SQLService.startTransaction(Connection.TRANSACTION_READ_COMMITTED, false)) {
             if(!checkUserExistance(username)) {
@@ -175,6 +191,14 @@ public final class UserService {
         }
     }
     
+    /**
+     * Retrieves the username corresponding to the specified userId
+     * @param userId the userId to fetch the username for
+     * @return the username of the user corresponding to the specified userId
+     * @throws IllegalArgumentException if the specified user does not exist
+     * @throws SecurityException if the current user does not have the permissions to fetch this user's username
+     * @throws SQLException if there was an error accessing the SQL server
+     */
     public static String getUsername(int userId) throws IllegalArgumentException, SecurityException, SQLException {
         LoginService.checkAccess(userId);
         try(Transaction transaction = SQLService.startTransaction(Connection.TRANSACTION_READ_COMMITTED, false)) {
@@ -191,6 +215,14 @@ public final class UserService {
         }
     }
     
+    /**
+     * Not Implemented Yet
+     * @param userId
+     * @return 
+     * throws IllegalArgumentException
+     * @throws SecurityException
+     * @throws SQLException
+     */
     public static SerializableImage getUserIcon(int userId) throws IllegalArgumentException, SecurityException, SQLException {
         LoginService.checkAccess(userId);
         throw new UnsupportedOperationException("Not Implemented Yet.");
@@ -202,8 +234,8 @@ public final class UserService {
     public static final Pattern INVALID_USERNAME_PATTERN = Pattern.compile(ServerConstants.USERNAME_FORBIDDEN_CHARACTERS_REGEX);
     /**
      * Checks if the given username is invalid
-     * @param userId the userId to check
-     * @return whether the given userId is invalid
+     * @param username the username to check
+     * @return whether the given username is invalid
      */
     public static boolean isInvalidUsername(String username) {
         return INVALID_USERNAME_PATTERN.matcher(username).find();

@@ -18,6 +18,11 @@ public class MultipleChoiceAnswer implements Serializable {
      */
     public final boolean isCorrect;
 
+    /**
+     * Creates a new MultipleChoiceAnswer
+     * @param answer The answer which will be displayed to the user
+     * @param isCorrect Whether this answer is correct
+     */
     public MultipleChoiceAnswer(String answer, boolean isCorrect) {
         this.answer = answer;
         this.isCorrect = isCorrect;

@@ -22,7 +22,7 @@ public class LoginPacket extends Packet {
 
     /**
      * Creates a new LoginPacket
-     * @param userId the userId of the account being requested
+     * @param username the username of the account being requested
      * @param password the password of the account being requested
      */
     public LoginPacket(String username, String password) {

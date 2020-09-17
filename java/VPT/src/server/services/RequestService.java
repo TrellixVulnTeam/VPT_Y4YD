@@ -39,7 +39,7 @@ public final class RequestService {
      * @param connection the SSLConnection which originated the request
      * @param type a string representing the requested resource
      * @param requestsToEscalate the maximum number of requests that can be made before it is determined that too many have been made
-     * @throws server.RequestService.TooManyRequestsException if it is determined that the client has sent too many requests
+     * @throws TooManyRequestsException if it is determined that the client has sent too many requests
      */
     public static void request(SSLConnection connection, String type, int requestsToEscalate) throws TooManyRequestsException {
         type = type.intern();

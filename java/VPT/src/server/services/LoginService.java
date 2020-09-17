@@ -27,6 +27,7 @@ public final class LoginService {
      * @param username the requested userId to login
      * @param password the password of the requested user
      * @return whether the login was successful
+     * @throws SQLException if there was an error accessing the SQL server
      */
     public static boolean login(String username, String password) throws SQLException {
         try(Transaction transaction = SQLService.startTransaction(Connection.TRANSACTION_READ_COMMITTED, true)) {
@@ -49,13 +50,14 @@ public final class LoginService {
     
     /**
      * Logs out the current thread
+     * @throws SQLException if there was an error accessing the SQL server
      */
     public static void logout() throws SQLException {
         session.get().setUser(-1);
     }
     
     /**
-     * Retrieves the user logged in to the current thread or <code>null</code> if the current thread is logged out
+     * Retrieves the userid of the user logged in to the current thread or <code>-1</code> if the current thread is logged out
      * @return The user logged in to the current thread
      */
     public static int getCurrentUserId() {
@@ -70,7 +72,7 @@ public final class LoginService {
         if(isSystemThread.get()) {
             return;
         }
-        //Add Admin Checking Code
+        //TODO: Add Admin Checking Code
 //        if(getCurrentUser() != null && getCurrentUser().isAdmin()) {
 //            return;
 //        }
@@ -79,7 +81,7 @@ public final class LoginService {
     
     /**
      * Checks if the currently logged in user can modify the properties of the given user
-     * @param user the user to check
+     * @param userId the userid of the user to check
      * @throws SecurityException if the currently logged in user cannot modify the properties of the given user
      */
     public static void checkAccess(int userId) throws SecurityException {
@@ -128,8 +130,9 @@ public final class LoginService {
         }
         
         /**
-         * Sets the user associated with this Session
-         * @param user the User to associate with this Session
+         * Sets the userid of the user associated with this Session
+         * @param user the userid of the user to associate with this Session
+         * @throws SQLException if there was an error accessing the SQL server
          */
         private synchronized void setUser(int userId) throws SQLException {
             if(onUserDeletion == null) {
@@ -149,8 +152,8 @@ public final class LoginService {
         }
         
         /**
-         * Retrieves the user currently associated with this Session
-         * @return the user currently associated with this Session
+         * Retrieves the userid of the user currently associated with this Session
+         * @return the userid of the user currently associated with this Session
          */
         private synchronized int getUserId() {
             return userId;

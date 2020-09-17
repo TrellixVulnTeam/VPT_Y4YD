@@ -2,7 +2,6 @@ package server;
 
 import common.Constants.Branch;
 import common.Utils;
-import java.io.File;
 import static java.io.File.separator;
 import java.util.concurrent.TimeUnit;
 
@@ -59,50 +58,62 @@ public final class ServerConstants {
     public static final long PERIODIC_INTERVAL = Utils.toNanos(10, TimeUnit.MINUTES);
     
     //SQL
+    /**
+     * The SQL database name
+     */
     public static final String SQL_DB = "VPTDB";
+    /**
+     * The SQL database URL
+     */
     public static final String SQL_URL = "jdbc:mysql://169.254.82.12:3306/" + SQL_DB;
+    /**
+     * The SQL user to use to access the database
+     */
     public static final String SQL_USER = "VPTAPI";
     
     //REQUEST
     /**
      * The exponent base to be used when calculating timeouts. New timeouts will be <code>TIMEOUT_BASE<sup>numberOfPreviousTimeouts+1</sup></code> seconds
-     * @see RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
+     * @see server.services.RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
      */
     public static final int TIMEOUT_BASE = 5;
     /**
      * The minimum amount of time (in nanoseconds) until a request can be forgotten
-     * @see RequestService#shouldForgetRequest
+     * @see server.services.RequestService#shouldForgetRequest
      */
     public static final long MIN_REQUEST_FORGET_TIME = Utils.toNanos(10, TimeUnit.MINUTES);
     /**
      * The maximum amount of computer generated requests until a timeout occurs
-     * @see RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
+     * @see server.services.RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
      */
     public static final int AUTO_REQUESTS_TE = 500;
     /**
      * The maximum amount of standard requests until a timeout occurs
-     * @see RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
+     * @see server.services.RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
      */
     public static final int USER_NORM_REQUESTS_TE = 100;
     /**
      * The maximum amount of special (ex. logins) requests until a timeout occurs
-     * @see RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
+     * @see server.services.RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
      */
     public static final int USER_SPEC_REQUESTS_TE = 5;
     /**
      * The maximum amount of one time (ex. password change) requests until a timeout occurs
-     * @see RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
+     * @see server.services.RequestService#request(common.networking.ssl.SSLConnection, java.lang.String, int) 
      */
     public static final int USER_ONET_REQUESTS_TE = 1;
     
     //USER
+    /**
+     * The max length for a username
+     */
     public static final int USERNAME_MAX_LENGTH = 20;
     /**
-     * A user readable string of characters forbidden in userIds
+     * A user readable string of characters forbidden in usernames
      */
     public static final String USERNAME_FORBIDDEN_CHARACTERS = "<>:'/\\|?*[]^$.+-(){}";
     /**
-     * A pattern string of characters forbidden in userIds
+     * A pattern string of characters forbidden in usernames
      * @see java.util.regex.Pattern
      */
     public static final String USERNAME_FORBIDDEN_CHARACTERS_REGEX = "[\\Q<>:'/\\|?*[]^$.+-(){}\\E]+";

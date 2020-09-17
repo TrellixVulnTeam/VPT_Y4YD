@@ -3,13 +3,9 @@ package common.networking.ssl;
 import common.Constants;
 import common.Utils;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.util.stream.Stream;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -47,6 +43,8 @@ public final class SSLConfig {
      * @param trustStore the {@link KeyStore} to verify trusted certificates
      * @throws KeyManagementException if the SSLContext cannot be initialized
      * @throws KeyStoreException if there is an error reading the trustStore
+     * @see SSLConfig#initServer(java.security.KeyStore, char[], java.lang.String) 
+     * @see SSLConfig#initBoth(java.security.KeyStore, char[], java.lang.String, java.security.KeyStore) 
      * @see SSLContext#init(javax.net.ssl.KeyManager[], javax.net.ssl.TrustManager[], java.security.SecureRandom) 
      */
     public static void initClient(KeyStore trustStore) throws KeyManagementException, KeyStoreException {
@@ -55,11 +53,13 @@ public final class SSLConfig {
     }
     
     /**
-     * 
+     * Initializes the {@link SSLContext} for server use
      * @param keyStore a {@link KeyStore} containing the key to use when creating SSL connections
      * @param password the password for the key
      * @param keyAlias the alias of the key
      * @throws KeyManagementException if the SSLContext cannot be initialized
+     * @see SSLConfig#initClient(java.security.KeyStore) 
+     * @see SSLConfig#initBoth(java.security.KeyStore, char[], java.lang.String, java.security.KeyStore) 
      * @see SSLContext#init(javax.net.ssl.KeyManager[], javax.net.ssl.TrustManager[], java.security.SecureRandom) 
      */
     public static void initServer(KeyStore keyStore, char[] password, String keyAlias) throws KeyManagementException {
@@ -67,6 +67,18 @@ public final class SSLConfig {
         init();
     }
     
+    /**
+     * Initializes the {@link SSLContext} for both client and server use
+     * @param keyStore a {@link KeyStore} containing the key to use when creating SSL connections
+     * @param password the password for the key
+     * @param keyAlias the alias of the key
+     * @param trustStore the {@link KeyStore} to verify trusted certificates
+     * @throws KeyManagementException if the SSLContext cannot be initialized
+     * @throws KeyStoreException if there is an error reading the trustStore
+     * @see SSLConfig#initClient(java.security.KeyStore) 
+     * @see SSLConfig#initServer(java.security.KeyStore, char[], java.lang.String) 
+     * @see SSLContext#init(javax.net.ssl.KeyManager[], javax.net.ssl.TrustManager[], java.security.SecureRandom) 
+     */
     public static void initBoth(KeyStore keyStore, char[] password, String keyAlias, KeyStore trustStore) throws KeyManagementException, KeyStoreException {
         context.init(new KeyManager[] {new SSLKeyManager(keyStore, password, keyAlias)}, new TrustManager[] {new SSLTrustManager(trustStore)}, null);
         init();
