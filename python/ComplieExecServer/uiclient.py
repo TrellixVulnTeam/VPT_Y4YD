@@ -14,8 +14,9 @@ class SocketThread(threading.Thread):
 	def stop(self):
 		self._stop.set()
 
+
 class CLAppWin(QMainWindow):
-	def __init__(self, clientsocketTF, isusersys):
+	def __init__(self, clientsocketTF, isusersys, ctt):
 		super().__init__()
 
 		self.comm = Queue()
@@ -25,6 +26,8 @@ class CLAppWin(QMainWindow):
 		self.lock = threading.Lock()
 		self.lock.acquire()
 		self.threadlock = threading.Lock()
+		self.ctt = ctt
+		self.texchangec = 0
 
 		self.setWindowTitle("GUI Client - ServerEnigne Systems")
 		self.width = 640
@@ -53,6 +56,13 @@ class CLAppWin(QMainWindow):
 		self.ConnectButton.clicked.connect(self.SSocketThread)
 		self.ConnectButton.resize(200, 32)
 		self.ConnectButton.move(10, 150)
+		self.ConnectButton.setStyleSheet("QPushButton""{""background-color : lightgreen;""}")
+
+		self.DisconnectButton = QPushButton("Disconnect", self)
+		self.DisconnectButton.clicked.connect(self.DFSocketThread)
+		self.DisconnectButton.resize(200, 32)
+		self.DisconnectButton.move(10, 190)
+		self.DisconnectButton.setStyleSheet("QPushButton""{""background-color : lightblue;""}")
 
 		self.SocketRecvOutB = QListWidget(self)
 		self.SocketRecvOutB.move(245, 5)
@@ -85,6 +95,18 @@ class CLAppWin(QMainWindow):
 
 	def Get(self):
 		return self
+
+	def DFSocketThread(self):
+		if self.CCSocketThread != None:
+			if self.CCSocketThread.is_alive():
+				self.SocketRecvOutB.addItem(QListWidgetItem("Disconnected from server"))
+				self.CCSocketThread.stop()
+				self.CCSocketThread = None
+
+			else:
+				self.SocketRecvOutB.addItem(QListWidgetItem("Can't Disconnected from a server that isn't connected to"))
+		else:
+			self.SocketRecvOutB.addItem(QListWidgetItem("Can't Disconnected from a server that isn't connected to"))
 
 	def SendDTS(self):
 		if self.CCSocketThread != None:
@@ -124,13 +146,15 @@ class CLAppWin(QMainWindow):
 
 	def StartNSocketThread(self, host, port):
 		self.resetlocks()
-		self.CCSocketThread = SocketThread(target= self.clientsocketTF, args=(host, port, self.comm, self.isusersys, self.lock, self.threadlock, ))
+		self.texchangec = 0
+		self.CCSocketThread = SocketThread(target= self.clientsocketTF, args=(host, port, self.comm, self.isusersys, self.lock, self.threadlock, self.ctt, ))
 		self.CCSocketThread.daemon = True
 		self.CCSocketThread.start()
 
 	def GetResultFromSocketThread(self):
 		RD = self.comm.get()
 		self.comm.task_done()
+		self.texchangec += 1
 		for x in range(len(RD)):
 			self.SocketRecvOutB.addItem(QListWidgetItem(RD[x]))
 
@@ -142,13 +166,37 @@ class CLAppWin(QMainWindow):
 #get
 #send
 
+class CSTT:
+	def __init__(self):
+		pass
+
+	def Get(self):
+		return self
+
+	def GSD(self, process, lock, thislock, in_queue, args):
+		data = None
+		with lock:
+			data = in_queue.get()
+			SD = process(data, args)
+			in_queue.put(SD)
+
+		thislock.release()
+
+		while lock.locked() == False:
+			pass
+
+		thislock.acquire()
+
+		return data
+
 #socket with while loop
-def SocketClientThread(host, port, in_queue, isusersys, lock, thislock):
+def SocketClientThread(host, port, in_queue, isusersys, lock, thislock, ctt):
 	
 	#always first segment of code
 	thislock.acquire()
 	isrunning = True
 	username = None
+	password = None
 	#always first segment of code
 
 	#connect to server
@@ -159,28 +207,29 @@ def SocketClientThread(host, port, in_queue, isusersys, lock, thislock):
 		#result to send back to server you always need a result
 		SD = []
 		SD.append("server> You have connected to server")
-		SD.append("server> Please Input username and password")
+		SD.append("server> Please Input your username")
 		in_queue.put(SD)
 
 		#get username and password from main thread
-		with lock:
-			username = in_queue.get()
+
+		def GUProcess(data, args):
 			SMSG = []
-			SMSG.append("server> Successfully registerd user: " + str(username))
-			in_queue.put(SMSG)
+			SMSG.append("server> Successfully registerd user: " + str(data))
+			SMSG.append("server> Please Input your password")
+			return SMSG
 
-		thislock.release()
+		username = ctt.GSD(GUProcess, lock, thislock, in_queue, {})
 
-		while lock.locked() == False:
-			pass
+		#get password and send username and password
+		def GPASUPProcess(data, args):
+			#send data to server
 
-		thislock.acquire()
+			SMSG = []
+			SMSG.append("server> Successfully registerd password: " + str(data))
+			return SMSG
 
-		print(username)
+		password = ctt.GSD(GPASUPProcess, lock, thislock, in_queue, {})
 
-		#send username and password to server
-
-		#send username and password to server
 
 		pass
 
@@ -189,26 +238,13 @@ def SocketClientThread(host, port, in_queue, isusersys, lock, thislock):
 		SD.append("server> You have connected to server")
 		in_queue.put(SD)
 
+	def lP(data, username):
+		SD = []
+		SD.append(str(username) + "> " + str(data)) 
+		return SD
 
 	while isrunning:
-		data = None
-		with lock:
-			data = in_queue.get()
-			DTSB = []
-			#get server data
-
-			#get server data
-
-			#tmp print out until conn works
-			DTSB.append("server> " + str(username) + " sent " + str(data))
-			in_queue.put(DTSB)
-
-		thislock.release()
-
-		while lock.locked() == False:
-			pass
-
-		thislock.acquire()
+		ctt.GSD(lP, lock, thislock, in_queue, username)
 		pass
 
 
@@ -217,7 +253,9 @@ def SocketClientThread(host, port, in_queue, isusersys, lock, thislock):
 def ApplicationMThread():
 	app = QApplication([])
 
-	appwin = CLAppWin(SocketClientThread, True)
+	clientsockettools = CSTT()
+
+	appwin = CLAppWin(SocketClientThread, True, clientsockettools)
 
 	app.exec_()
 
