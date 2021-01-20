@@ -5,3 +5,5 @@ knowledge. We do not dispute the validity of more traditional assessments
 such as the AP test. However, we find these to be too focused on theory
 and too abstract in their problems. (We think that they abstract away
 the important complexity behind them).
+
+Note: For the foreseeable future, development of this project is on hold, and this repository is archived.
